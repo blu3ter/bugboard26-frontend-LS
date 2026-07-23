@@ -1,75 +1,36 @@
-# React + TypeScript + Vite
+# BugBoard26 - Frontend 🐛
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 📖 Descrizione del Progetto
+BugBoard26 è una piattaforma per la gestione collaborativa di issue,domande o bug. Il sistema consente a team di sviluppo di segnalare problemi relativi a un progetto, monitorarne lo stato, assegnarli a membri del team e tenere traccia delle attività di risoluzione.
 
-Currently, two official plugins are available:
+Questo repository contiene il **Front-end** dell'applicazione, progettato per comunicare esclusivamente tramite API REST con un Back-end indipendente.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 👥 Chi Siamo
+* **Luigi De Falchi** -.
+* **Simone Catenaccio** -
+Entrambi studenti dell'Università degli Studi di Napoli Federico II.
 
-## React Compiler
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## ✨ Funzionalità Implementate
+In conformità con le specifiche del progetto, questo applicativo implementa le seguenti funzionalità:
+* **Autenticazione Sicura (Req. 1):** Sistema di autenticazione semplice e sicuro basato su email e password[cite: 1]. Include la gestione di account standard e di account amministratore, essenziali per preservare l'integrità delle informazioni aziendali[cite: 1].
+* **Gestione Segnalazioni (Req. 2):** Gli utenti autenticati possono creare issue specificando titolo, descrizione e opzionalmente priorità e immagini[cite: 1]. Le tipologie supportate sono *question*, *bug*, *documentation* e *feature*, e vengono inizializzate nello stato "todo"[cite: 1].
+* **Visualizzazione e Filtri (Req. 3):** È presente una vista riepilogativa delle issue che offre la possibilità di filtrare o ordinare i risultati in base a tipologia, stato e priorità[cite: 1].
+* **Sistema di Commenti (Req. 5):** Sezione dedicata associata a ciascun bug dove tutti gli utenti possono scambiarsi messaggi, fornire aggiornamenti o chiedere chiarimenti[cite: 1].
+* **Etichette Personalizzate (Req. 10):** Il sistema permette di associare un numero variabile di etichette personalizzabili (come ad esempio "frontend", "urgente" o "sicurezza") ai singoli bug[cite: 1].
 
-## Expanding the ESLint configuration
+## 🛠️ Stack Tecnologico
+* **Front-end:** React, TypeScript, Vite
+* **Back-end:** Java, SpringBoot (Gestito in un repository separato).
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🚀 Come avviare il progetto localmente
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+1) Assicurati di avere [Node.js](https://nodejs.org/en/download) installato sul tuo computer.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
+2) Installa le dipendenze (bash):
+    npm install
+3) Avvia il progetto (bash):
+    npm run dev
+4) Apri l'applicazione :
+   Visita http://localhost:5173 nel tuo browser. 
+   **Nota: Assicurati che il Back-end SpringBoot sia in esecuzione parallela affinché le API REST rispondano correttamente per il login e il caricamento dei dati.**
