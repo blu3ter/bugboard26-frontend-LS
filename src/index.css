@@ -33,10 +33,12 @@ body {
   background-color: var(--bauhaus-yellow);
   color: var(--text-main);
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   transition: background-color 0.3s ease;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
 }
 
 @media (prefers-color-scheme: dark) {
