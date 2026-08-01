@@ -13,11 +13,11 @@ Entrambi studenti dell'Università degli Studi di Napoli Federico II.
 
 ## ✨ Funzionalità Implementate
 In conformità con le specifiche del progetto, questo applicativo implementa le seguenti funzionalità:
-* **Autenticazione Sicura (Req. 1):** Sistema di autenticazione semplice e sicuro basato su email e password[cite: 1]. Include la gestione di account standard e di account amministratore, essenziali per preservare l'integrità delle informazioni aziendali[cite: 1].
-* **Gestione Segnalazioni (Req. 2):** Gli utenti autenticati possono creare issue specificando titolo, descrizione e opzionalmente priorità e immagini[cite: 1]. Le tipologie supportate sono *question*, *bug*, *documentation* e *feature*, e vengono inizializzate nello stato "todo"[cite: 1].
-* **Visualizzazione e Filtri (Req. 3):** È presente una vista riepilogativa delle issue che offre la possibilità di filtrare o ordinare i risultati in base a tipologia, stato e priorità[cite: 1].
-* **Sistema di Commenti (Req. 5):** Sezione dedicata associata a ciascun bug dove tutti gli utenti possono scambiarsi messaggi, fornire aggiornamenti o chiedere chiarimenti[cite: 1].
-* **Etichette Personalizzate (Req. 10):** Il sistema permette di associare un numero variabile di etichette personalizzabili (come ad esempio "frontend", "urgente" o "sicurezza") ai singoli bug[cite: 1].
+* **Autenticazione Sicura (Req. 1):** Sistema di autenticazione semplice e sicuro basato su email e password. Include la gestione di account standard e di account amministratore, essenziali per preservare l'integrità delle informazioni aziendali.
+* **Gestione Segnalazioni (Req. 2):** Gli utenti autenticati possono creare issue specificando titolo, descrizione e opzionalmente priorità e immagini. Le tipologie supportate sono *question*, *bug*, *documentation* e *feature*, e vengono inizializzate nello stato "todo".
+* **Visualizzazione e Filtri (Req. 3):** È presente una vista riepilogativa delle issue che offre la possibilità di filtrare o ordinare i risultati in base a tipologia, stato e priorità.
+* **Sistema di Commenti (Req. 5):** Sezione dedicata associata a ciascun bug dove tutti gli utenti possono scambiarsi messaggi, fornire aggiornamenti o chiedere chiarimenti.
+* **Etichette Personalizzate (Req. 10):** Il sistema permette di associare un numero variabile di etichette personalizzabili (come ad esempio "frontend", "urgente" o "sicurezza") ai singoli bug.
 
 ## 🛠️ Stack Tecnologico
 * **Front-end:** React, TypeScript, Vite
