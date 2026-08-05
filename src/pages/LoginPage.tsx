@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { LoginRequestDto } from '../types';
 import './LoginPage.css';
 
 export const LoginPage: React.FC = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<LoginRequestDto>({
     email: '',
     password: '',
@@ -17,16 +19,49 @@ export const LoginPage: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  /*in questo metodo si raggruppano gli attributi email e password in una variabile "formdata"
+  e di inviarla al server tramite una request post all'indirizzo specificato, ovviamwente in formato JSON*/
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // Simulazione del login per mostrare l'effetto interattivo al frontend
-    console.log('Tentativo di login con DTO:', formData);
-    setTimeout(() => {
-      alert(`Login effettuato per: ${formData.email}`);
+
+    try {
+      const response = await fetch('http://localhost:8080/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (!response.ok) {
+        // Se il backend risponde con 401, stampiamo il messaggio
+        const errorText = await response.text();
+        throw new Error(errorText || 'Email o password non corretti');
+      }
+
+      const data = await response.json(); // Il LoginResponseDto
+
+      // Salva il token in sessionStorage
+      sessionStorage.setItem('bugboard_token', data.token);
+
+      // Salva i dati utente se servono all'interfaccia (opzionale)
+      sessionStorage.setItem('bugboard_user', JSON.stringify({
+        email: data.email,
+        name: data.name,
+        role: data.role
+      }));
+
+      alert(`Benvenuto ${data.name || data.email}!`);
+
+      // Reindirizza l'utente alla schermata con le issues
+      navigate('/dashboard/my-issues');
+
+    } catch (error: any) {
+      alert(error.message || 'Errore di connessione al server');
+    } finally {
       setIsSubmitting(false);
-    }, 800);
+    }
   };
 
   return (
@@ -102,14 +137,14 @@ export const LoginPage: React.FC = () => {
             <div className="bg-black rounded-bl-full"></div>
             <div className="bg-blue rounded-bl-full"></div>
             <div className="bg-yellow rounded-tr-full"></div>
-            
+
             <div className="stripes-container">
               <div className="stripe"></div>
               <div className="stripe"></div>
               <div className="stripe"></div>
               <div className="stripe"></div>
             </div>
-            
+
             <div className="bg-red rounded-tl-full"></div>
             <div className="bg-black rounded-br-full"></div>
             <div className="bg-yellow rounded-bl-full"></div>
