@@ -9,18 +9,18 @@ export const UsersManagementView: React.FC = () => {
   return (
     <div className="admin-users-view">
       <div className="admin-form-container">
-        
+
         {/* Visual Panel */}
         <section className="visual-panel">
           <div className="visual-decoration-top"></div>
           <div className="visual-decoration-bottom"></div>
-          
+
           <div className="visual-content">
             <div className="visual-logo">B</div>
             <h2 className="visual-title">Create a new member to BugBoard26 community.</h2>
             <p className="visual-subtitle">Start managing your software issues with the most efficient Material Design workflow.</p>
           </div>
-          
+
           <div className="visual-footer">
             <p className="visual-footer-text">Everything starts with a report.</p>
           </div>
@@ -37,48 +37,48 @@ export const UsersManagementView: React.FC = () => {
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label" htmlFor="nome">Name</label>
-                <input 
-                  className="form-input" 
-                  id="nome" 
-                  name="nome" 
-                  placeholder="John" 
-                  required 
-                  type="text" 
+                <input
+                  className="form-input"
+                  id="nome"
+                  name="nome"
+                  placeholder="John"
+                  required
+                  type="text"
                 />
               </div>
               <div className="form-group">
                 <label className="form-label" htmlFor="cognome">Surname</label>
-                <input 
-                  className="form-input" 
-                  id="cognome" 
-                  name="cognome" 
-                  placeholder="Doe" 
-                  required 
-                  type="text" 
+                <input
+                  className="form-input"
+                  id="cognome"
+                  name="cognome"
+                  placeholder="Doe"
+                  required
+                  type="text"
                 />
               </div>
             </div>
 
             <div className="form-group">
               <label className="form-label" htmlFor="email">Email</label>
-              <input 
-                className="form-input" 
-                id="email" 
-                name="email" 
-                placeholder="john.doe@example.com" 
-                required 
-                type="email" 
+              <input
+                className="form-input"
+                id="email"
+                name="email"
+                placeholder="john.doe@example.com"
+                required
+                type="email"
               />
             </div>
 
             <div className="form-group">
               <label className="form-label" htmlFor="password">Password</label>
-              <input 
-                className="form-input" 
-                id="password" 
-                name="password" 
-                required 
-                type="password" 
+              <input
+                className="form-input"
+                id="password"
+                name="password"
+                required
+                type="password"
               />
             </div>
 
@@ -86,19 +86,19 @@ export const UsersManagementView: React.FC = () => {
               <span className="form-label" style={{ marginBottom: '12px' }}>Select type:</span>
               <div className="profile-selector-container">
                 <label className="profile-option">
-                  <input 
-                    name="profile_type" 
-                    type="radio" 
-                    value="user" 
+                  <input
+                    name="profile_type"
+                    type="radio"
+                    value="user"
                     checked={profileType === 'user'}
                     onChange={() => setProfileType('user')}
                   />
                   <div className="profile-button">User</div>
                 </label>
                 <label className="profile-option">
-                  <input 
-                    name="profile_type" 
-                    type="radio" 
+                  <input
+                    name="profile_type"
+                    type="radio"
                     value="admin"
                     checked={profileType === 'admin'}
                     onChange={() => setProfileType('admin')}
