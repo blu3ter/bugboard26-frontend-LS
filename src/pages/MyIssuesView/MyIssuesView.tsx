@@ -1,5 +1,5 @@
 import React from 'react';
-import './AllIssuesView.css';
+import '../AllIssuesView/AllIssuesView.css';
 
 export const MyIssuesView: React.FC = () => {
   return (
