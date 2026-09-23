@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { LoginRequestDto } from '../types';
+import type { LoginRequestDto } from '../../types';
 import './LoginPage.css';
 
 export const LoginPage: React.FC = () => {
