@@ -295,11 +295,12 @@
   font-weight: 700;
   font-size: 1.05rem;
   letter-spacing: 0.5px;
-  opacity: 0.88;
+  opacity: 0.92;
   white-space: nowrap;
   user-select: none;
   pointer-events: none;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 @keyframes float-tag {
@@ -330,96 +331,83 @@
   }
 }
 
-/* Tag Colors */
+/* Tag Colors - Palette Bauhaus BugBoard26: colori pieni, definiti e coerenti */
 .tag-backend,
 .tag-backend-2 {
-  background-color: #ffe4e6;
-  color: #e11d48;
+  background-color: #1e3a8a; /* Deep Bauhaus Navy */
+  color: #ffffff;
 }
 
 .tag-frontend,
 .tag-frontend-2 {
-  background-color: #e0e7ff;
-  color: #4f46e5;
+  background-color: #00539f; /* Bauhaus Royal Blue */
+  color: #ffffff;
 }
 
 .tag-bug,
 .tag-bug-2 {
-  background-color: #fef3c7;
-  color: #d97706;
+  background-color: #b91c1c; /* Bauhaus Deep Red */
+  color: #ffffff;
 }
 
-.tag-question {
-  background-color: #f3e8ff;
-  color: #9333ea;
+.tag-dangerous,
+.tag-urgent,
+.tag-hotfix {
+  background-color: #dd1f25; /* Vivid Bauhaus Red */
+  color: #ffffff;
+}
+
+.tag-meeting {
+  background-color: #ffb800; /* Bauhaus Golden Yellow */
+  color: #1c1917;
+}
+
+.tag-open {
+  background-color: #ea580c; /* Bauhaus Orange */
+  color: #ffffff;
+}
+
+.tag-chill {
+  background-color: #d97706; /* Bauhaus Amber / Ochre */
+  color: #ffffff;
+}
+
+.tag-in-progress {
+  background-color: #0284c7; /* Bauhaus Cerulean Blue */
+  color: #ffffff;
+}
+
+.tag-devops {
+  background-color: #0369a1; /* Bauhaus Cobalt Blue */
+  color: #ffffff;
 }
 
 .tag-fast,
 .tag-fast-2 {
-  background-color: #ccfbf1;
-  color: #0f766e;
+  background-color: #0f766e; /* Bauhaus Deep Teal */
+  color: #ffffff;
 }
 
 .tag-feature,
 .tag-feature-2 {
-  background-color: #dcfce7;
-  color: #15803d;
+  background-color: #15803d; /* Bauhaus Forest Green */
+  color: #ffffff;
 }
 
-.tag-chill {
-  background-color: #e0f2fe;
-  color: #0369a1;
-}
-
-.tag-dangerous,
-.tag-urgent {
-  background-color: #fee2e2;
-  color: #b91c1c;
-}
-
-/* Red */
-.tag-open {
-  background-color: #ffedd5;
-  color: #c2410c;
-}
-
-/* Orange */
-.tag-in-progress {
-  background-color: #dbeafe;
-  color: #1d4ed8;
-}
-
-/* Blue */
-.tag-closed {
-  background-color: #f3f4f6;
-  color: #374151;
-}
-
-/* Gray */
 .tag-uiux {
-  background-color: #fce7f3;
-  color: #be185d;
+  background-color: #be123c; /* Bauhaus Carmine / Crimson */
+  color: #ffffff;
 }
 
-/* Pink */
-.tag-devops {
-  background-color: #cffafe;
-  color: #0e7490;
+.tag-question {
+  background-color: #6d28d9; /* Bauhaus Violet */
+  color: #ffffff;
 }
 
-/* Cyan */
-.tag-meeting {
-  background-color: #fef08a;
-  color: #a16207;
+.tag-closed {
+  background-color: #334155; /* Bauhaus Slate Charcoal */
+  color: #ffffff;
 }
-
-/* Yellow */
-.tag-hotfix {
-  background-color: #fecaca;
-  color: #dc2626;
-}
-
-/* Light Red */
 
 /* Tag positions (staggered grid with guaranteed no overlaps) */
 /* Left Side - Outer Column */
