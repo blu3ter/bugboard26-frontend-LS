@@ -6,7 +6,9 @@
   justify-content: center;
   padding: 1.5rem;
   background: radial-gradient(circle at 10% 20%, rgba(0, 83, 159, 0.15) 0%, transparent 40%),
-              radial-gradient(circle at 90% 80%, rgba(221, 31, 37, 0.1) 0%, transparent 40%);
+    radial-gradient(circle at 90% 80%, rgba(221, 31, 37, 0.1) 0%, transparent 40%);
+  position: relative;
+  overflow: hidden;
 }
 
 .login-card {
@@ -19,6 +21,8 @@
   display: flex;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 10;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -72,19 +76,26 @@
 }
 
 .login-title {
-  font-size: 2.25rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.2;
-  color: var(--text-main);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60px;
+  overflow: hidden;
   margin-bottom: 0.75rem;
-  text-align: center;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 40px) {
   .login-title {
-    font-size: 2.5rem;
+    justify-content: flex-start;
   }
+}
+
+.login-title-img {
+  width: 360px;
+  max-width: none;
+  height: auto;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 @media (min-width: 1024px) {
@@ -182,77 +193,378 @@
     background: linear-gradient(135deg, #00539f 0%, #3b82f6 100%);
     box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4);
   }
+
   .submit-btn:hover {
     box-shadow: 0 15px 25px -5px rgba(59, 130, 246, 0.55);
   }
 }
 
-/* Colonna Destra: Bauhaus Geometric Art */
-.bauhaus-art-section {
+/* Colonna Destra: Sezione Logo BB26 Hero */
+.login-hero-section {
   display: none;
   width: 50%;
   position: relative;
   overflow: hidden;
-  background-color: #f8fafc;
-  border-left: 1px solid rgba(0, 0, 0, 0.05);
+  background: linear-gradient(145deg, #f8fafc 0%, #edf2f7 100%);
+  border-left: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 @media (min-width: 1024px) {
-  .bauhaus-art-section {
-    display: block;
+  .login-hero-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
   }
 }
 
 @media (prefers-color-scheme: dark) {
-  .bauhaus-art-section {
-    background-color: #0b0f19;
-    border-left: 1px solid rgba(255, 255, 255, 0.05);
+  .login-hero-section {
+    background: linear-gradient(145deg, #0b0f19 0%, #162032 100%);
+    border-left: 1px solid rgba(255, 255, 255, 0.06);
   }
 }
 
-.bauhaus-grid {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(4, 1fr);
-}
-
-.bg-red { background-color: var(--bauhaus-red); }
-.bg-black { background-color: var(--bauhaus-black); }
-.bg-blue { background-color: var(--bauhaus-blue); }
-.bg-yellow { background-color: var(--bauhaus-yellow); }
-
-.rounded-br-full { border-bottom-right-radius: 100%; }
-.rounded-bl-full { border-bottom-left-radius: 100%; }
-.rounded-tr-full { border-top-right-radius: 100%; }
-.rounded-tl-full { border-top-left-radius: 100%; }
-
-.stripes-container {
+.login-hero-content {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  padding: 1.5rem;
-  gap: 0.6rem;
-  background-color: #ffffff;
+  justify-content: center;
+  width: 100%;
+  max-width: 650px;
+  animation: logoFadeIn 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.login-hero-logo {
+  width: 100%;
+  max-width: 480px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 14px 28px rgba(0, 72, 141, 0.15));
+  transition: transform 0.35s ease, filter 0.35s ease;
+  margin-bottom: 1.5rem;
+}
+
+.login-hero-logo:hover {
+  transform: translateY(-4px) scale(1.02);
+  filter: drop-shadow(0 18px 36px rgba(0, 72, 141, 0.22));
+}
+
+.login-hero-tagline {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #ffffff;
+  text-align: center;
+  max-width: 460px;
+  padding: 0 1.25rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
 @media (prefers-color-scheme: dark) {
-  .stripes-container {
-    background-color: #1e293b;
+  .login-hero-tagline {
+    color: #ffffff;
   }
 }
 
-.stripe {
-  width: 100%;
-  height: 0.35rem;
-  background-color: var(--bauhaus-black);
-  border-radius: 2px;
+@keyframes logoFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-@media (prefers-color-scheme: dark) {
-  .stripe {
-    background-color: #ffffff;
+/* Floating Tags Background */
+.floating-tags-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.floating-tag {
+  position: absolute;
+  padding: 0.55rem 1.35rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.5px;
+  opacity: 0.88;
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+@keyframes float-tag {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-15px) rotate(2.5deg);
+  }
+
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+}
+
+@keyframes float-tag-alt {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(15px) rotate(-2.5deg);
+  }
+
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+}
+
+/* Tag Colors */
+.tag-backend,
+.tag-backend-2 {
+  background-color: #ffe4e6;
+  color: #e11d48;
+}
+
+.tag-frontend,
+.tag-frontend-2 {
+  background-color: #e0e7ff;
+  color: #4f46e5;
+}
+
+.tag-bug,
+.tag-bug-2 {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.tag-question {
+  background-color: #f3e8ff;
+  color: #9333ea;
+}
+
+.tag-fast,
+.tag-fast-2 {
+  background-color: #ccfbf1;
+  color: #0f766e;
+}
+
+.tag-feature,
+.tag-feature-2 {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.tag-chill {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
+
+.tag-dangerous,
+.tag-urgent {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+/* Red */
+.tag-open {
+  background-color: #ffedd5;
+  color: #c2410c;
+}
+
+/* Orange */
+.tag-in-progress {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
+
+/* Blue */
+.tag-closed {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+/* Gray */
+.tag-uiux {
+  background-color: #fce7f3;
+  color: #be185d;
+}
+
+/* Pink */
+.tag-devops {
+  background-color: #cffafe;
+  color: #0e7490;
+}
+
+/* Cyan */
+.tag-meeting {
+  background-color: #fef08a;
+  color: #a16207;
+}
+
+/* Yellow */
+.tag-hotfix {
+  background-color: #fecaca;
+  color: #dc2626;
+}
+
+/* Light Red */
+
+/* Tag positions (staggered grid with guaranteed no overlaps) */
+/* Left Side - Outer Column */
+.tag-backend {
+  top: 6%;
+  left: 3%;
+  animation: float-tag 14s ease-in-out infinite;
+}
+
+.tag-urgent {
+  top: 28%;
+  left: 2.5%;
+  animation: float-tag-alt 16s ease-in-out -4s infinite;
+}
+
+.tag-fast {
+  top: 50%;
+  left: 2.5%;
+  animation: float-tag 18s ease-in-out -2s infinite;
+}
+
+.tag-frontend {
+  top: 72%;
+  left: 3%;
+  animation: float-tag-alt 15s ease-in-out -6s infinite;
+}
+
+.tag-devops {
+  top: 91%;
+  left: 4%;
+  animation: float-tag 20s ease-in-out -3s infinite;
+}
+
+/* Left Side - Inner Column (staggered) */
+.tag-open {
+  top: 17%;
+  left: 15%;
+  animation: float-tag-alt 17s ease-in-out -5s infinite;
+}
+
+.tag-meeting {
+  top: 39%;
+  left: 16%;
+  animation: float-tag 19s ease-in-out -1s infinite;
+}
+
+.tag-uiux {
+  top: 61%;
+  left: 15%;
+  animation: float-tag-alt 21s ease-in-out -7s infinite;
+}
+
+.tag-feature-2 {
+  top: 82%;
+  left: 16%;
+  animation: float-tag 18s ease-in-out -9s infinite;
+}
+
+/* Top Edge */
+.tag-dangerous {
+  top: 4%;
+  left: 36%;
+  animation: float-tag 16s ease-in-out -8s infinite;
+}
+
+.tag-closed {
+  top: 4%;
+  right: 35%;
+  animation: float-tag-alt 22s ease-in-out -2s infinite;
+}
+
+/* Bottom Edge */
+.tag-chill {
+  bottom: 4%;
+  left: 35%;
+  animation: float-tag-alt 20s ease-in-out -4s infinite;
+}
+
+.tag-bug-2 {
+  bottom: 4%;
+  right: 36%;
+  animation: float-tag 18s ease-in-out -10s infinite;
+}
+
+/* Right Side - Inner Column (staggered) */
+.tag-frontend-2 {
+  top: 16%;
+  right: 15%;
+  animation: float-tag 19s ease-in-out -3s infinite;
+}
+
+.tag-question {
+  top: 38%;
+  right: 16%;
+  animation: float-tag-alt 17s ease-in-out -6s infinite;
+}
+
+.tag-in-progress {
+  top: 60%;
+  right: 15%;
+  animation: float-tag 21s ease-in-out -2s infinite;
+}
+
+.tag-fast-2 {
+  top: 82%;
+  right: 16%;
+  animation-duration: 18s;
+  animation: float-tag-alt 18s ease-in-out -8s infinite;
+}
+
+/* Right Side - Outer Column */
+.tag-hotfix {
+  top: 6%;
+  right: 3%;
+  animation: float-tag-alt 15s ease-in-out -1s infinite;
+}
+
+.tag-bug {
+  top: 27%;
+  right: 2.5%;
+  animation: float-tag 17s ease-in-out -5s infinite;
+}
+
+.tag-feature {
+  top: 49%;
+  right: 3%;
+  animation: float-tag-alt 20s ease-in-out -9s infinite;
+}
+
+.tag-backend-2 {
+  top: 71%;
+  right: 2.5%;
+  animation: float-tag 16s ease-in-out -4s infinite;
+}
+
+@media (max-width: 900px) {
+
+  .tag-frontend-2,
+  .tag-backend-2,
+  .tag-feature-2,
+  .tag-fast-2,
+  .tag-bug-2,
+  .tag-meeting,
+  .tag-uiux,
+  .tag-urgent {
+    display: none;
   }
 }
