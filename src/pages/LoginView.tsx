@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { LoginRequestDto } from '../types';
+import { authService } from '../service/authService';
+import { formatWelcomeMessage } from '../controller/authController';
 import logoImg from '../assets/logobb26.png';
 import titleImg from '../assets/title BugBoard26.png';
-import './LoginPage.css';
+import './LoginView.css';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -21,44 +23,25 @@ export const LoginPage: React.FC = () => {
     }));
   };
 
-  /*in questo metodo si raggruppano gli attributi email e password in una variabile "formdata"
-  e di inviarla al server tramite una request post all'indirizzo specificato, ovviamwente in formato JSON*/
+  /**
+   * Presentation Layer:
+   * Gestisce l'interazione con l'utente (submit del form),
+   * delegando l'orchestrazione del workflow al Service Layer e
+   * la logica di business/presentazione al Controller Layer.
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('http://localhost:8080/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
-      });
+      // Service Layer: convalida le regole di business, esegue la chiamata API e memorizza la sessione
+      const user = await authService.executeLoginWorkflow(formData);
 
-      if (!response.ok) {
-        // Se il backend risponde con 401, stampiamo il messaggio
-        const errorText = await response.text();
-        throw new Error(errorText || 'Email o password non corretti');
-      }
-
-      const data = await response.json(); // Il LoginResponseDto
-
-      // Salva il token in sessionStorage
-      sessionStorage.setItem('bugboard_token', data.token);
-
-      // Salva i dati utente se servono all'interfaccia (opzionale)
-      sessionStorage.setItem('bugboard_user', JSON.stringify({
-        email: data.email,
-        name: data.name,
-        role: data.role
-      }));
-
-      alert(`Benvenuto ${data.name || data.email}!`);
+      // Controller Layer: formatta il messaggio secondo le regole di dominio
+      alert(formatWelcomeMessage(user));
 
       // Reindirizza l'utente alla schermata con le issues
       navigate('/dashboard/my-issues');
-
     } catch (error: any) {
       alert(error.message || 'Errore di connessione al server');
     } finally {
