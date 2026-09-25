@@ -1,10 +1,10 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { LoginPage } from './pages/LoginView';
+import { LoginPage } from './pages/LoginView/LoginView';
 import { DashboardLayout } from './components/DashboardLayout';
-import { AllIssuesView } from './pages/AllIssuesView';
-import { MyIssuesView } from './pages/MyIssuesView';
-import { UsersManagementView } from './pages/UsersManagementView';
-import { CreateIssueView } from './pages/CreateIssueView';
+import { AllIssuesView } from './pages/AllIssuesView/AllIssuesView';
+import { MyIssuesView } from './pages/MyIssuesView/MyIssuesView';
+import { UsersManagementView } from './pages/UsersManagementView/UsersManagementView';
+import { CreateIssueView } from './pages/CreateIssueView/CreateIssueView';
 import './App.css';
 
 function App() {

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { LoginRequestDto } from '../types';
-import { authService } from '../service/authService';
-import { formatWelcomeMessage } from '../controller/authController';
-import logoImg from '../assets/logobb26.png';
-import titleImg from '../assets/title BugBoard26.png';
+import type { LoginRequestDto } from '../../types';
+import { authService } from '../../service/authService';
+import { formatWelcomeMessage } from '../../controller/authController';
+import logoImg from '../../assets/logobb26.png';
+import titleImg from '../../assets/title BugBoard26.png';
 import './LoginView.css';
+
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
