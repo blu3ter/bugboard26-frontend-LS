@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { LoginRequestDto } from '../../types';
-import './LoginPage.css';
+import { authService } from '../../service/authService';
+import { formatWelcomeMessage } from '../../controller/authController';
+import logoImg from '../../assets/logobb26.png';
+import titleImg from '../../assets/title BugBoard26.png';
+import './LoginView.css';
+
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -19,44 +24,25 @@ export const LoginPage: React.FC = () => {
     }));
   };
 
-  /*in questo metodo si raggruppano gli attributi email e password in una variabile "formdata"
-  e di inviarla al server tramite una request post all'indirizzo specificato, ovviamwente in formato JSON*/
+  /**
+   * Presentation Layer:
+   * Gestisce l'interazione con l'utente (submit del form),
+   * delegando l'orchestrazione del workflow al Service Layer e
+   * la logica di business/presentazione al Controller Layer.
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('http://localhost:8080/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
-      });
+      // Service Layer: convalida le regole di business, esegue la chiamata API e memorizza la sessione
+      const user = await authService.executeLoginWorkflow(formData);
 
-      if (!response.ok) {
-        // Se il backend risponde con 401, stampiamo il messaggio
-        const errorText = await response.text();
-        throw new Error(errorText || 'Email o password non corretti');
-      }
-
-      const data = await response.json(); // Il LoginResponseDto
-
-      // Salva il token in sessionStorage
-      sessionStorage.setItem('bugboard_token', data.token);
-
-      // Salva i dati utente se servono all'interfaccia (opzionale)
-      sessionStorage.setItem('bugboard_user', JSON.stringify({
-        email: data.email,
-        name: data.name,
-        role: data.role
-      }));
-
-      alert(`Benvenuto ${data.name || data.email}!`);
+      // Controller Layer: formatta il messaggio secondo le regole di dominio
+      alert(formatWelcomeMessage(user));
 
       // Reindirizza l'utente alla schermata con le issues
       navigate('/dashboard/my-issues');
-
     } catch (error: any) {
       alert(error.message || 'Errore di connessione al server');
     } finally {
@@ -66,18 +52,42 @@ export const LoginPage: React.FC = () => {
 
   return (
     <div className="login-container">
+      {/* Sfondo animato con gli hashtag */}
+      <div className="floating-tags-container">
+        <span className="floating-tag tag-backend">#backend</span>
+        <span className="floating-tag tag-frontend">#frontend</span>
+        <span className="floating-tag tag-bug">#bug</span>
+        <span className="floating-tag tag-question">#question</span>
+        <span className="floating-tag tag-fast">#fast</span>
+        <span className="floating-tag tag-feature">#feature</span>
+        <span className="floating-tag tag-chill">#chill</span>
+        <span className="floating-tag tag-dangerous">#dangerous</span>
+        <span className="floating-tag tag-open">#open</span>
+        <span className="floating-tag tag-in-progress">#in progress</span>
+        <span className="floating-tag tag-closed">#closed</span>
+        <span className="floating-tag tag-uiux">#ui/ux</span>
+        <span className="floating-tag tag-devops">#devops</span>
+        <span className="floating-tag tag-meeting">#meeting</span>
+        <span className="floating-tag tag-hotfix">#hotfix</span>
+        <span className="floating-tag tag-urgent">#urgent</span>
+        <span className="floating-tag tag-backend-2">#backend</span>
+        <span className="floating-tag tag-frontend-2">#frontend</span>
+        <span className="floating-tag tag-bug-2">#bug</span>
+        <span className="floating-tag tag-feature-2">#feature</span>
+        <span className="floating-tag tag-fast-2">#fast</span>
+      </div>
+
       <div className="login-card">
         {/* Colonna Sinistra: Form di Autenticazione */}
         <div className="login-form-section">
           <div className="login-form-wrapper">
-            <div className="logo-container">
+            <h1 className="login-title">
               <img
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBu0P_fmIrOntSJlHKz13Kr9ZOEwKtlBxmfSbXcQjg3zf3l16TXL812tbbFI2fuSyLCVNIo9oEEWfWdff7TnnRxvFmnDE_BoHYI8BE4hGmdbazmu2SMmHPQ5aEL5lqSBAFO-7errwHAt4IdVraD5rN0ZvN-PaRnq30DsFg7hBlr0E8SCPbh_gBi1NDEcPlZFAtwkIQjA8T1gQ_7izYTJKx-8m6GW3-Vd1zo_x2D5N4njYK61fUm54ucSEEmyIxaVyCDWJ_fViUxZ34"
-                alt="Bugboard Logo"
-                className="logo-img"
+                src={titleImg}
+                alt="BugBoard26"
+                className="login-title-img"
               />
-            </div>
-            <h1 className="login-title">bugboard26</h1>
+            </h1>
             <p className="login-subtitle">
               Welcome back. Enter your aziendal credentials to access your account.
             </p>
@@ -130,28 +140,17 @@ export const LoginPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Colonna Destra: Griglia Geometrica Bauhaus */}
-        <div className="bauhaus-art-section">
-          <div className="bauhaus-grid">
-            <div className="bg-red rounded-br-full"></div>
-            <div className="bg-black rounded-bl-full"></div>
-            <div className="bg-blue rounded-bl-full"></div>
-            <div className="bg-yellow rounded-tr-full"></div>
-
-            <div className="stripes-container">
-              <div className="stripe"></div>
-              <div className="stripe"></div>
-              <div className="stripe"></div>
-              <div className="stripe"></div>
-            </div>
-
-            <div className="bg-red rounded-tl-full"></div>
-            <div className="bg-black rounded-br-full"></div>
-            <div className="bg-yellow rounded-bl-full"></div>
-            <div className="bg-black rounded-bl-full"></div>
-            <div className="bg-blue rounded-tr-full"></div>
-            <div className="bg-red rounded-tl-full"></div>
-            <div className="bg-yellow rounded-tl-full"></div>
+        {/* Colonna Destra: Logo BB26 Hero */}
+        <div className="login-hero-section">
+          <div className="login-hero-content">
+            <img
+              src={logoImg}
+              alt="Bugboard 26"
+              className="login-hero-logo"
+            />
+            <p className="login-hero-tagline">
+              The collaborative platform to track issues, share feedback, and streamline your team's workflow in one place.
+            </p>
           </div>
         </div>
       </div>
