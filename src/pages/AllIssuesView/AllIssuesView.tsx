@@ -1,5 +1,6 @@
 import React from 'react';
 import './AllIssuesView.css';
+import { IssuesFilterBar } from '../../components/IssuesFilterBar';
 
 interface AllIssuesViewProps {
   // Pass isAdmin from your auth context or global state
@@ -10,48 +11,7 @@ export const AllIssuesView: React.FC<AllIssuesViewProps> = ({ isAdmin = true }) 
   return (
     <div className="issues-view-container">
       {/* Filters & Search */}
-      <section className="filters-section">
-        <div className="search-box">
-          <span className="material-symbols-outlined">search</span>
-          <input type="text" placeholder="Cerca ID, titolo, progetto..." />
-        </div>
-        
-        <div className="dropdowns-group">
-          <div className="custom-select">
-            <select>
-              <option value="">Tipo (Tutti)</option>
-              <option value="bug">Bug</option>
-              <option value="feature">Feature</option>
-              <option value="domanda">Domanda</option>
-              <option value="documentazione">Documentazione</option>
-            </select>
-            <span className="material-symbols-outlined">arrow_drop_down</span>
-          </div>
-
-          <div className="custom-select">
-            <select>
-              <option value="">Stato (Tutti)</option>
-              <option value="todo">Todo</option>
-              <option value="in_lavorazione">In Lavorazione</option>
-              <option value="in_verifica">In Verifica</option>
-              <option value="chiuso">Chiuso</option>
-            </select>
-            <span className="material-symbols-outlined">arrow_drop_down</span>
-          </div>
-
-          <div className="custom-select">
-            <select>
-              <option value="">Priorità (Tutte)</option>
-              <option value="urgente" style={{ color: 'var(--error)', fontWeight: 'bold' }}>Solo urgenti</option>
-            </select>
-            <span className="material-symbols-outlined">arrow_drop_down</span>
-          </div>
-          
-          <button className="btn-ghost" title="Azzera Filtri">
-            <span className="material-symbols-outlined">filter_alt_off</span>
-          </button>
-        </div>
-      </section>
+      <IssuesFilterBar searchPlaceholder="Search ID, title, project..." />
 
       {/* Grid of Issues */}
       <div className="issues-grid">

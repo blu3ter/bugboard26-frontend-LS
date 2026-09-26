@@ -8,9 +8,9 @@ import './DashboardLayout.css';
 export const DashboardLayout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   const user = authService.getUser();
-  const userName = user?.name?.trim() || user?.email?.split('@')[0] || 'Utente';
+  const userName = user?.name?.trim() || user?.email?.split('@')[0] || 'User';
 
   const getSubtitle = () => {
     if (location.pathname.includes('all-issues')) return 'Overview of all team issues.';
@@ -57,7 +57,7 @@ export const DashboardLayout: React.FC = () => {
               <span>All issues</span>
             </NavLink>
           </li>
-          
+
           {/* Admin Only Link */}
           {isAdmin && (
             <li>
@@ -77,9 +77,9 @@ export const DashboardLayout: React.FC = () => {
             </a>
           </li>
           <li>
-            <button 
-              type="button" 
-              className="nav-link nav-logout-btn" 
+            <button
+              type="button"
+              className="nav-link nav-logout-btn"
               onClick={handleLogout}
             >
               <span className="material-symbols-outlined">logout</span>
@@ -94,7 +94,7 @@ export const DashboardLayout: React.FC = () => {
         {/* Top App Bar */}
         <header className="dashboard-topbar">
           <div className="topbar-welcome">
-            <h2 className="topbar-title">Bentornato, {userName}!</h2>
+            <h2 className="topbar-title">Welcome back, {userName}!</h2>
             <p className="topbar-subtitle">{getSubtitle()}</p>
           </div>
           <div className="topbar-actions">
@@ -102,9 +102,9 @@ export const DashboardLayout: React.FC = () => {
               <span className="material-symbols-outlined">notifications</span>
             </button>
             <div className="profile-avatar">
-              <img 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBis87CkE9qyDcWc8fR6Z8G3Ule7pXCxqtaUjoyjd2qEGCCzWouDyIn9uLtytL_dvigICoAXMAcnApUl9xNvJv9TAlkar-iPlEf3uXHMjjnc8g4NPR1TDF1ZWaxXhS22v-dQjigLhbSH-k6wAK9apl2dpu8bB9ojpvhYjEcQ_qM_dYX7B__zLoT-_L-bb-lSxiw4EB9bR2gvZ029EB5Sj2OtiQ1tNu2EDWIPZ4nGSv45QG1MKmOTDzDNF9mth94mt6TJ1jMFYqg5gw" 
-                alt={userName} 
+              <img
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBis87CkE9qyDcWc8fR6Z8G3Ule7pXCxqtaUjoyjd2qEGCCzWouDyIn9uLtytL_dvigICoAXMAcnApUl9xNvJv9TAlkar-iPlEf3uXHMjjnc8g4NPR1TDF1ZWaxXhS22v-dQjigLhbSH-k6wAK9apl2dpu8bB9ojpvhYjEcQ_qM_dYX7B__zLoT-_L-bb-lSxiw4EB9bR2gvZ029EB5Sj2OtiQ1tNu2EDWIPZ4nGSv45QG1MKmOTDzDNF9mth94mt6TJ1jMFYqg5gw"
+                alt={userName}
               />
             </div>
           </div>
