@@ -1,24 +1,33 @@
 import React from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { authService } from '../service/authService';
+import logoImg from '../assets/logobb26.png';
+import titleImg from '../assets/title BugBoard26.png';
 import './DashboardLayout.css';
 
 export const DashboardLayout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // A simple way to get the title based on the route
-  const getPageTitle = () => {
-    if (location.pathname.includes('my-issues')) return 'Le Mie Issue';
-    if (location.pathname.includes('all-issues')) return 'Tutte le Issue';
-    if (location.pathname.includes('users')) return 'Gestione Utenti';
-    return 'Dashboard';
+  const user = authService.getUser();
+  const userName = user?.name?.trim() || user?.email?.split('@')[0] || 'Utente';
+
+  const getSubtitle = () => {
+    if (location.pathname.includes('all-issues')) return 'Overview of all team issues.';
+    if (location.pathname.includes('users')) return 'System user management and configuration.';
+    return 'Overview of your open issues.';
   };
 
-  // TO DO: Replace with actual authentication context logic
-  const isAdmin = true; // Hardcoded to true so you can see the button
+  const isAdmin = user ? user.role === 'ADMIN' : true;
 
   const handleReportBug = () => {
     navigate('/dashboard/create-issue');
+  };
+
+  const handleLogout = (e: React.MouseEvent) => {
+    e.preventDefault();
+    authService.clearSession();
+    navigate('/login');
   };
 
   return (
@@ -26,11 +35,8 @@ export const DashboardLayout: React.FC = () => {
       {/* Sidebar Navigation */}
       <nav className="dashboard-sidebar">
         <div className="sidebar-header">
-          <div className="logo-avatar">B</div>
-          <div className="logo-text">
-            <h1>BugBoard26</h1>
-            <p>Issue Management</p>
-          </div>
+          <img src={logoImg} alt="BugBoard26 Logo" className="sidebar-logo-img" />
+          <img src={titleImg} alt="BugBoard26" className="sidebar-title-img" />
         </div>
 
         <button className="btn-report-bug" onClick={handleReportBug}>
@@ -41,13 +47,13 @@ export const DashboardLayout: React.FC = () => {
         <ul className="sidebar-nav-list">
           <li>
             <NavLink to="/dashboard/my-issues" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-              <span className="material-symbols-outlined">dashboard</span>
+              <span className="material-symbols-outlined">grid_view</span>
               <span>My issue</span>
             </NavLink>
           </li>
           <li>
             <NavLink to="/dashboard/all-issues" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-              <span className="material-symbols-outlined">list_alt</span>
+              <span className="material-symbols-outlined">view_list</span>
               <span>All issues</span>
             </NavLink>
           </li>
@@ -66,15 +72,19 @@ export const DashboardLayout: React.FC = () => {
         <ul className="sidebar-footer-list">
           <li>
             <a className="nav-link" href="#">
-              <span className="material-symbols-outlined">help</span>
+              <span className="material-symbols-outlined">help_outline</span>
               <span>Help</span>
             </a>
           </li>
           <li>
-            <a className="nav-link" href="#">
+            <button 
+              type="button" 
+              className="nav-link nav-logout-btn" 
+              onClick={handleLogout}
+            >
               <span className="material-symbols-outlined">logout</span>
               <span>Logout</span>
-            </a>
+            </button>
           </li>
         </ul>
       </nav>
@@ -83,15 +93,18 @@ export const DashboardLayout: React.FC = () => {
       <main className="dashboard-main">
         {/* Top App Bar */}
         <header className="dashboard-topbar">
-          <h2 className="topbar-title">{getPageTitle()}</h2>
+          <div className="topbar-welcome">
+            <h2 className="topbar-title">Bentornato, {userName}!</h2>
+            <p className="topbar-subtitle">{getSubtitle()}</p>
+          </div>
           <div className="topbar-actions">
-            <button className="btn-icon">
+            <button className="btn-icon" title="Notifiche">
               <span className="material-symbols-outlined">notifications</span>
             </button>
             <div className="profile-avatar">
               <img 
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuBis87CkE9qyDcWc8fR6Z8G3Ule7pXCxqtaUjoyjd2qEGCCzWouDyIn9uLtytL_dvigICoAXMAcnApUl9xNvJv9TAlkar-iPlEf3uXHMjjnc8g4NPR1TDF1ZWaxXhS22v-dQjigLhbSH-k6wAK9apl2dpu8bB9ojpvhYjEcQ_qM_dYX7B__zLoT-_L-bb-lSxiw4EB9bR2gvZ029EB5Sj2OtiQ1tNu2EDWIPZ4nGSv45QG1MKmOTDzDNF9mth94mt6TJ1jMFYqg5gw" 
-                alt="User Profile" 
+                alt={userName} 
               />
             </div>
           </div>
