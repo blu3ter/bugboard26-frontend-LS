@@ -10,27 +10,13 @@ export const UsersManagementView: React.FC = () => {
     <div className="admin-users-view">
       <div className="admin-form-container">
 
-        {/* Visual Panel */}
-        <section className="visual-panel">
-          <div className="visual-decoration-top"></div>
-          <div className="visual-decoration-bottom"></div>
 
-          <div className="visual-content">
-            <div className="visual-logo">B</div>
-            <h2 className="visual-title">Create a new member to BugBoard26 community.</h2>
-            <p className="visual-subtitle">Start managing your software issues with the most efficient Material Design workflow.</p>
-          </div>
-
-          <div className="visual-footer">
-            <p className="visual-footer-text">Everything starts with a report.</p>
-          </div>
-        </section>
 
         {/* Form Panel */}
         <section className="form-panel">
           <div className="form-header">
-            <h1>bugboard26</h1>
-            <p>Create account to new user. Fill all fields to procede.</p>
+            <h1>New Member</h1>
+            <p>Set up credentials and assign workspace permissions for the new user.</p>
           </div>
 
           <form className="admin-form" onSubmit={(e) => e.preventDefault()}>
@@ -83,34 +69,52 @@ export const UsersManagementView: React.FC = () => {
             </div>
 
             <div className="form-group">
-              <span className="form-label" style={{ marginBottom: '12px' }}>Select type:</span>
-              <div className="profile-selector-container">
-                <label className="profile-option">
+              <span className="form-label" style={{ marginBottom: '12px' }}>Role</span>
+              <div className="role-cards-container">
+                <label className="role-card-label">
                   <input
                     name="profile_type"
                     type="radio"
                     value="user"
                     checked={profileType === 'user'}
                     onChange={() => setProfileType('user')}
+                    className="role-radio-input"
                   />
-                  <div className="profile-button">User</div>
+                  <div className="role-card">
+                    <div className="role-card-icon">
+                      <span className="material-symbols-outlined">person</span>
+                    </div>
+                    <div className="role-card-content">
+                      <span className="role-card-title">Member</span>
+                      <span className="role-card-desc">Basic level access. Can view, report and comment issues.</span>
+                    </div>
+                  </div>
                 </label>
-                <label className="profile-option">
+                <label className="role-card-label">
                   <input
                     name="profile_type"
                     type="radio"
                     value="admin"
                     checked={profileType === 'admin'}
                     onChange={() => setProfileType('admin')}
+                    className="role-radio-input"
                   />
-                  <div className="profile-button">Admin</div>
+                  <div className="role-card">
+                    <div className="role-card-icon">
+                      <span className="material-symbols-outlined">admin_panel_settings</span>
+                    </div>
+                    <div className="role-card-content">
+                      <span className="role-card-title">Admin</span>
+                      <span className="role-card-desc">Can view, report, comment and assign issues to members. Can create new users</span>
+                    </div>
+                  </div>
                 </label>
               </div>
             </div>
 
             <button className="btn-submit" type="submit">
               <span className="material-symbols-outlined">person_add</span>
-              SIGN UP
+              CREATE USER
             </button>
           </form>
 
