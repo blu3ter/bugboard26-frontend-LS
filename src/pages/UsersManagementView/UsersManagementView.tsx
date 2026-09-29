@@ -1,10 +1,45 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { authService } from '../../service/authService';
 import './UsersManagementView.css';
 
 export const UsersManagementView: React.FC = () => {
   const navigate = useNavigate();
   const [profileType, setProfileType] = useState('user');
+  const [nome, setNome] = useState('');
+  const [cognome, setCognome] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(false);
+    setIsLoading(true);
+
+    try {
+      await authService.executeRegisterWorkflow({
+        firstName: nome,
+        lastName: cognome,
+        email,
+        password,
+        role: profileType,
+      });
+      setSuccess(true);
+      setNome('');
+      setCognome('');
+      setEmail('');
+      setPassword('');
+      setProfileType('user');
+    } catch (err: any) {
+      setError(err.message || 'Errore durante la creazione dell\'utente');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="admin-users-view">
@@ -19,7 +54,10 @@ export const UsersManagementView: React.FC = () => {
             <p>Set up credentials and assign workspace permissions for the new user.</p>
           </div>
 
-          <form className="admin-form" onSubmit={(e) => e.preventDefault()}>
+          {error && <div className="error-message" style={{ color: '#d32f2f', backgroundColor: '#ffebee', padding: '10px', borderRadius: '4px', marginBottom: '16px', fontSize: '14px' }}>{error}</div>}
+          {success && <div className="success-message" style={{ color: '#2e7d32', backgroundColor: '#e8f5e9', padding: '10px', borderRadius: '4px', marginBottom: '16px', fontSize: '14px' }}>User created successfully!</div>}
+
+          <form className="admin-form" onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label" htmlFor="nome">Name</label>
@@ -30,6 +68,8 @@ export const UsersManagementView: React.FC = () => {
                   placeholder="John"
                   required
                   type="text"
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
                 />
               </div>
               <div className="form-group">
@@ -41,6 +81,8 @@ export const UsersManagementView: React.FC = () => {
                   placeholder="Doe"
                   required
                   type="text"
+                  value={cognome}
+                  onChange={(e) => setCognome(e.target.value)}
                 />
               </div>
             </div>
@@ -54,6 +96,8 @@ export const UsersManagementView: React.FC = () => {
                 placeholder="john.doe@example.com"
                 required
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
@@ -65,6 +109,8 @@ export const UsersManagementView: React.FC = () => {
                 name="password"
                 required
                 type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
 
@@ -112,9 +158,9 @@ export const UsersManagementView: React.FC = () => {
               </div>
             </div>
 
-            <button className="btn-submit" type="submit">
+            <button className="btn-submit" type="submit" disabled={isLoading}>
               <span className="material-symbols-outlined">person_add</span>
-              CREATE USER
+              {isLoading ? 'CREATING...' : 'CREATE USER'}
             </button>
           </form>
 
