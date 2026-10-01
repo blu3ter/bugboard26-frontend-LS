@@ -23,28 +23,28 @@ export const MyIssuesView: React.FC = () => {
     fetchIssues();
   }, []);
 
-  const getAccentColor = (issue: IssueDto) => {
-    if (issue.isUrgent) return '#ba1a1a';
-    if (issue.type === 'FEATURE') return 'var(--primary)';
-    if (issue.type === 'DOCUMENTATION') return 'var(--secondary)';
-    return 'var(--primary)';
-  };
-
-  const getTypeIcon = (type: string) => {
+  const getTypeStyles = (type: string) => {
     switch (type) {
-      case 'BUG': return 'bug_report';
-      case 'FEATURE': return 'add_box';
-      case 'DOCUMENTATION': return 'description';
-      default: return 'list';
+      case 'BUG': 
+        return { color: '#ef4444', icon: 'bug_report', badgeBg: 'rgba(239, 68, 68, 0.1)', badgeBorder: '#ef4444', textColor: '#ef4444' };
+      case 'FEATURE': 
+        return { color: '#fef08a', icon: 'stars', badgeBg: 'rgba(254, 240, 138, 0.1)', badgeBorder: '#fef08a', textColor: '#ca8a04' };
+      case 'QUESTION': 
+        return { color: '#3b82f6', icon: 'help', badgeBg: 'rgba(59, 130, 246, 0.1)', badgeBorder: '#3b82f6', textColor: '#3b82f6' };
+      case 'DOCUMENTATION': 
+        return { color: '#86efac', icon: 'description', badgeBg: 'rgba(134, 239, 172, 0.1)', badgeBorder: '#86efac', textColor: '#16a34a' };
+      default: 
+        return { color: 'var(--primary)', icon: 'list', badgeBg: 'var(--surface-container-high)', badgeBorder: 'var(--border-color)', textColor: 'var(--text-secondary)' };
     }
   };
 
-  const getBadgeClass = (type: string) => {
-    switch (type) {
-      case 'BUG': return 'badge-bug';
-      case 'FEATURE': return 'badge-feature';
-      case 'DOCUMENTATION': return 'badge-documentation';
-      default: return 'badge-todo';
+  const getStateText = (state: string) => {
+    switch (state) {
+      case 'TODO': return 'Todo';
+      case 'IN_PROGRESS': return 'In Progress';
+      case 'REVIEW': return 'Review';
+      case 'DONE': return 'Closed';
+      default: return state;
     }
   };
 
@@ -80,37 +80,46 @@ export const MyIssuesView: React.FC = () => {
             <p>Nessuna issue trovata.</p>
           ) : (
             <div className="issues-grid">
-              {issues.map(issue => (
-                <article key={issue.id} className={`issue-card ${issue.state === 'DONE' ? 'card-closed' : ''}`} style={issue.isUrgent ? { borderColor: 'rgba(186,26,26,0.5)' } : {}}>
-                  <div className="card-accent-line" style={{ backgroundColor: getAccentColor(issue) }}></div>
-                  
-                  <div className="card-header">
-                    <div className="card-id-group">
-                      <span className="issue-id">BB-{issue.id}</span>
-                      {issue.isUrgent && (
-                        <span className="badge-urgent">
-                          <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>warning</span> URGENTE
-                        </span>
-                      )}
+              {issues.map(issue => {
+                const typeStyle = getTypeStyles(issue.type);
+                return (
+                  <article key={issue.id} className={`issue-card ${issue.state === 'DONE' ? 'card-closed' : ''}`} style={issue.isUrgent ? { borderColor: 'rgba(186,26,26,0.5)' } : {}}>
+                    <div className="card-accent-line" style={{ backgroundColor: typeStyle.color }}></div>
+                    
+                    <div className="card-header">
+                      <div className="card-id-group">
+                        <span className="issue-id">BB-{issue.id}</span>
+                        {issue.isUrgent && (
+                          <span className="badge-urgent">
+                            <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>warning</span> URGENTE
+                          </span>
+                        )}
+                      </div>
+                      <button className={`btn-check ${issue.state === 'DONE' ? 'btn-checked' : ''}`} disabled={issue.state === 'DONE'}>
+                        <span className="material-symbols-outlined" style={issue.state === 'DONE' ? { fontVariationSettings: '"FILL" 1' } : {}}>check_circle</span>
+                      </button>
                     </div>
-                    <button className={`btn-check ${issue.state === 'DONE' ? 'btn-checked' : ''}`} disabled={issue.state === 'DONE'}>
-                      <span className="material-symbols-outlined" style={issue.state === 'DONE' ? { fontVariationSettings: '"FILL" 1' } : {}}>check_circle</span>
-                    </button>
-                  </div>
-                  
-                  <h3 className={`issue-title ${issue.state === 'DONE' ? 'issue-title-closed' : ''}`}>{issue.title}</h3>
-                  {issue.reporterFullName && <p className="issue-project">Reporter: {issue.reporterFullName}</p>}
-                  
-                  <div className="card-footer">
-                    <span className={`badge ${getBadgeClass(issue.type)}`}>
-                      <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>{getTypeIcon(issue.type)}</span> {issue.type}
-                    </span>
-                    <span className={`badge ${getStateBadgeClass(issue.state)}`}>
-                      <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>list</span> {issue.state}
-                    </span>
-                  </div>
-                </article>
-              ))}
+                    
+                    <h3 className={`issue-title ${issue.state === 'DONE' ? 'issue-title-closed' : ''}`}>{issue.title}</h3>
+                    {issue.reporterFullName && <p className="issue-project" style={{ marginBottom: '8px' }}>Assegnato da: {issue.reporterFullName}</p>}
+                    
+                    <div className="card-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                        <span className="badge" style={{ backgroundColor: typeStyle.badgeBg, border: `1px solid ${typeStyle.badgeBorder}`, color: typeStyle.textColor }}>
+                          <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>{typeStyle.icon}</span> {issue.type}
+                        </span>
+                        <span className={`badge ${getStateBadgeClass(issue.state)}`}>
+                          <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>pending_actions</span> {getStateText(issue.state)}
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-secondary)', fontSize: '12px' }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>chat_bubble</span>
+                        <span>{issue.commentsCount || 0}</span>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           )}
         </div>

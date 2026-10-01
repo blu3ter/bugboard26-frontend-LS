@@ -29,4 +29,5 @@ export interface IssueDto {
   assigneeEmail?: string;
   assigneeFullName?: string;
   tags: string[];
+  commentsCount?: number;
 }
