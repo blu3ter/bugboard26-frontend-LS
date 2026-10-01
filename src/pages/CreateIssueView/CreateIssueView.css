@@ -112,6 +112,22 @@
   gap: 16px;
 }
 
+.modal-header-icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.16) 0%, rgba(37, 99, 235, 0.08) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #60a5fa;
+  font-size: 22px;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
 .brand-badge {
   display: flex;
   align-items: center;
@@ -277,14 +293,14 @@
 /* Title Input */
 .title-input {
   width: 100%;
-  background-color: #f1f5f9;
-  color: #0f172a;
+  background-color: #162235;
+  color: #f1f5f9;
   font-weight: 500;
   font-size: 14px;
   border-radius: 12px;
   padding: 12px 16px;
-  border: 1px solid transparent;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
   outline: none;
   transition: all 0.2s ease;
   font-family: inherit;
@@ -295,9 +311,13 @@
   color: #64748b;
 }
 
+.title-input:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
 .title-input:focus {
   border-color: #3b82f6;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06), 0 0 0 3px rgba(59, 130, 246, 0.35);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 0 3px rgba(59, 130, 246, 0.35);
 }
 
 /* Rich Text Editor */
@@ -342,6 +362,13 @@
 .editor-toolbar-btn:hover {
   color: #ffffff;
   background-color: rgba(255, 255, 255, 0.1);
+}
+
+.editor-toolbar-btn.is-active {
+  color: #60a5fa;
+  background-color: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.25);
 }
 
 .editor-toolbar-btn.font-code {
@@ -454,42 +481,6 @@
   font-weight: 700;
 }
 
-/* Ping Indicator */
-.ping-wrapper {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  display: flex;
-  width: 8px;
-  height: 8px;
-}
-
-.ping-ring {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 9999px;
-  background-color: #f87171;
-  opacity: 0.75;
-  animation: ping-pulse 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
-
-.ping-core {
-  position: relative;
-  display: inline-flex;
-  width: 8px;
-  height: 8px;
-  border-radius: 9999px;
-  background-color: #ef4444;
-}
-
-@keyframes ping-pulse {
-  75%, 100% {
-    transform: scale(2.2);
-    opacity: 0;
-  }
-}
-
 /* Feature Card Styling */
 .type-radio-card.type-feature:hover {
   border-color: rgba(16, 185, 129, 0.6);
@@ -553,130 +544,229 @@
   font-weight: 700;
 }
 
-/* Labels & Scope Section (D7) */
-.labels-box {
+/* Labels & Scope Section (D7) - Interactive Rotating Tag System */
+.labels-box-grid {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  padding: 12px;
+  padding: 12px 14px;
   background-color: #162235;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
+  transition: all 0.2s ease;
 }
 
-.label-chip {
+.selectable-tag-chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 12px;
-  border-radius: 9999px;
+  padding: 6px 12px;
+  border-radius: 8px;
   font-size: 12px;
-  font-weight: 600;
-  color: #ffffff;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  transition: all 0.2s ease;
+  font-weight: 500;
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+  color: #94a3b8;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
+  font-family: inherit;
 }
 
-.label-chip-delete {
-  background: transparent;
-  border: none;
-  color: inherit;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  padding: 0;
-  margin-left: 2px;
-  font-size: 10px;
-  opacity: 0.8;
-  transition: opacity 0.15s, color 0.15s;
-}
-
-.label-chip-delete:hover {
-  opacity: 1;
-  color: #fecaca;
-}
-
-.label-chip-suggested {
-  opacity: 0.6;
-  cursor: pointer;
-}
-
-.label-chip-suggested:hover {
-  opacity: 1;
+.selectable-tag-chip:hover {
+  background-color: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #ffffff;
   transform: translateY(-1px);
 }
 
-/* Tag Specific Colors */
-.tag-color-backend {
-  background-color: #1d4ed8;
+/* The Rotating Icon: 0deg = '+' , 45deg = '×' */
+.tag-toggle-icon {
+  font-size: 13px;
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: 50% 50%;
+  transition: transform 0.36s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.25s ease;
+  color: #64748b;
+  will-change: transform;
 }
 
-.tag-color-frontend {
-  background-color: #0284c7;
+.selectable-tag-chip:hover .tag-toggle-icon {
+  color: #cbd5e1;
 }
 
-.tag-color-security {
-  background-color: #7c3aed;
+.selectable-tag-chip.is-active {
+  font-weight: 600;
+  border-style: solid;
+  transform: translateY(0);
 }
 
-.tag-color-fast {
-  background-color: #0d9488;
+.selectable-tag-chip.is-active .tag-toggle-icon {
+  transform: rotate(45deg) scale(1.15);
+  color: inherit;
 }
 
-.tag-color-uiux {
-  background-color: #db2777;
+/* Glassmorphism Active Styles */
+.selectable-tag-chip.tag-color-backend.is-active {
+  background: rgba(37, 99, 235, 0.16);
+  border-color: rgba(59, 130, 246, 0.5);
+  color: #93c5fd;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
 }
 
-.tag-color-urgent {
-  background-color: #dc2626;
+.selectable-tag-chip.tag-color-frontend.is-active {
+  background: rgba(2, 132, 199, 0.16);
+  border-color: rgba(56, 189, 248, 0.5);
+  color: #7dd3fc;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
 }
 
-.tag-color-default {
-  background-color: #3b82f6;
+.selectable-tag-chip.tag-color-security.is-active {
+  background: rgba(124, 58, 237, 0.16);
+  border-color: rgba(167, 139, 250, 0.5);
+  color: #c4b5fd;
+  box-shadow: 0 0 10px rgba(167, 139, 250, 0.2);
 }
 
-/* Add Tag Trigger / Input */
+.selectable-tag-chip.tag-color-fast.is-active {
+  background: rgba(13, 148, 136, 0.16);
+  border-color: rgba(45, 212, 191, 0.5);
+  color: #5eead4;
+  box-shadow: 0 0 10px rgba(45, 212, 191, 0.2);
+}
+
+.selectable-tag-chip.tag-color-uiux.is-active {
+  background: rgba(219, 39, 119, 0.16);
+  border-color: rgba(244, 114, 182, 0.5);
+  color: #f472b6;
+  box-shadow: 0 0 10px rgba(244, 114, 182, 0.2);
+}
+
+.selectable-tag-chip.tag-color-urgent.is-active {
+  background: rgba(220, 38, 38, 0.18);
+  border-color: rgba(248, 113, 113, 0.55);
+  color: #fca5a5;
+  box-shadow: 0 0 10px rgba(248, 113, 113, 0.25);
+}
+
+.selectable-tag-chip.tag-color-amber.is-active {
+  background: rgba(245, 158, 11, 0.16);
+  border-color: rgba(251, 191, 36, 0.55);
+  color: #fde68a;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.22);
+}
+
+.selectable-tag-chip.tag-color-emerald.is-active {
+  background: rgba(16, 185, 129, 0.16);
+  border-color: rgba(52, 211, 153, 0.55);
+  color: #a7f3d0;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.22);
+}
+
+.selectable-tag-chip.tag-color-indigo.is-active {
+  background: rgba(99, 102, 241, 0.16);
+  border-color: rgba(129, 140, 248, 0.55);
+  color: #c7d2fe;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.22);
+}
+
+.selectable-tag-chip.tag-color-fuchsia.is-active {
+  background: rgba(217, 70, 239, 0.16);
+  border-color: rgba(232, 121, 249, 0.55);
+  color: #f5d0fe;
+  box-shadow: 0 0 10px rgba(217, 70, 239, 0.22);
+}
+
+.selectable-tag-chip.tag-color-orange.is-active {
+  background: rgba(249, 115, 22, 0.16);
+  border-color: rgba(251, 146, 60, 0.55);
+  color: #fed7aa;
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.22);
+}
+
+.selectable-tag-chip.tag-color-default.is-active {
+  background: rgba(100, 116, 139, 0.18);
+  border-color: rgba(148, 163, 184, 0.45);
+  color: #f1f5f9;
+  box-shadow: 0 0 8px rgba(148, 163, 184, 0.2);
+}
+
+/* Custom Tag Button & Form - Accent Blue Glass */
 .btn-add-label-trigger {
   margin-left: auto;
   font-size: 12px;
-  color: #94a3b8;
+  font-weight: 600;
+  color: #93c5fd;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 6px;
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid transparent;
-  transition: all 0.2s ease;
+  padding: 6px 14px;
+  border-radius: 8px;
+  background-color: rgba(59, 130, 246, 0.08);
+  border: 1px dashed rgba(96, 165, 250, 0.45);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.08);
+}
+
+.btn-add-label-trigger i {
+  font-size: 14px;
+  color: #60a5fa;
+  transition: color 0.2s ease;
 }
 
 .btn-add-label-trigger:hover {
   color: #ffffff;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.15);
+  background-color: rgba(59, 130, 246, 0.2);
+  border-color: rgba(96, 165, 250, 0.8);
+  border-style: solid;
+  box-shadow: 0 0 14px rgba(59, 130, 246, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-add-label-trigger:hover i {
+  color: #ffffff;
 }
 
 .add-label-inline-form {
   margin-left: auto;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 4px;
+  background-color: #0f172a;
+  border: 1px solid #3b82f6;
+  border-radius: 8px;
+  padding: 5px 10px;
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.35);
+}
+
+.add-label-hash,
+.add-label-tag-icon {
+  color: #60a5fa;
+  font-weight: 700;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .add-label-input {
-  background-color: #0f1726;
-  border: 1px solid #3b82f6;
-  border-radius: 9999px;
+  background: transparent;
+  border: none;
   color: #ffffff;
-  padding: 3px 10px;
+  padding: 0 4px;
   font-size: 12px;
   outline: none;
   font-family: inherit;
-  width: 140px;
+  width: 110px;
+}
+
+.add-label-input::placeholder {
+  color: #64748b;
 }
 
 /* Priority & Urgency Section (D3) */
@@ -686,9 +776,16 @@
   justify-content: space-between;
   padding: 14px 16px;
   border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background-color: #162235;
+  gap: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.urgency-card.is-active {
   border: 1px solid rgba(239, 68, 68, 0.5);
   background: linear-gradient(to right, rgba(69, 10, 10, 0.5) 0%, rgba(127, 29, 29, 0.25) 50%, #162235 100%);
-  gap: 16px;
+  box-shadow: 0 0 24px rgba(239, 68, 68, 0.18);
 }
 
 .urgency-info {
@@ -701,17 +798,25 @@
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  background-color: rgba(239, 68, 68, 0.2);
-  border: 1px solid rgba(239, 68, 68, 0.4);
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #f87171;
+  color: #64748b;
   font-size: 20px;
   flex-shrink: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.animate-pulse-icon {
+.urgency-card.is-active .urgency-icon-box {
+  background-color: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #f87171;
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.25);
+}
+
+.urgency-card.is-active .animate-pulse-icon {
   animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
@@ -739,6 +844,12 @@
 
 .urgency-title-text {
   font-size: 14px;
+  font-weight: 600;
+  color: #94a3b8;
+  transition: color 0.3s ease;
+}
+
+.urgency-card.is-active .urgency-title-text {
   font-weight: 700;
   color: #fecaca;
 }
@@ -750,6 +861,13 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.06);
+  color: #64748b;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.urgency-card.is-active .urgency-badge-block {
   background-color: #dc2626;
   color: #ffffff;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
@@ -757,8 +875,13 @@
 
 .urgency-subtext {
   font-size: 12px;
-  color: rgba(254, 202, 202, 0.8);
+  color: #64748b;
   margin-top: 2px;
+  transition: color 0.3s ease;
+}
+
+.urgency-card.is-active .urgency-subtext {
+  color: rgba(254, 202, 202, 0.85);
 }
 
 /* Pure CSS Urgency Switch Toggle */
@@ -801,6 +924,7 @@
 
 .urgency-switch input:checked + .switch-slider {
   background-color: #dc2626;
+  box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
 }
 
 .urgency-switch input:checked + .switch-slider::before {

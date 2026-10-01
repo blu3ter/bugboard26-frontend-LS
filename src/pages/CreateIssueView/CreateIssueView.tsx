@@ -17,16 +17,22 @@ export const CreateIssueView: React.FC = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [issueType, setIssueType] = useState<IssueType>('bug');
-  const [labels, setLabels] = useState<string[]>(['#backend', '#frontend', '#security']);
-  const [suggestedLabels, setSuggestedLabels] = useState<string[]>(['#fast', '#ui/ux', '#urgent']);
+  const [availableTags, setAvailableTags] = useState<string[]>([
+    'backend',
+    'frontend',
+    'security',
+    'ui/ux',
+    'fast',
+    'urgent',
+  ]);
+  const [labels, setLabels] = useState<string[]>([]);
   const [isAddingLabel, setIsAddingLabel] = useState(false);
   const [newLabelInput, setNewLabelInput] = useState('');
-  const [isUrgent, setIsUrgent] = useState(true);
-  const [attachment, setAttachment] = useState<AttachmentFile | null>({
-    name: 'auth_error_screenshot_v2.png',
-    size: '1.4 MB',
-  });
+  const [customTagColors, setCustomTagColors] = useState<Record<string, string>>({});
+  const [isUrgent, setIsUrgent] = useState(false);
+  const [attachment, setAttachment] = useState<AttachmentFile | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [isListActive, setIsListActive] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -35,32 +41,57 @@ export const CreateIssueView: React.FC = () => {
     navigate('/dashboard/my-issues');
   };
 
-  // Add Label Handlers
-  const handleRemoveLabel = (tagToRemove: string) => {
-    setLabels(labels.filter((t) => t !== tagToRemove));
-    // If it was one of the suggested tags, make it available again
-    if (['#fast', '#ui/ux', '#urgent'].includes(tagToRemove) && !suggestedLabels.includes(tagToRemove)) {
-      setSuggestedLabels([...suggestedLabels, tagToRemove]);
-    }
-  };
-
-  const handleAddSuggestedLabel = (tag: string) => {
-    if (!labels.includes(tag)) {
+  // Toggle Tag Handler (+ to x rotation)
+  const handleToggleTag = (tag: string) => {
+    const isUrgentTag = tag.toLowerCase().replace(/^#/, '') === 'urgent';
+    if (labels.includes(tag)) {
+      setLabels(labels.filter((t) => t !== tag));
+      if (isUrgentTag) {
+        setIsUrgent(false);
+      }
+    } else {
       setLabels([...labels, tag]);
-      setSuggestedLabels(suggestedLabels.filter((t) => t !== tag));
-      if (tag === '#urgent') {
+      if (isUrgentTag) {
         setIsUrgent(true);
       }
     }
   };
 
-  const handleSaveCustomLabel = () => {
-    let clean = newLabelInput.trim();
-    if (clean) {
-      if (!clean.startsWith('#')) {
-        clean = `#${clean}`;
+  const handleToggleUrgent = (checked: boolean) => {
+    setIsUrgent(checked);
+    if (checked) {
+      if (!labels.includes('urgent')) {
+        setLabels([...labels, 'urgent']);
       }
+    } else {
+      setLabels(labels.filter((t) => t !== 'urgent' && t !== '#urgent'));
+    }
+  };
+
+  const RANDOM_TAG_COLORS = [
+    'tag-color-backend',
+    'tag-color-frontend',
+    'tag-color-security',
+    'tag-color-fast',
+    'tag-color-uiux',
+    'tag-color-amber',
+    'tag-color-emerald',
+    'tag-color-indigo',
+    'tag-color-fuchsia',
+    'tag-color-orange',
+  ];
+
+  const handleSaveCustomLabel = () => {
+    let clean = newLabelInput.trim().replace(/^#+/, '');
+    if (clean) {
       clean = clean.toLowerCase();
+      if (!customTagColors[clean]) {
+        const randomColor = RANDOM_TAG_COLORS[Math.floor(Math.random() * RANDOM_TAG_COLORS.length)];
+        setCustomTagColors((prev) => ({ ...prev, [clean]: randomColor }));
+      }
+      if (!availableTags.includes(clean)) {
+        setAvailableTags([...availableTags, clean]);
+      }
       if (!labels.includes(clean)) {
         setLabels([...labels, clean]);
       }
@@ -79,21 +110,173 @@ export const CreateIssueView: React.FC = () => {
     }
   };
 
-  // Markdown Formatting Helper
-  const applyMarkdown = (prefix: string, suffix: string = '') => {
+  // Smart Markdown Formatting Helper
+  const applyMarkdown = (prefix: string, suffix: string = prefix) => {
     if (!textareaRef.current) return;
     const textarea = textareaRef.current;
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
-    const selectedText = description.substring(start, end);
-    const replacement = `${prefix}${selectedText || 'text'}${suffix}`;
-    const nextVal = description.substring(0, start) + replacement + description.substring(end);
-    setDescription(nextVal);
+    const value = description;
+    const selectedText = value.substring(start, end);
 
+    if (selectedText.length > 0) {
+      // Check if selection is already wrapped with prefix and suffix
+      const isWrapped =
+        selectedText.startsWith(prefix) &&
+        selectedText.endsWith(suffix) &&
+        selectedText.length >= prefix.length + suffix.length;
+
+      let nextVal: string;
+      let newStart: number;
+      let newEnd: number;
+
+      if (isWrapped) {
+        // Unwrap
+        const unwrapped = selectedText.substring(prefix.length, selectedText.length - suffix.length);
+        nextVal = value.substring(0, start) + unwrapped + value.substring(end);
+        newStart = start;
+        newEnd = start + unwrapped.length;
+      } else {
+        // Check if surroundings are already prefix/suffix
+        const before = start >= prefix.length ? value.substring(start - prefix.length, start) : '';
+        const after = end + suffix.length <= value.length ? value.substring(end, end + suffix.length) : '';
+
+        if (before === prefix && after === suffix) {
+          nextVal = value.substring(0, start - prefix.length) + selectedText + value.substring(end + suffix.length);
+          newStart = start - prefix.length;
+          newEnd = newStart + selectedText.length;
+        } else {
+          // Wrap
+          const wrapped = `${prefix}${selectedText}${suffix}`;
+          nextVal = value.substring(0, start) + wrapped + value.substring(end);
+          newStart = start + prefix.length;
+          newEnd = newStart + selectedText.length;
+        }
+      }
+
+      setDescription(nextVal);
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(newStart, newEnd);
+      }, 0);
+    } else {
+      // No text selected: insert prefix and suffix and place cursor in between (e.g. **|**)
+      const replacement = `${prefix}${suffix}`;
+      const nextVal = value.substring(0, start) + replacement + value.substring(end);
+      setDescription(nextVal);
+
+      setTimeout(() => {
+        textarea.focus();
+        const cursorInside = start + prefix.length;
+        textarea.setSelectionRange(cursorInside, cursorInside);
+      }, 0);
+    }
+  };
+
+  // Bullet List Toggle
+  const handleToggleList = () => {
+    if (!textareaRef.current) return;
+    const textarea = textareaRef.current;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const value = description;
+
+    const lineStart = value.lastIndexOf('\n', start - 1) + 1;
+    const lineEnd = value.indexOf('\n', end);
+    const currentLine = value.substring(lineStart, lineEnd === -1 ? value.length : lineEnd);
+    const isCurrentLineBullet = /^(\s*[•\-*]\s+)/.test(currentLine);
+
+    let nextValue: string;
+    let newCursorPos: number;
+
+    if (isCurrentLineBullet) {
+      const replacedLine = currentLine.replace(/^(\s*)[•\-*]\s+/, '$1');
+      nextValue = value.substring(0, lineStart) + replacedLine + (lineEnd === -1 ? '' : value.substring(lineEnd));
+      newCursorPos = Math.max(lineStart, start - 2);
+      setIsListActive(false);
+    } else {
+      const bullet = '• ';
+      const replacedLine = bullet + currentLine;
+      nextValue = value.substring(0, lineStart) + replacedLine + (lineEnd === -1 ? '' : value.substring(lineEnd));
+      newCursorPos = start + bullet.length;
+      setIsListActive(true);
+    }
+
+    setDescription(nextValue);
     setTimeout(() => {
       textarea.focus();
-      textarea.setSelectionRange(start + prefix.length, start + prefix.length + (selectedText.length || 4));
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
     }, 0);
+  };
+
+  // Auto-continue bullet list on Enter, cancel on empty bullet
+  const handleDescriptionKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (!textareaRef.current) return;
+    const textarea = textareaRef.current;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const value = description;
+
+    const lineStart = value.lastIndexOf('\n', start - 1) + 1;
+    const lineEnd = value.indexOf('\n', start);
+    const currentLine = value.substring(lineStart, lineEnd === -1 ? value.length : lineEnd);
+    const bulletMatch = currentLine.match(/^(\s*[•\-*]\s+)(.*)$/);
+
+    if (e.key === 'Enter') {
+      if (bulletMatch) {
+        e.preventDefault();
+        const bulletPrefix = bulletMatch[1];
+        const textAfterBullet = bulletMatch[2];
+
+        // Empty bullet line -> exit list mode cleanly
+        if (textAfterBullet.trim() === '') {
+          const nextValue = value.substring(0, lineStart) + (lineEnd === -1 ? '' : value.substring(lineEnd));
+          setDescription(nextValue);
+          setIsListActive(false);
+          setTimeout(() => {
+            textarea.focus();
+            textarea.setSelectionRange(lineStart, lineStart);
+          }, 0);
+          return;
+        }
+
+        // Continue list with new bullet point
+        const continuation = `\n${bulletPrefix}`;
+        const nextValue = value.substring(0, start) + continuation + value.substring(end);
+        setDescription(nextValue);
+        setIsListActive(true);
+        setTimeout(() => {
+          textarea.focus();
+          const nextPos = start + continuation.length;
+          textarea.setSelectionRange(nextPos, nextPos);
+        }, 0);
+      }
+    } else if (e.key === 'Backspace') {
+      // If backspace on an empty bullet line right after the marker -> remove bullet
+      if (bulletMatch && bulletMatch[2] === '' && start === lineStart + bulletMatch[1].length) {
+        e.preventDefault();
+        const nextValue = value.substring(0, lineStart) + (lineEnd === -1 ? '' : value.substring(lineEnd));
+        setDescription(nextValue);
+        setIsListActive(false);
+        setTimeout(() => {
+          textarea.focus();
+          textarea.setSelectionRange(lineStart, lineStart);
+        }, 0);
+      }
+    }
+  };
+
+  // Sync isListActive state when cursor moves
+  const updateActiveFormatting = () => {
+    if (!textareaRef.current) return;
+    const textarea = textareaRef.current;
+    const start = textarea.selectionStart;
+    const value = textarea.value;
+
+    const lineStart = value.lastIndexOf('\n', start - 1) + 1;
+    const lineEnd = value.indexOf('\n', start);
+    const currentLine = value.substring(lineStart, lineEnd === -1 ? value.length : lineEnd);
+    setIsListActive(/^(\s*[•\-*]\s+)/.test(currentLine));
   };
 
   // File Upload Handlers
@@ -130,21 +313,31 @@ export const CreateIssueView: React.FC = () => {
 
   // Tag Color Mapper
   const getTagColorClass = (tag: string) => {
-    switch (tag.toLowerCase()) {
-      case '#backend':
+    const normalized = tag.toLowerCase().replace(/^#/, '');
+    if (customTagColors[normalized]) {
+      return customTagColors[normalized];
+    }
+    switch (normalized) {
+      case 'backend':
         return 'tag-color-backend';
-      case '#frontend':
+      case 'frontend':
         return 'tag-color-frontend';
-      case '#security':
+      case 'security':
         return 'tag-color-security';
-      case '#fast':
+      case 'fast':
         return 'tag-color-fast';
-      case '#ui/ux':
+      case 'ui/ux':
         return 'tag-color-uiux';
-      case '#urgent':
+      case 'urgent':
         return 'tag-color-urgent';
-      default:
-        return 'tag-color-default';
+      default: {
+        let hash = 0;
+        for (let i = 0; i < normalized.length; i++) {
+          hash = normalized.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const index = Math.abs(hash) % RANDOM_TAG_COLORS.length;
+        return RANDOM_TAG_COLORS[index];
+      }
     }
   };
 
@@ -188,17 +381,9 @@ export const CreateIssueView: React.FC = () => {
           {/* Header */}
           <div className="modal-header">
             <div className="modal-header-left">
-              <div className="brand-badge">
-                <div className="brand-dots">
-                  <span className="brand-dot dot-red"></span>
-                  <span className="brand-dot dot-amber"></span>
-                  <span className="brand-dot dot-blue"></span>
-                </div>
-                <span className="brand-logo-text">
-                  BUGBOARD<span className="brand-num-orange">2</span><span className="brand-num-blue">6</span>
-                </span>
+              <div className="modal-header-icon-badge">
+                <i className="ph-bold ph-ticket"></i>
               </div>
-              <div className="header-divider"></div>
               <div className="header-title-group">
                 <h2 id="modal-title">New Issue</h2>
                 <p>Fill in the ticket details to track</p>
@@ -271,9 +456,9 @@ export const CreateIssueView: React.FC = () => {
                   </button>
                   <button
                     type="button"
-                    className="editor-toolbar-btn"
+                    className={`editor-toolbar-btn ${isListActive ? 'is-active' : ''}`}
                     title="Bullet list"
-                    onClick={() => applyMarkdown('\n- ')}
+                    onClick={handleToggleList}
                   >
                     <i className="ph-bold ph-list-bullets"></i>
                   </button>
@@ -288,6 +473,9 @@ export const CreateIssueView: React.FC = () => {
                   placeholder="Describe the issue in detail, precise steps to reproduce, expected behavior..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
+                  onKeyDown={handleDescriptionKeyDown}
+                  onClick={updateActiveFormatting}
+                  onKeyUp={updateActiveFormatting}
                   required
                 ></textarea>
               </div>
@@ -313,12 +501,6 @@ export const CreateIssueView: React.FC = () => {
                   />
                   <i className="ph-fill ph-bug type-icon"></i>
                   <span className="type-label">Bug</span>
-                  {issueType === 'bug' && (
-                    <span className="ping-wrapper">
-                      <span className="ping-ring"></span>
-                      <span className="ping-core"></span>
-                    </span>
-                  )}
                 </label>
 
                 {/* Feature */}
@@ -373,42 +555,38 @@ export const CreateIssueView: React.FC = () => {
 
             {/* Labels & Scope (D7) */}
             <div className="form-field">
-              <label className="field-label">Labels &amp; Scope (D7)</label>
-              <div className="labels-box">
-                {/* Active selected labels */}
-                {labels.map((tag) => (
-                  <span key={tag} className={`label-chip ${getTagColorClass(tag)}`}>
-                    {tag}
+              <div className="field-header">
+                <label className="field-label">Labels &amp; Scope (D7)</label>
+                <span className="field-hint">
+                  {labels.length === 0 ? 'Click + to select tags' : `${labels.length} selected`}
+                </span>
+              </div>
+              <div className="labels-box-grid">
+                {availableTags.map((tag) => {
+                  const isSelected = labels.includes(tag);
+                  return (
                     <button
                       type="button"
-                      className="label-chip-delete"
-                      aria-label={`Remove label ${tag}`}
-                      onClick={() => handleRemoveLabel(tag)}
+                      key={tag}
+                      className={`selectable-tag-chip ${getTagColorClass(tag)} ${isSelected ? 'is-active' : ''}`}
+                      onClick={() => handleToggleTag(tag)}
+                      title={isSelected ? `Click to deselect ${tag}` : `Click to select ${tag}`}
+                      aria-pressed={isSelected}
                     >
-                      <i className="ph-bold ph-x"></i>
+                      <i className="ph-bold ph-plus tag-toggle-icon"></i>
+                      <span className="tag-name">{tag}</span>
                     </button>
-                  </span>
-                ))}
-
-                {/* Suggested clickable labels */}
-                {suggestedLabels.map((tag) => (
-                  <span
-                    key={tag}
-                    className={`label-chip label-chip-suggested ${getTagColorClass(tag)}`}
-                    onClick={() => handleAddSuggestedLabel(tag)}
-                    title={`Click to add ${tag}`}
-                  >
-                    {tag}
-                  </span>
-                ))}
+                  );
+                })}
 
                 {/* Add Custom Label */}
                 {isAddingLabel ? (
                   <div className="add-label-inline-form">
+                    <i className="ph-bold ph-tag add-label-tag-icon"></i>
                     <input
                       type="text"
                       className="add-label-input"
-                      placeholder="e.g. #performance"
+                      placeholder="tag name..."
                       value={newLabelInput}
                       onChange={(e) => setNewLabelInput(e.target.value)}
                       onKeyDown={handleCustomLabelKeyDown}
@@ -422,7 +600,8 @@ export const CreateIssueView: React.FC = () => {
                     className="btn-add-label-trigger"
                     onClick={() => setIsAddingLabel(true)}
                   >
-                    <i className="ph-bold ph-plus"></i> Add label...
+                    <i className="ph-bold ph-plus-circle"></i>
+                    <span>Add tag</span>
                   </button>
                 )}
               </div>
@@ -431,7 +610,7 @@ export const CreateIssueView: React.FC = () => {
             {/* Priority & Urgency Section (D3) */}
             <div className="form-field">
               <label className="field-label">Priority &amp; Urgency Level (D3)</label>
-              <div className="urgency-card">
+              <div className={`urgency-card ${isUrgent ? 'is-active' : ''}`}>
                 <div className="urgency-info">
                   <div className="urgency-icon-box">
                     <i className="ph-bold ph-warning animate-pulse-icon"></i>
@@ -442,7 +621,7 @@ export const CreateIssueView: React.FC = () => {
                       <span className="urgency-badge-block">Blocker</span>
                     </div>
                     <p className="urgency-subtext">
-                      Instant notification sent to on-call team &amp; top priority on board
+                      Highlights issue with top priority and pins it to the board
                     </p>
                   </div>
                 </div>
@@ -452,7 +631,7 @@ export const CreateIssueView: React.FC = () => {
                   <input
                     type="checkbox"
                     checked={isUrgent}
-                    onChange={(e) => setIsUrgent(e.target.checked)}
+                    onChange={(e) => handleToggleUrgent(e.target.checked)}
                   />
                   <span className="switch-slider"></span>
                 </label>
