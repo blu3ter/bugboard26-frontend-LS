@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Dettaglio Issue - BugBoard26</title>
+  
+  <!-- Google Fonts: Inter & Fira Code -->
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  
+  <!-- Pure CSS Stylesheet -->
+  <link rel="stylesheet" href="./src/pages/IssueDetailsView/IssueDetailsView.css">
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #06090e;
+      overflow-x: hidden;
+      font-family: 'Inter', sans-serif;
+    }
+    .preview-info-banner {
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      backdrop-filter: blur(10px);
+      color: #93c5fd;
+      padding: 8px 18px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      user-select: none;
+    }
+    .preview-info-banner .badge {
+      background: #2563eb;
+      color: #ffffff;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Preview Badge -->
+  <div class="preview-info-banner">
+    <span class="badge">PURE CSS PREVIEW</span>
+    <span>Vista Dettaglio Issue (IssueDetails) convertita in CSS puro</span>
+  </div>
+
+  <div class="issue-detail-overlay custom-scrollbar">
+    <!-- Ambient Lighting Background -->
+    <div class="issue-detail-ambient-bg" aria-hidden="true">
+      <div class="ambient-badge ambient-blue-1"></div>
+      <div class="ambient-badge ambient-amber-1"></div>
+      <div class="ambient-badge ambient-red-1"></div>
+      <div class="ambient-badge ambient-emerald-1"></div>
+      <div class="ambient-badge ambient-cyan-1"></div>
+      <div class="ambient-badge ambient-rose-1"></div>
+      <div class="ambient-badge ambient-cyan-2"></div>
+      <div class="ambient-badge ambient-pink-1"></div>
+      <div class="ambient-badge ambient-emerald-2"></div>
+      <div class="ambient-badge ambient-blue-2"></div>
+      <div class="ambient-badge ambient-purple-1"></div>
+    </div>
+
+    <!-- Issue Detail Modal -->
+    <main class="issue-detail-modal">
+      <!-- Modal Header -->
+      <header class="issue-detail-header" data-purpose="modal-header">
+        <div class="header-top-row">
+          <!-- Logo, tags, and issue title column -->
+          <div class="header-info-col">
+            <div class="badges-row">
+              <!-- Brand pill button -->
+              <div class="brand-pill">
+                <span class="brand-dots">
+                  <span class="dot-amber"></span>
+                  <span class="dot-red"></span>
+                  <span class="dot-blue"></span>
+                </span>
+                <span class="brand-pill-text">
+                  BUGBOARD<span class="text-accent">26</span>
+                </span>
+              </div>
+              
+              <!-- Issue Identifier & Tags -->
+              <span class="badge-in-progress">
+                <span class="pulse-indicator"></span>
+                In Lavorazione
+              </span>
+              
+              <span class="badge-urgent">
+                <svg class="badge-urgent-icon" fill="currentColor" viewBox="0 0 20 20">
+                  <path clip-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" fill-rule="evenodd"></path>
+                </svg>
+                URGENTE
+              </span>
+            </div>
+
+            <!-- Modal Title -->
+            <h1 class="issue-title-heading">
+              <span class="issue-key-code">BB-1042</span>
+              <span class="issue-dot-sep">·</span>
+              <span>Database Connection Timeout</span>
+            </h1>
+
+            <!-- Meta author & assignees -->
+            <div class="issue-meta-row">
+              <span>Segnalato da <strong>Luca Verdi</strong> il 28 Set 2026</span>
+              <span class="meta-sep">·</span>
+              <span>Assegnato ad <strong class="assignee-name">Alessandro Conti</strong></span>
+              <span class="meta-sep">·</span>
+              <span class="on-call-badge">
+                <svg class="on-call-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                </svg>
+                On-Call Alert Notificato
+              </span>
+            </div>
+          </div>
+
+          <!-- Close Button -->
+          <button aria-label="Chiudi Modale" class="btn-close-modal" type="button">
+            <svg class="close-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Modal Body -->
+      <div class="issue-detail-body custom-scrollbar" data-purpose="modal-content">
+        <!-- Section 1: Description -->
+        <section data-purpose="issue-description">
+          <div class="section-header-line">
+            <h2 class="section-label">Descrizione del Problema</h2>
+            <span class="section-hint">Formattato in Markdown</span>
+          </div>
+          
+          <div class="description-card">
+            <p>
+              Durante il picco di traffico serale tra le 20:30 e le 21:00 UTC, i microservizi di autenticazione e billing riscontrano un blocco totale nella risoluzione delle query verso l'istanza primaria Postgres. I pod del cluster Kubernetes hanno iniziato a fallire i controlli di liveness probe.
+            </p>
+            
+            <!-- Monospace Error Snippet -->
+            <div class="stacktrace-box">
+              <div class="stacktrace-header">
+                <span>Stack trace catturato dal container:</span>
+                <span class="stacktrace-severity">Severity: Critical</span>
+              </div>
+              <div class="stacktrace-code-block">
+                <code>[ERROR] pg_pool_exhausted: timeout 5000ms exceeded in pool (max_connections: 120, active: 120, queued: 48) at Client.query (/srv/app/node_modules/pg-pool/index.js:312:11)</code>
+              </div>
+            </div>
+
+            <!-- Reproduction Steps -->
+            <div class="reproduction-steps">
+              <h3 class="reproduction-title">Passi per riprodurre il timeout:</h3>
+              <ul class="reproduction-list">
+                <li>Eseguire un test di carico concorrente con 150 sessioni attive su <code class="inline-code">/api/v2/auth/verify-session</code>.</li>
+                <li>Osservare il tempo di acquisizione dal pool di connessioni superare la soglia di guardia fissata a 5000ms.</li>
+                <li>I thread vanno in deadlock senza rilasciare il client a causa delle transazioni lasciate aperte nei fallback di rete.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 2: Attachments -->
+        <section data-purpose="issue-attachments">
+          <div class="section-header-line">
+            <h2 class="section-label">Allegati e Log Visivi</h2>
+          </div>
+          <div class="attachments-grid">
+            <div class="attachment-card">
+              <div class="attachment-icon-wrapper">
+                <svg class="attachment-file-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                </svg>
+              </div>
+              <div class="attachment-meta-info">
+                <p class="attachment-filename">auth_error_screenshot_v2.png</p>
+                <p class="attachment-size-time">1.4 MB · Caricato 2 ore fa</p>
+              </div>
+              <button class="btn-preview-attachment" title="Visualizza anteprima" type="button">
+                <svg class="preview-eye-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                  <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 3: Tags -->
+        <section data-purpose="issue-tags">
+          <div class="section-header-line">
+            <h2 class="section-label">Etichette &amp; Ambito</h2>
+          </div>
+          <div class="tags-wrapper-box">
+            <!-- Backend Tag -->
+            <span class="tag-item-pill tag-backend-color">
+              #backend
+              <button aria-label="Rimuovi tag backend" class="btn-remove-tag" type="button">
+                <svg class="tag-close-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+              </button>
+            </span>
+            <!-- Security Tag -->
+            <span class="tag-item-pill tag-security-color">
+              #security
+              <button aria-label="Rimuovi tag security" class="btn-remove-tag" type="button">
+                <svg class="tag-close-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+              </button>
+            </span>
+            <!-- Database Tag -->
+            <span class="tag-item-pill tag-database-color">
+              #database
+              <button aria-label="Rimuovi tag database" class="btn-remove-tag" type="button">
+                <svg class="tag-close-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+              </button>
+            </span>
+            <!-- Urgent Tag -->
+            <span class="tag-item-pill tag-urgent-color">
+              #urgent
+            </span>
+            <!-- Add tag trigger -->
+            <button class="btn-add-tag-trigger" type="button">
+              <svg class="add-tag-plus-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+              </svg>
+              Aggiungi etichetta...
+            </button>
+          </div>
+        </section>
+
+        <!-- Section 4: Comments -->
+        <section class="comments-section-container" data-purpose="issue-discussion">
+          <div class="section-header-line">
+            <h2 class="section-label">Attività &amp; Discussione (1)</h2>
+            <button class="refresh-feed-btn" type="button">Aggiorna feed</button>
+          </div>
+          
+          <!-- Single Comment -->
+          <div class="comment-card-box">
+            <div class="comment-avatar-bubble">
+              ED
+            </div>
+            <div class="comment-body-col">
+              <div class="comment-author-row">
+                <div class="comment-author-badge">
+                  <span class="comment-user-name">Elena De Luca</span>
+                  <span class="comment-role-tag">DBA Lead</span>
+                </div>
+                <time class="comment-timestamp">1 ora fa</time>
+              </div>
+              <p class="comment-message-text">
+                Ho controllato i log dell'RDS: c'è un lock prolungato sulla tabella <code class="comment-code-inline">user_sessions</code> generato dalla migrazione <code>#20260928_idx</code>. Ho predisposto un hotfix per riavviare il pooling a 250 connessioni e rilasciare l'indice non bloccante.
+              </p>
+            </div>
+          </div>
+
+          <!-- Add Comment Input Area -->
+          <div class="new-comment-editor">
+            <textarea class="comment-input-textarea" placeholder="Scrivi una risposta tecnica o menziona un collaboratore (@nome)..." rows="2"></textarea>
+            <div class="editor-bottom-bar">
+              <div class="editor-formatting-tools">
+                <button class="btn-format-tool" title="Grassetto" type="button">
+                  <strong>B</strong>
+                </button>
+                <button class="btn-format-tool" title="Corsivo" type="button">
+                  <em>I</em>
+                </button>
+                <button class="btn-format-tool font-mono" title="Codice inline" type="button">
+                  &lt;/&gt;
+                </button>
+              </div>
+              <button class="btn-submit-comment" type="button">
+                <svg class="send-comment-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                </svg>
+                Invia Commento
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Modal Footer -->
+      <footer class="issue-detail-footer" data-purpose="modal-footer">
+        <div class="footer-visibility-info">
+          <svg class="visibility-shield-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+          </svg>
+          <span>Visibile a tutti i collaboratori autorizzati di BugBoard26</span>
+        </div>
+        <div class="footer-actions-group">
+          <button class="btn-footer-cancel" type="button">
+            Chiudi
+          </button>
+          <button class="btn-footer-submit" type="button">
+            <svg class="submit-check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+            </svg>
+            Invia in Verifica
+          </button>
+        </div>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>
