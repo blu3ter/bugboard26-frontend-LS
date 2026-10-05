@@ -20,7 +20,7 @@ class IssueService {
     });
 
     if (!response.ok) {
-      throw new Error('Errore durante il recupero delle issues');
+      throw new Error('Failed to fetch issues');
     }
 
     return await response.json();
@@ -33,7 +33,7 @@ class IssueService {
     });
 
     if (!response.ok) {
-      throw new Error('Errore durante il recupero delle issues assegnate');
+      throw new Error('Failed to fetch assigned issues');
     }
 
     return await response.json();

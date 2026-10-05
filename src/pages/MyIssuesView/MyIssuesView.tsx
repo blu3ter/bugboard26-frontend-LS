@@ -25,15 +25,15 @@ export const MyIssuesView: React.FC = () => {
 
   const getTypeStyles = (type: string) => {
     switch (type) {
-      case 'BUG': 
+      case 'BUG':
         return { color: '#ef4444', icon: 'bug_report', badgeBg: 'rgba(239, 68, 68, 0.1)', badgeBorder: '#ef4444', textColor: '#ef4444' };
-      case 'FEATURE': 
-        return { color: '#fef08a', icon: 'stars', badgeBg: 'rgba(254, 240, 138, 0.1)', badgeBorder: '#fef08a', textColor: '#ca8a04' };
-      case 'QUESTION': 
-        return { color: '#3b82f6', icon: 'help', badgeBg: 'rgba(59, 130, 246, 0.1)', badgeBorder: '#3b82f6', textColor: '#3b82f6' };
-      case 'DOCUMENTATION': 
-        return { color: '#86efac', icon: 'description', badgeBg: 'rgba(134, 239, 172, 0.1)', badgeBorder: '#86efac', textColor: '#16a34a' };
-      default: 
+      case 'FEATURE':
+        return { color: '#10b981', icon: 'add_box', badgeBg: 'rgba(16, 185, 129, 0.1)', badgeBorder: '#10b981', textColor: '#10b981' };
+      case 'QUESTION':
+        return { color: '#fbbf24', icon: 'help', badgeBg: 'rgba(251, 191, 36, 0.1)', badgeBorder: '#fbbf24', textColor: '#fbbf24' };
+      case 'DOCUMENTATION':
+        return { color: '#2563eb', icon: 'description', badgeBg: 'rgba(37, 99, 235, 0.1)', badgeBorder: '#2563eb', textColor: '#2563eb' };
+      default:
         return { color: 'var(--primary)', icon: 'list', badgeBg: 'var(--surface-container-high)', badgeBorder: 'var(--border-color)', textColor: 'var(--text-secondary)' };
     }
   };
@@ -64,7 +64,7 @@ export const MyIssuesView: React.FC = () => {
   const urgentCount = issues.filter(i => i.isUrgent).length;
   const totalCount = issues.length;
   const completedPercentage = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
-  
+
   return (
     <div className="issues-view-container">
       {/* Search Bar Full Width */}
@@ -75,9 +75,9 @@ export const MyIssuesView: React.FC = () => {
         {/* Main Content Area (Left side) */}
         <div className="my-issues-main-content">
           {loading ? (
-            <p>Caricamento issues...</p>
+            <p>Loading issues...</p>
           ) : issues.length === 0 ? (
-            <p>Nessuna issue trovata.</p>
+            <p>No issue  found.</p>
           ) : (
             <div className="issues-grid">
               {issues.map(issue => {
@@ -85,13 +85,13 @@ export const MyIssuesView: React.FC = () => {
                 return (
                   <article key={issue.id} className={`issue-card ${issue.state === 'DONE' ? 'card-closed' : ''}`} style={issue.isUrgent ? { borderColor: 'rgba(186,26,26,0.5)' } : {}}>
                     <div className="card-accent-line" style={{ backgroundColor: typeStyle.color }}></div>
-                    
+
                     <div className="card-header">
                       <div className="card-id-group">
                         <span className="issue-id">BB-{issue.id}</span>
                         {issue.isUrgent && (
                           <span className="badge-urgent">
-                            <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>warning</span> URGENTE
+                            <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>warning</span> URGENT
                           </span>
                         )}
                       </div>
@@ -99,10 +99,10 @@ export const MyIssuesView: React.FC = () => {
                         <span className="material-symbols-outlined" style={issue.state === 'DONE' ? { fontVariationSettings: '"FILL" 1' } : {}}>check_circle</span>
                       </button>
                     </div>
-                    
+
                     <h3 className={`issue-title ${issue.state === 'DONE' ? 'issue-title-closed' : ''}`}>{issue.title}</h3>
-                    {issue.reporterFullName && <p className="issue-project" style={{ marginBottom: '8px' }}>Assegnato da: {issue.reporterFullName}</p>}
-                    
+                    {issue.reporterFullName && <p className="issue-project" style={{ marginBottom: '8px' }}>Assigned by: {issue.reporterFullName}</p>}
+
                     <div className="card-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                         <span className="badge" style={{ backgroundColor: typeStyle.badgeBg, border: `1px solid ${typeStyle.badgeBorder}`, color: typeStyle.textColor }}>
@@ -127,10 +127,10 @@ export const MyIssuesView: React.FC = () => {
         {/* Sidebar Area (Right side) */}
         <aside className="my-issues-sidebar">
           <div className="summary-panel">
-            
+
             <div className="summary-header">
               <h2 className="summary-title">
-                <span className="material-symbols-outlined" style={{ color: 'var(--primary)' }}>analytics</span> 
+                <span className="material-symbols-outlined" style={{ color: 'var(--primary)' }}>analytics</span>
                 Tasks Summary
               </h2>
               <span className="summary-total-badge">{totalCount} Total</span>
@@ -198,7 +198,7 @@ export const MyIssuesView: React.FC = () => {
                 <span className="chart-title">Progress Status</span>
                 <span className="chart-badge">{doneCount} of {totalCount} resolved</span>
               </div>
-              
+
               <div className="donut-container">
                 <svg className="donut-svg" viewBox="0 0 120 120">
                   <circle className="donut-bg" cx="60" cy="60" r="48"></circle>

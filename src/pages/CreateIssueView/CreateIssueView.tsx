@@ -3,7 +3,7 @@ import type { KeyboardEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './CreateIssueView.css';
 
-type IssueType = 'bug' | 'feature' | 'domanda' | 'documentazione' | null;
+type IssueType = 'bug' | 'feature' | 'question' | 'documentation' | null;
 
 export const CreateIssueView: React.FC = () => {
   const navigate = useNavigate();
@@ -28,52 +28,52 @@ export const CreateIssueView: React.FC = () => {
 
   const toggleUrgent = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent form submission
-    if (labels.includes('URGENTE')) {
-      removeLabel('URGENTE');
+    if (labels.includes('URGENT')) {
+      removeLabel('URGENT');
     } else {
-      setLabels(['URGENTE', ...labels]);
+      setLabels(['URGENT', ...labels]);
     }
   };
 
   return (
     <div className="create-issue-view">
       <div className="page-title-row">
-        <h1 className="page-title">Crea Nuova Issue</h1>
+        <h1 className="page-title">Create New Issue</h1>
       </div>
 
       <form className="form-card" onSubmit={(e) => { e.preventDefault(); navigate('/dashboard/my-issues'); }}>
         
         {/* Title & Description */}
         <div>
-          <label className="input-label" htmlFor="issue-title">Titolo Issue</label>
+          <label className="input-label" htmlFor="issue-title">Issue Title</label>
           <input 
             id="issue-title"
             className="text-input" 
-            placeholder="Es: Il pulsante di login non risponde al click" 
+            placeholder="e.g. Login button is not responding" 
             required
           />
         </div>
 
         <div>
-          <label className="input-label">Descrizione</label>
+          <label className="input-label">Description</label>
           <div className="editor-container">
             <div className="editor-toolbar">
-              <button type="button" className="toolbar-btn" title="Grassetto">
+              <button type="button" className="toolbar-btn" title="Bold">
                 <span className="material-symbols-outlined">format_bold</span>
               </button>
-              <button type="button" className="toolbar-btn" title="Corsivo">
+              <button type="button" className="toolbar-btn" title="Italic">
                 <span className="material-symbols-outlined">format_italic</span>
               </button>
-              <button type="button" className="toolbar-btn" title="Lista puntata">
+              <button type="button" className="toolbar-btn" title="Bulleted List">
                 <span className="material-symbols-outlined">format_list_bulleted</span>
               </button>
-              <button type="button" className="toolbar-btn" title="Codice">
+              <button type="button" className="toolbar-btn" title="Code">
                 <span className="material-symbols-outlined">code</span>
               </button>
             </div>
             <textarea 
               className="editor-textarea" 
-              placeholder="Includi dettagli, step per riprodurre, comportamento atteso, etc."
+              placeholder="Include details, steps to reproduce, expected behavior, etc."
               required
             ></textarea>
           </div>
@@ -81,7 +81,7 @@ export const CreateIssueView: React.FC = () => {
 
         {/* Issue Type */}
         <div>
-          <p className="input-label">Tipo di Issue</p>
+          <p className="input-label">Issue Type</p>
           <div className="type-grid">
             <button 
               type="button" 
@@ -101,19 +101,19 @@ export const CreateIssueView: React.FC = () => {
             </button>
             <button 
               type="button" 
-              className={`type-btn ${issueType === 'domanda' ? 'selected' : ''}`} 
-              data-type="domanda"
-              onClick={() => setIssueType('domanda')}
+              className={`type-btn ${issueType === 'question' ? 'selected' : ''}`} 
+              data-type="question"
+              onClick={() => setIssueType('question')}
             >
-              Domanda
+              Question
             </button>
             <button 
               type="button" 
-              className={`type-btn ${issueType === 'documentazione' ? 'selected' : ''}`} 
-              data-type="documentazione"
-              onClick={() => setIssueType('documentazione')}
+              className={`type-btn ${issueType === 'documentation' ? 'selected' : ''}`} 
+              data-type="documentation"
+              onClick={() => setIssueType('documentation')}
             >
-              Documentazione
+              Documentation
             </button>
           </div>
         </div>
@@ -121,18 +121,18 @@ export const CreateIssueView: React.FC = () => {
         {/* Labels & Urgency */}
         <div className="labels-grid">
           <div>
-            <label className="input-label" htmlFor="label-input">Etichette</label>
+            <label className="input-label" htmlFor="label-input">Labels</label>
             <input 
               id="label-input"
               className="text-input" 
-              placeholder="Scrivi e premi Invio per aggiungere un'etichetta..." 
+              placeholder="Type and press Enter to add a label..." 
               value={labelInput}
               onChange={(e) => setLabelInput(e.target.value)}
               onKeyDown={handleAddLabel}
             />
             <div className="labels-container">
               {labels.map(label => (
-                <span key={label} className={`tag-label ${label === 'URGENTE' ? 'urgent' : ''}`}>
+                <span key={label} className={`tag-label ${label === 'URGENT' ? 'urgent' : ''}`}>
                   {label}
                   <button type="button" className="tag-remove-btn" onClick={() => removeLabel(label)}>
                     <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>close</span>
@@ -145,30 +145,30 @@ export const CreateIssueView: React.FC = () => {
           <div className="urgent-btn-container">
             <button type="button" className="btn-urgent" onClick={toggleUrgent}>
               <span className="material-symbols-outlined">bolt</span>
-              {labels.includes('URGENTE') ? 'Rimuovi Segnalazione URGENTE' : 'Segnala come URGENTE'}
+              {labels.includes('URGENT') ? 'Remove URGENT Flag' : 'Mark as URGENT'}
             </button>
           </div>
         </div>
 
         {/* Attachments */}
         <div>
-          <p className="input-label">Allegati</p>
+          <p className="input-label">Attachments</p>
           <div className="dropzone">
             <div className="dropzone-icon">
               <span className="material-symbols-outlined" style={{ fontSize: '32px' }}>upload_file</span>
             </div>
-            <p style={{ fontWeight: 600, color: 'var(--primary)', marginBottom: '4px' }}>Trascina i file qui <span style={{ color: 'var(--on-surface-variant)', fontWeight: 400 }}>o clicca per caricare</span></p>
-            <p style={{ fontSize: '12px', color: 'var(--on-surface-variant)' }}>PNG, JPG, GIF, PDF fino a 10MB</p>
+            <p style={{ fontWeight: 600, color: 'var(--primary)', marginBottom: '4px' }}>Drag files here <span style={{ color: 'var(--on-surface-variant)', fontWeight: 400 }}>or click to upload</span></p>
+            <p style={{ fontSize: '12px', color: 'var(--on-surface-variant)' }}>PNG, JPG, GIF, PDF up to 10MB</p>
           </div>
         </div>
 
         {/* Action Buttons */}
         <div className="actions-row">
           <button type="button" className="btn-cancel" onClick={() => navigate('/dashboard')}>
-            Annulla
+            Cancel
           </button>
           <button type="submit" className="btn-create">
-            Crea Issue
+            Create Issue
           </button>
         </div>
         

@@ -35,7 +35,7 @@ export const UsersManagementView: React.FC = () => {
       setPassword('');
       setProfileType('user');
     } catch (err: any) {
-      setError(err.message || 'Errore durante la creazione dell\'utente');
+      setError(err.message || 'Error creating user');
     } finally {
       setIsLoading(false);
     }

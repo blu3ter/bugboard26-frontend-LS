@@ -26,28 +26,18 @@ export const AllIssuesView: React.FC<AllIssuesViewProps> = ({ isAdmin = true }) 
     fetchIssues();
   }, []);
 
-  const getAccentColor = (issue: IssueDto) => {
-    if (issue.isUrgent) return '#ba1a1a';
-    if (issue.type === 'FEATURE') return 'var(--primary)';
-    if (issue.type === 'DOCUMENTATION') return 'var(--secondary)';
-    return 'var(--primary)';
-  };
-
-  const getTypeIcon = (type: string) => {
+  const getTypeStyles = (type: string) => {
     switch (type) {
-      case 'BUG': return 'bug_report';
-      case 'FEATURE': return 'add_box';
-      case 'DOCUMENTATION': return 'description';
-      default: return 'list';
-    }
-  };
-
-  const getBadgeClass = (type: string) => {
-    switch (type) {
-      case 'BUG': return 'badge-bug';
-      case 'FEATURE': return 'badge-feature';
-      case 'DOCUMENTATION': return 'badge-documentation';
-      default: return 'badge-todo';
+      case 'BUG': 
+        return { color: '#ef4444', icon: 'bug_report', badgeBg: 'rgba(239, 68, 68, 0.1)', badgeBorder: '#ef4444', textColor: '#ef4444' };
+      case 'FEATURE': 
+        return { color: '#10b981', icon: 'add_box', badgeBg: 'rgba(16, 185, 129, 0.1)', badgeBorder: '#10b981', textColor: '#10b981' };
+      case 'QUESTION': 
+        return { color: '#fbbf24', icon: 'help', badgeBg: 'rgba(251, 191, 36, 0.1)', badgeBorder: '#fbbf24', textColor: '#fbbf24' };
+      case 'DOCUMENTATION': 
+        return { color: '#2563eb', icon: 'description', badgeBg: 'rgba(37, 99, 235, 0.1)', badgeBorder: '#2563eb', textColor: '#2563eb' };
+      default: 
+        return { color: 'var(--primary)', icon: 'list', badgeBg: 'var(--surface-container-high)', badgeBorder: 'var(--border-color)', textColor: 'var(--text-secondary)' };
     }
   };
 
@@ -69,60 +59,60 @@ export const AllIssuesView: React.FC<AllIssuesViewProps> = ({ isAdmin = true }) 
       {/* Grid of Issues */}
       <div className="issues-grid">
         {loading ? (
-          <p>Caricamento issues...</p>
+          <p>Loading issues...</p>
         ) : issues.length === 0 ? (
-          <p>Nessuna issue trovata.</p>
+          <p>No issues found.</p>
         ) : (
-          issues.map((issue) => (
-            <article 
-              key={issue.id} 
-              className={`issue-card ${issue.state === 'DONE' ? 'card-closed' : ''}`}
-              style={issue.isUrgent ? { borderColor: 'rgba(186,26,26,0.5)' } : {}}
-            >
-              <div className="card-accent-line" style={{ backgroundColor: getAccentColor(issue) }}></div>
-              
-              <div className="card-header">
-                <div className="card-id-group">
-                  <span className="issue-id">BB-{issue.id}</span>
-                  {issue.isUrgent && (
-                    <span className="badge-urgent">
-                      <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>warning</span> URGENTE
-                    </span>
-                  )}
-                </div>
-                <button className={`btn-check ${issue.state === 'DONE' ? 'btn-checked' : ''}`} disabled={issue.state === 'DONE'}>
-                  <span className="material-symbols-outlined" style={issue.state === 'DONE' ? { fontVariationSettings: '"FILL" 1' } : {}}>check_circle</span>
-                </button>
-              </div>
-              
-              <h3 className={`issue-title ${issue.state === 'DONE' ? 'issue-title-closed' : ''}`}>{issue.title}</h3>
-              {issue.reporterFullName && (
-                <p className="issue-project">Reporter: {issue.reporterFullName}</p>
-              )}
-              
-              <div className="card-footer">
-                <span className={`badge ${getBadgeClass(issue.type)}`}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>{getTypeIcon(issue.type)}</span> {issue.type}
-                </span>
-                <span className={`badge ${getStateBadgeClass(issue.state)}`}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>list</span> {issue.state}
-                </span>
+          issues.map((issue) => {
+            const typeStyle = getTypeStyles(issue.type);
+            return (
+              <article 
+                key={issue.id} 
+                className={`issue-card ${issue.state === 'DONE' ? 'card-closed' : ''}`}
+                style={issue.isUrgent ? { borderColor: 'rgba(186,26,26,0.5)' } : {}}
+              >
+                <div className="card-accent-line" style={{ backgroundColor: typeStyle.color }}></div>
                 
-                <div className="assignee-info">
-                  {issue.assigneeFullName && (
-                    <span className="assignee-text">Assegnato a: {issue.assigneeFullName}</span>
-                  )}
+                <div className="card-header">
+                  <div className="card-id-group">
+                    <span className="issue-id">BB-{issue.id}</span>
+                    {issue.isUrgent && (
+                      <span className="badge-urgent">
+                        <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>warning</span> URGENT
+                      </span>
+                    )}
+                  </div>
                 </div>
                 
-                {isAdmin && (
-                  <button className="btn-assign" style={!issue.assigneeFullName ? { marginLeft: 'auto' } : {}} title="Assegna/Riassegna">
-                    <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>{issue.assigneeFullName ? 'sync' : 'person_add'}</span>
-                    <span>Assegna</span>
-                  </button>
+                <h3 className={`issue-title ${issue.state === 'DONE' ? 'issue-title-closed' : ''}`}>{issue.title}</h3>
+                {issue.reporterFullName && (
+                  <p className="issue-project">Reporter: {issue.reporterFullName}</p>
                 )}
-              </div>
-            </article>
-          ))
+                
+                <div className="card-footer">
+                  <span className="badge" style={{ backgroundColor: typeStyle.badgeBg, border: `1px solid ${typeStyle.badgeBorder}`, color: typeStyle.textColor }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>{typeStyle.icon}</span> {issue.type}
+                  </span>
+                  <span className={`badge ${getStateBadgeClass(issue.state)}`}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>list</span> {issue.state}
+                  </span>
+                  
+                  <div className="assignee-info">
+                    {issue.assigneeFullName && (
+                      <span className="assignee-text">Assigned to: {issue.assigneeFullName}</span>
+                    )}
+                  </div>
+                  
+                  {isAdmin && (
+                    <button className="btn-assign" style={!issue.assigneeFullName ? { marginLeft: 'auto' } : {}} title="Assign / Reassign">
+                      <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>{issue.assigneeFullName ? 'sync' : 'person_add'}</span>
+                      <span>{issue.assigneeFullName ? 'Reassign' : 'Assign'}</span>
+                    </button>
+                  )}
+                </div>
+              </article>
+            );
+          })
         )}
       </div>
     </div>
