@@ -181,57 +181,51 @@
   gap: 12px;
 }
 
-.brand-pill {
+/* Issue Type Badge (replaces redundant brand logo) */
+.issue-type-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  background-color: #0c1322;
-  border: 1px solid #22304d;
-  padding: 6px 12px;
-  border-radius: 8px;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
-}
-
-.brand-dots {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.dot-amber {
-  width: 10px;
-  height: 10px;
-  border-radius: 9999px;
-  background-color: #f59e0b;
-  display: inline-block;
-}
-
-.dot-red {
-  width: 10px;
-  height: 10px;
-  border-radius: 9999px;
-  background-color: #ef4444;
-  display: inline-block;
-}
-
-.dot-blue {
-  width: 10px;
-  height: 10px;
-  border-radius: 9999px;
-  background-color: #3b82f6;
-  display: inline-block;
-}
-
-.brand-pill-text {
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.05em;
-  color: #f1f5f9;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
+  transition: all 0.2s ease;
 }
 
-.brand-pill-text .text-accent {
-  color: #3b82f6;
+.issue-type-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+/* Issue Type Variants */
+.issue-type-badge.type-bug {
+  background-color: rgba(239, 68, 68, 0.16);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.38);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.12);
+}
+
+.issue-type-badge.type-feature {
+  background-color: rgba(147, 51, 234, 0.16);
+  color: #d8b4fe;
+  border: 1px solid rgba(147, 51, 234, 0.38);
+  box-shadow: 0 0 10px rgba(147, 51, 234, 0.12);
+}
+
+.issue-type-badge.type-question {
+  background-color: rgba(6, 182, 212, 0.16);
+  color: #67e8f9;
+  border: 1px solid rgba(6, 182, 212, 0.38);
+}
+
+.issue-type-badge.type-documentation {
+  background-color: rgba(59, 130, 246, 0.16);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.38);
 }
 
 /* Status Pill: In Lavorazione */

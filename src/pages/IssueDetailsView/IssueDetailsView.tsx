@@ -93,16 +93,29 @@ export const IssueDetailsView: React.FC = () => {
             <div className="header-info-col">
               {/* Brand and Status Badges */}
               <div className="badges-row">
-                <div className="brand-pill">
-                  <span className="brand-dots">
-                    <span className="dot-amber"></span>
-                    <span className="dot-red"></span>
-                    <span className="dot-blue"></span>
-                  </span>
-                  <span className="brand-pill-text">
-                    BUGBOARD<span className="text-accent">26</span>
-                  </span>
-                </div>
+                {/* Issue Type Badge (Bug) */}
+                <span className="issue-type-badge type-bug">
+                  <svg
+                    className="issue-type-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect width="8" height="14" x="8" y="6" rx="4" />
+                    <path d="m19 7-3 2" />
+                    <path d="m5 7 3 2" />
+                    <path d="m19 19-3-2" />
+                    <path d="m5 19 3-2" />
+                    <path d="M20 13h-4" />
+                    <path d="M4 13h4" />
+                    <path d="m10 4 1 2" />
+                    <path d="m14 4-1 2" />
+                  </svg>
+                  <span>Bug</span>
+                </span>
 
                 <span className="badge-in-progress">
                   <span className="pulse-indicator"></span>
