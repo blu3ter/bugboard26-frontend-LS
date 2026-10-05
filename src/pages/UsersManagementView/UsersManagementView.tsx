@@ -1,39 +1,63 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { authService } from '../../service/authService';
 import './UsersManagementView.css';
 
 export const UsersManagementView: React.FC = () => {
   const navigate = useNavigate();
   const [profileType, setProfileType] = useState('user');
+  const [nome, setNome] = useState('');
+  const [cognome, setCognome] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(false);
+    setIsLoading(true);
+
+    try {
+      await authService.executeRegisterWorkflow({
+        firstName: nome,
+        lastName: cognome,
+        email,
+        password,
+        role: profileType,
+      });
+      setSuccess(true);
+      setNome('');
+      setCognome('');
+      setEmail('');
+      setPassword('');
+      setProfileType('user');
+    } catch (err: any) {
+      setError(err.message || 'Error creating user');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="admin-users-view">
       <div className="admin-form-container">
 
-        {/* Visual Panel */}
-        <section className="visual-panel">
-          <div className="visual-decoration-top"></div>
-          <div className="visual-decoration-bottom"></div>
 
-          <div className="visual-content">
-            <div className="visual-logo">B</div>
-            <h2 className="visual-title">Create a new member to BugBoard26 community.</h2>
-            <p className="visual-subtitle">Start managing your software issues with the most efficient Material Design workflow.</p>
-          </div>
-
-          <div className="visual-footer">
-            <p className="visual-footer-text">Everything starts with a report.</p>
-          </div>
-        </section>
 
         {/* Form Panel */}
         <section className="form-panel">
           <div className="form-header">
-            <h1>bugboard26</h1>
-            <p>Create account to new user. Fill all fields to procede.</p>
+            <h1>New Member</h1>
+            <p>Set up credentials and assign workspace permissions for the new user.</p>
           </div>
 
-          <form className="admin-form" onSubmit={(e) => e.preventDefault()}>
+          {error && <div className="error-message" style={{ color: '#d32f2f', backgroundColor: '#ffebee', padding: '10px', borderRadius: '4px', marginBottom: '16px', fontSize: '14px' }}>{error}</div>}
+          {success && <div className="success-message" style={{ color: '#2e7d32', backgroundColor: '#e8f5e9', padding: '10px', borderRadius: '4px', marginBottom: '16px', fontSize: '14px' }}>User created successfully!</div>}
+
+          <form className="admin-form" onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label" htmlFor="nome">Name</label>
@@ -44,6 +68,8 @@ export const UsersManagementView: React.FC = () => {
                   placeholder="John"
                   required
                   type="text"
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
                 />
               </div>
               <div className="form-group">
@@ -55,6 +81,8 @@ export const UsersManagementView: React.FC = () => {
                   placeholder="Doe"
                   required
                   type="text"
+                  value={cognome}
+                  onChange={(e) => setCognome(e.target.value)}
                 />
               </div>
             </div>
@@ -68,6 +96,8 @@ export const UsersManagementView: React.FC = () => {
                 placeholder="john.doe@example.com"
                 required
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
@@ -79,38 +109,58 @@ export const UsersManagementView: React.FC = () => {
                 name="password"
                 required
                 type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
 
             <div className="form-group">
-              <span className="form-label" style={{ marginBottom: '12px' }}>Select type:</span>
-              <div className="profile-selector-container">
-                <label className="profile-option">
+              <span className="form-label" style={{ marginBottom: '12px' }}>Role</span>
+              <div className="role-cards-container">
+                <label className="role-card-label">
                   <input
                     name="profile_type"
                     type="radio"
                     value="user"
                     checked={profileType === 'user'}
                     onChange={() => setProfileType('user')}
+                    className="role-radio-input"
                   />
-                  <div className="profile-button">User</div>
+                  <div className="role-card">
+                    <div className="role-card-icon">
+                      <span className="material-symbols-outlined">person</span>
+                    </div>
+                    <div className="role-card-content">
+                      <span className="role-card-title">Member</span>
+                      <span className="role-card-desc">Basic level access. Can view, report and comment issues.</span>
+                    </div>
+                  </div>
                 </label>
-                <label className="profile-option">
+                <label className="role-card-label">
                   <input
                     name="profile_type"
                     type="radio"
                     value="admin"
                     checked={profileType === 'admin'}
                     onChange={() => setProfileType('admin')}
+                    className="role-radio-input"
                   />
-                  <div className="profile-button">Admin</div>
+                  <div className="role-card">
+                    <div className="role-card-icon">
+                      <span className="material-symbols-outlined">admin_panel_settings</span>
+                    </div>
+                    <div className="role-card-content">
+                      <span className="role-card-title">Admin</span>
+                      <span className="role-card-desc">Can view, report, comment and assign issues to members. Can create new users</span>
+                    </div>
+                  </div>
                 </label>
               </div>
             </div>
 
-            <button className="btn-submit" type="submit">
+            <button className="btn-submit" type="submit" disabled={isLoading}>
               <span className="material-symbols-outlined">person_add</span>
-              SIGN UP
+              {isLoading ? 'CREATING...' : 'CREATE USER'}
             </button>
           </form>
 

@@ -1,4 +1,4 @@
-import type { LoginRequestDto } from '../types';
+import type { LoginRequestDto, RegisterRequestDto } from '../types';
 
 /**
  * Controller Layer (Domain / Business Rules & Use Cases)
@@ -59,10 +59,57 @@ export const validateLoginCredentials = (credentials: LoginRequestDto): Validati
   };
 };
 
+export interface RegisterValidationResult {
+  isValid: boolean;
+  errors: {
+    email?: string;
+    password?: string;
+    firstName?: string;
+    lastName?: string;
+    role?: string;
+  };
+}
+
+/**
+ * Valida i dati forniti per la registrazione di un nuovo utente
+ */
+export const validateRegisterCredentials = (credentials: RegisterRequestDto): RegisterValidationResult => {
+  const errors: RegisterValidationResult['errors'] = {};
+
+  if (!credentials.firstName || credentials.firstName.trim() === '') {
+    errors.firstName = 'Il nome è obbligatorio.';
+  }
+
+  if (!credentials.lastName || credentials.lastName.trim() === '') {
+    errors.lastName = 'Il cognome è obbligatorio.';
+  }
+
+  const emailError = validateEmail(credentials.email);
+  if (emailError) {
+    errors.email = emailError;
+  } else if (!credentials.email.includes('@')) {
+    errors.email = "L'email deve contenere '@'.";
+  }
+
+  const passwordError = validatePassword(credentials.password);
+  if (passwordError) {
+    errors.password = passwordError;
+  }
+
+  if (!credentials.role || credentials.role.trim() === '') {
+    errors.role = 'Il ruolo è obbligatorio.';
+  }
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors,
+  };
+};
+
 /**
  * Costruisce il messaggio di benvenuto formattato per l'utente autenticato
  */
 export const formatWelcomeMessage = (user: { name?: string; email: string }): string => {
   const displayName = user.name && user.name.trim() !== '' ? user.name : user.email;
-  return `Benvenuto ${displayName}!`;
+  return `Welcome back, ${displayName}!`;
 };

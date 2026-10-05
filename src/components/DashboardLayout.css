@@ -2,25 +2,25 @@
   color-scheme: dark;
 
   /* Backgrounds */
-  --bg-main: #0c1017;
-  --bg-sidebar: #0d1117;
-  --background: #0c1017;
-  --border-color: #1e2633;
-  --darkborder: #1e2633;
+  --bg-main: #0b0f17;
+  --bg-sidebar: #111827;
+  --background: #0b0f17;
+  --border-color: #334155;
+  --darkborder: #334155;
 
   /* Surfaces & Containers (Cards, Modals, Sections) */
-  --surface-container-lowest: #111722;
-  --surface-container-low: #0e141e;
-  --surface-container-high: #161f2e;
+  --surface-container-lowest: #1e293b;
+  --surface-container-low: #1e293b;
+  --surface-container-high: #1e293b;
   --surface-container-highest: #1e293b;
 
   /* Borders & Outlines */
-  --outline-variant: #1f293d;
+  --outline-variant: #334155;
 
   /* Typography */
-  --text-primary: #f0f6fc;
+  --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
-  --on-surface: #f0f6fc;
+  --on-surface: #f8fafc;
   --on-surface-variant: #94a3b8;
 
   /* Primary Accent (Sky Blue) */
@@ -63,8 +63,10 @@ body {
   color: var(--text-primary);
   /* Selection styling as requested in body classes */
 }
+
 .dashboard-root ::selection {
-  background-color: #2563eb; /* blue-600 */
+  background-color: #2563eb;
+  /* blue-600 */
   color: white;
 }
 
@@ -119,7 +121,7 @@ body {
   margin-bottom: 24px;
   width: 100%;
   transition: all 0.15s;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .btn-report-bug:hover {
@@ -152,21 +154,24 @@ body {
   padding: 10px 12px;
   border-radius: 8px;
   color: var(--text-secondary);
+  background-color: transparent;
   text-decoration: none;
   font-weight: 500;
   font-size: 14px;
-  transition: all 0.2s;
+  border-left: 3px solid transparent;
+  transition: all 0.15s ease;
 }
 
 .nav-link:hover {
-  background-color: var(--nav-hover);
+  background-color: rgba(255, 255, 255, 0.04);
   color: #e2e8f0;
 }
 
 .nav-link.active {
-  background-color: var(--nav-active-bg);
-  color: var(--nav-active-text);
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  background-color: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  border-left-color: var(--primary);
+  border-radius: 4px 8px 8px 4px;
 }
 
 .nav-link .material-symbols-outlined {
@@ -228,6 +233,7 @@ body {
   letter-spacing: -0.025em;
   margin: 0;
 }
+
 @media (min-width: 768px) {
   .topbar-title {
     font-size: 30px;
@@ -291,4 +297,3 @@ body {
   overflow-y: auto;
   padding: 0 32px 32px 32px;
 }
-
