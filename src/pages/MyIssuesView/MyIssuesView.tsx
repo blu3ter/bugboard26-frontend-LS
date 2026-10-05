@@ -40,8 +40,8 @@ export const MyIssuesView: React.FC = () => {
 
   const getStateText = (state: string) => {
     switch (state) {
-      case 'TODO': return 'Todo';
-      case 'IN_PROGRESS': return 'In Progress';
+      case 'TODO': return 'To do';
+      case 'IN_PROGRESS': return 'In progress';
       case 'REVIEW': return 'Review';
       case 'DONE': return 'Closed';
       default: return state;
