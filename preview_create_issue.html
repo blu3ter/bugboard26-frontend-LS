@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CreateIssueView - Interactive Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <link rel="stylesheet" href="./src/pages/CreateIssueView/CreateIssueView.css?v=5">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #0b111e;
+      overflow: hidden;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .preview-info-banner {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      backdrop-filter: blur(10px);
+      color: #93c5fd;
+      padding: 8px 18px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      user-select: none;
+    }
+
+    .preview-info-banner .badge {
+      background: #2563eb;
+      color: #ffffff;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* Force Horizontal 2-Column Layout */
+    .create-issue-modal {
+      max-width: 1120px !important;
+      border-radius: 20px !important;
+    }
+
+    .modal-header {
+      padding: 24px 36px 20px !important;
+    }
+
+    .modal-form {
+      padding: 24px 36px 28px !important;
+    }
+
+    .modal-horizontal-grid {
+      display: grid !important;
+      grid-template-columns: 1.18fr 1fr !important;
+      gap: 36px !important;
+      align-items: stretch !important;
+    }
+
+    .modal-col-main,
+    .modal-col-sidebar {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 20px !important;
+    }
+
+    .modal-col-main {
+      height: 100% !important;
+    }
+
+    .flex-grow-field,
+    .flex-grow-editor {
+      flex: 1 !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+
+    .flex-grow-editor .editor-textarea {
+      flex: 1 !important;
+      min-height: 280px !important;
+      padding: 16px 18px !important;
+      font-size: 13.5px !important;
+      line-height: 1.65 !important;
+      scrollbar-width: thin !important;
+      scrollbar-color: #334155 transparent !important;
+    }
+
+    .editor-textarea::-webkit-scrollbar {
+      width: 6px !important;
+    }
+
+    .editor-textarea::-webkit-scrollbar-track {
+      background: transparent !important;
+      margin: 6px 0 !important;
+    }
+
+    .editor-textarea::-webkit-scrollbar-thumb {
+      background-color: #334155 !important;
+      border-radius: 9999px !important;
+      transition: background-color 0.2s ease !important;
+    }
+
+    .editor-textarea::-webkit-scrollbar-thumb:hover {
+      background-color: #475569 !important;
+    }
+
+    .editor-textarea::-webkit-scrollbar-thumb:active {
+      background-color: #3b82f6 !important;
+    }
+
+    .editor-textarea::-webkit-scrollbar-button {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+
+    .title-input {
+      padding: 14px 18px !important;
+      font-size: 14.5px !important;
+    }
+
+    .title-char-counter {
+      font-size: 11px !important;
+      font-family: inherit !important;
+      color: #94a3b8 !important;
+      margin-left: 2px !important;
+      transition: color 0.15s ease !important;
+    }
+
+    .title-char-counter.is-max {
+      color: #f87171 !important;
+      font-weight: 600 !important;
+    }
+
+    .type-selector-grid {
+      grid-template-columns: repeat(4, 1fr) !important;
+      gap: 10px !important;
+    }
+
+    .type-radio-card {
+      padding: 14px 8px !important;
+    }
+
+    .labels-box-grid {
+      padding: 16px 18px !important;
+      gap: 10px !important;
+      border-radius: 14px !important;
+    }
+
+    .selectable-tag-chip {
+      padding: 7px 14px !important;
+      font-size: 12.5px !important;
+      border-radius: 9999px !important;
+    }
+
+    .btn-add-label-trigger {
+      padding: 7px 16px !important;
+      font-size: 12.5px !important;
+      border-radius: 9999px !important;
+    }
+
+    .urgency-card {
+      padding: 18px 20px !important;
+      border-radius: 14px !important;
+    }
+
+    .urgency-icon-box {
+      width: 44px !important;
+      height: 44px !important;
+      font-size: 22px !important;
+    }
+
+    .dropzone-box {
+      padding: 20px 18px !important;
+      border-radius: 14px !important;
+    }
+
+    .modal-footer {
+      padding: 20px 36px 24px !important;
+      border-bottom-left-radius: 20px !important;
+      border-bottom-right-radius: 20px !important;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Preview Floating Helper -->
+  <div class="preview-info-banner">
+    <span class="badge">LIVE PREVIEW</span>
+    <span>Clicca sui tag per vedere il <strong>+ ruotare in &times;</strong> e lo switch <strong>Mark as URGENT</strong>
+      sincronizzato!</span>
+  </div>
+
+  <div class="create-issue-page-wrapper">
+    <!-- Background Floating Tags Layer -->
+    <div class="issue-bg-layer" aria-hidden="true">
+      <div class="bg-floating-tag" style="top: 7%; left: 4%; background-color: rgba(37, 66, 160, 0.85);">#backend</div>
+      <div class="bg-floating-tag" style="top: 5%; left: 37%; background-color: rgba(204, 26, 40, 0.9);">#dangerous
+      </div>
+      <div class="bg-floating-tag" style="top: 6%; left: 60%; background-color: rgba(51, 65, 85, 0.9); color: #e2e8f0;">
+        #closed</div>
+      <div class="bg-floating-tag" style="top: 8%; right: 7%; background-color: rgba(220, 38, 38, 0.9);">#hotfix</div>
+      <div class="bg-floating-tag" style="top: 19%; left: 15%; background-color: rgba(234, 88, 12, 0.9);">#open</div>
+      <div class="bg-floating-tag" style="top: 16%; right: 15%; background-color: rgba(2, 132, 199, 0.9);">#frontend
+      </div>
+      <div class="bg-floating-tag" style="top: 26%; right: 6%; background-color: rgba(185, 28, 28, 0.9);">#bug</div>
+      <div class="bg-floating-tag" style="top: 30%; left: 3%; background-color: rgba(225, 29, 72, 0.9);">#urgent</div>
+      <div class="bg-floating-tag"
+        style="top: 38%; left: 16%; background-color: rgba(245, 158, 11, 0.9); color: #000; font-weight: bold;">#meeting
+      </div>
+      <div class="bg-floating-tag" style="top: 40%; right: 19%; background-color: rgba(124, 58, 237, 0.9);">#question
+      </div>
+      <div class="bg-floating-tag" style="top: 49%; left: 3%; background-color: rgba(13, 148, 136, 0.9);">#fast</div>
+      <div class="bg-floating-tag" style="top: 49%; right: 6%; background-color: rgba(22, 163, 74, 0.9);">#feature</div>
+      <div class="bg-floating-tag" style="top: 61%; left: 15%; background-color: rgba(219, 39, 119, 0.9);">#ui/ux</div>
+      <div class="bg-floating-tag" style="top: 60%; right: 18%; background-color: rgba(14, 165, 233, 0.9);">#in progress
+      </div>
+      <div class="bg-floating-tag" style="top: 69%; right: 5%; background-color: rgba(29, 78, 216, 0.9);">#backend</div>
+      <div class="bg-floating-tag" style="bottom: 23%; left: 3%; background-color: rgba(2, 132, 199, 0.9);">#frontend
+      </div>
+      <div class="bg-floating-tag" style="bottom: 17%; left: 16%; background-color: rgba(21, 128, 61, 0.9);">#feature
+      </div>
+      <div class="bg-floating-tag" style="bottom: 14%; right: 19%; background-color: rgba(13, 148, 136, 0.9);">#fast
+      </div>
+      <div class="bg-floating-tag" style="bottom: 7%; left: 4%; background-color: rgba(2, 132, 199, 0.9);">#devops</div>
+      <div class="bg-floating-tag" style="bottom: 5%; left: 36%; background-color: rgba(217, 119, 6, 0.9);">#chill</div>
+      <div class="bg-floating-tag" style="bottom: 4%; right: 38%; background-color: rgba(185, 28, 28, 0.9);">#bug</div>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div class="create-issue-overlay">
+      <div class="create-issue-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"
+        onclick="event.stopPropagation()">
+
+        <!-- Header -->
+        <div class="modal-header">
+          <div class="modal-header-left">
+            <div class="modal-header-icon-badge">
+              <i class="ph-bold ph-ticket"></i>
+            </div>
+            <div class="header-title-group">
+              <h2 id="modal-title">New Issue</h2>
+              <p>Fill in the ticket details to track</p>
+            </div>
+          </div>
+          <button type="button" class="modal-close-btn" aria-label="Close modal" onclick="alert('Close clicked')">
+            <i class="ph-bold ph-x"></i>
+          </button>
+        </div>
+
+        <!-- Form Body with 2-Column Grid -->
+        <form class="modal-form custom-scroll" onsubmit="event.preventDefault(); alert('Issue created!');">
+          <div class="modal-horizontal-grid">
+
+            <!-- LEFT COLUMN: Primary Details & Content -->
+            <div class="modal-col-main">
+              <!-- Title -->
+              <div class="form-field">
+                <div class="field-header">
+                  <label class="field-label" for="issue-title">
+                    Title <span class="required-mark">*</span>
+                  </label>
+                  <span class="field-hint">
+                    Max 120 characters <span id="title-char-counter" class="title-char-counter">(0/120)</span>
+                  </span>
+                </div>
+                <input
+                  id="issue-title"
+                  name="issue-title"
+                  type="text"
+                  class="title-input"
+                  placeholder="Enter a descriptive title for the issue or request..."
+                  maxlength="120"
+                  required
+                />
+              </div>
+
+              <!-- Description & Rich Text Editor -->
+              <div class="form-field flex-grow-field">
+                <label class="field-label" for="issue-description">
+                  Description <span class="required-mark">*</span>
+                </label>
+                <div class="editor-container flex-grow-editor">
+                  <div class="editor-toolbar">
+                    <button type="button" class="editor-toolbar-btn" title="Bold" onclick="applyMarkdown('**', '**')">
+                      <i class="ph-bold ph-text-b"></i>
+                    </button>
+                    <button type="button" class="editor-toolbar-btn" title="Italic" onclick="applyMarkdown('*', '*')">
+                      <i class="ph-bold ph-text-italic"></i>
+                    </button>
+                    <span class="editor-toolbar-divider"></span>
+                    <button type="button" class="editor-toolbar-btn font-code" title="Inline code" onclick="applyMarkdown('`', '`')">
+                      &lt;/&gt;
+                    </button>
+                    <button type="button" class="editor-toolbar-btn" id="bulletListBtn" title="Bullet list" onclick="toggleBulletList()">
+                      <i class="ph-bold ph-list-bullets"></i>
+                    </button>
+                    <span class="editor-support-text">Ctrl+B / Ctrl+I</span>
+                  </div>
+                  <textarea
+                    id="issue-description"
+                    class="editor-textarea"
+                    placeholder="Describe the issue in detail, precise steps to reproduce, expected behavior... Use • for lists."
+                    onkeydown="handleDescriptionKeyDown(event)"
+                    onclick="updateListActiveState()"
+                    onkeyup="updateListActiveState()"
+                    required
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Properties, Classification & Scope -->
+            <div class="modal-col-sidebar">
+              <!-- Issue Type (D6) -->
+              <div class="form-field">
+                <label class="field-label">Issue Type (D6) <span class="required-mark">*</span></label>
+                <div class="type-selector-grid" role="radiogroup">
+                  <label class="type-radio-card type-bug is-selected" onclick="selectType(this, 'bug')">
+                    <input type="radio" name="issue_type" value="bug" checked />
+                    <i class="ph-fill ph-bug type-icon"></i>
+                    <span class="type-label">Bug</span>
+                  </label>
+
+                  <label class="type-radio-card type-feature" onclick="selectType(this, 'feature')">
+                    <input type="radio" name="issue_type" value="feature" />
+                    <i class="ph-bold ph-sparkle type-icon"></i>
+                    <span class="type-label">Feature</span>
+                  </label>
+
+                  <label class="type-radio-card type-question" onclick="selectType(this, 'question')">
+                    <input type="radio" name="issue_type" value="question" />
+                    <i class="ph-bold ph-question type-icon"></i>
+                    <span class="type-label">Question</span>
+                  </label>
+
+                  <label class="type-radio-card type-docs" onclick="selectType(this, 'documentation')">
+                    <input type="radio" name="issue_type" value="documentation" />
+                    <i class="ph-bold ph-file-text type-icon"></i>
+                    <span class="type-label">Docs</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Labels & Scope (D7) -->
+              <div class="form-field">
+                <div class="field-header">
+                  <label class="field-label">Labels &amp; Scope (D7)</label>
+                  <span class="field-hint" id="labels-count-hint">Click + to select tags</span>
+                </div>
+                <div class="labels-box-grid" id="labels-container">
+                  <!-- Rendered dynamically via JS -->
+                </div>
+              </div>
+
+              <!-- Priority & Urgency Section (D3) -->
+              <div class="form-field">
+                <label class="field-label">Priority &amp; Urgency Level (D3)</label>
+                <div class="urgency-card" id="urgencyCard">
+                  <div class="urgency-info">
+                    <div class="urgency-icon-box">
+                      <i class="ph-bold ph-warning animate-pulse-icon"></i>
+                    </div>
+                    <div class="urgency-text-group">
+                      <div class="urgency-title-row">
+                        <span class="urgency-title-text">Mark as URGENT</span>
+                        <span class="urgency-badge-block">Blocker</span>
+                      </div>
+                      <p class="urgency-subtext">
+                        Highlights issue with top priority and pins it to the board
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Switch Toggle -->
+                  <label class="urgency-switch">
+                    <input type="checkbox" id="urgencyCheckbox" onchange="toggleUrgency(this.checked)" />
+                    <span class="switch-slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Attachments Section -->
+              <div class="form-field">
+                <div class="field-header">
+                  <label class="field-label">
+                    Attach a screenshot <span class="field-optional">(optional)</span>
+                  </label>
+                  <span class="field-hint">PNG, JPG or GIF up to 10MB</span>
+                </div>
+
+                <!-- Hidden File Input -->
+                <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileSelected(event)" />
+
+                <div
+                  class="dropzone-box"
+                  id="dropzoneBox"
+                  onclick="handleDropzoneClick()"
+                  ondragover="event.preventDefault(); this.classList.add('is-dragover');"
+                  ondragleave="this.classList.remove('is-dragover');"
+                  ondrop="handleFileDrop(event)"
+                >
+                  <div class="dropzone-icon-circle">
+                    <i class="ph ph-upload-simple"></i>
+                  </div>
+                  <p class="dropzone-prompt">
+                    <span class="dropzone-link-text">Choose file</span> or drag image here
+                  </p>
+                  <p class="dropzone-keyboard-hint">
+                    You can paste screenshots directly with <kbd class="kbd-badge">Ctrl+V</kbd>
+                  </p>
+
+                  <!-- Attached File Container (empty by default) -->
+                  <div id="attachment-container"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </form>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+          <div class="footer-visibility-notice">
+            <i class="ph-bold ph-shield-check visibility-icon"></i>
+            Visible to all authorized collaborators
+          </div>
+          <div class="footer-actions">
+            <button type="button" class="btn-secondary" onclick="alert('Canceled')">Cancel</button>
+            <button type="button" class="btn-primary" onclick="alert('Issue Created!')">
+              <i class="ph-bold ph-paper-plane-tilt"></i>
+              <span>Create Issue</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State
+    let availableTags = ['backend', 'frontend', 'security', 'ui/ux', 'fast', 'urgent'];
+    let labels = [];
+    let isUrgent = false;
+
+    const tagColorMap = {
+      'backend': 'tag-color-backend',
+      'frontend': 'tag-color-frontend',
+      'security': 'tag-color-security',
+      'fast': 'tag-color-fast',
+      'ui/ux': 'tag-color-uiux',
+      'urgent': 'tag-color-urgent'
+    };
+
+    let isAddingCustomLabel = false;
+
+    function renderLabels() {
+      const container = document.getElementById('labels-container');
+      const countHint = document.getElementById('labels-count-hint');
+
+      if (countHint) {
+        countHint.innerText = labels.length === 0 ? 'Click + to select tags' : `${labels.length} selected`;
+      }
+
+      container.innerHTML = '';
+
+      availableTags.forEach(tag => {
+        const isSelected = labels.includes(tag);
+        const colorClass = tagColorMap[tag] || 'tag-color-default';
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.dataset.tag = tag;
+        btn.className = `selectable-tag-chip ${colorClass} ${isSelected ? 'is-active' : ''}`;
+        btn.title = isSelected ? `Click to deselect ${tag}` : `Click to select ${tag}`;
+        btn.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+        btn.innerHTML = `
+          <i class="ph-bold ph-plus tag-toggle-icon"></i>
+          <span class="tag-name">${tag}</span>
+        `;
+        btn.onclick = () => toggleTag(tag);
+        container.appendChild(btn);
+      });
+
+      // Add Custom Label button / inline form
+      if (isAddingCustomLabel) {
+        const formDiv = document.createElement('div');
+        formDiv.className = 'add-label-inline-form';
+        formDiv.innerHTML = `
+          <i class="ph-bold ph-tag add-label-tag-icon"></i>
+          <input type="text" id="customTagInput" class="add-label-input" placeholder="tag name..." />
+        `;
+        container.appendChild(formDiv);
+        const inp = document.getElementById('customTagInput');
+        inp.focus();
+        inp.onkeydown = (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            saveCustomLabel(inp.value);
+          } else if (e.key === 'Escape') {
+            isAddingCustomLabel = false;
+            renderLabels();
+          }
+        };
+        inp.onblur = () => {
+          saveCustomLabel(inp.value);
+        };
+      } else {
+        const addBtn = document.createElement('button');
+        addBtn.type = 'button';
+        addBtn.className = 'btn-add-label-trigger';
+        addBtn.innerHTML = '<i class="ph-bold ph-plus-circle"></i><span>Add tag</span>';
+        addBtn.onclick = () => {
+          isAddingCustomLabel = true;
+          renderLabels();
+        };
+        container.appendChild(addBtn);
+      }
+    }
+
+    function toggleTag(tag) {
+      const isSelected = labels.includes(tag);
+      const btn = document.querySelector(`[data-tag="${tag}"]`);
+      const isUrgentTag = tag.toLowerCase().replace(/^#/, '') === 'urgent';
+
+      if (isSelected) {
+        labels = labels.filter(t => t !== tag);
+        if (btn) {
+          btn.classList.remove('is-active');
+          btn.setAttribute('aria-pressed', 'false');
+          btn.title = `Click to select ${tag}`;
+        }
+        if (isUrgentTag) {
+          setUrgencyState(false, false);
+        }
+      } else {
+        labels.push(tag);
+        if (btn) {
+          btn.classList.add('is-active');
+          btn.setAttribute('aria-pressed', 'true');
+          btn.title = `Click to deselect ${tag}`;
+        }
+        if (isUrgentTag) {
+          setUrgencyState(true, false);
+        }
+      }
+
+      const countHint = document.getElementById('labels-count-hint');
+      if (countHint) {
+        countHint.innerText = labels.length === 0 ? 'Click + to select tags' : `${labels.length} selected`;
+      }
+    }
+
+    const RANDOM_TAG_COLORS = [
+      'tag-color-backend',
+      'tag-color-frontend',
+      'tag-color-security',
+      'tag-color-fast',
+      'tag-color-uiux',
+      'tag-color-amber',
+      'tag-color-emerald',
+      'tag-color-indigo',
+      'tag-color-fuchsia',
+      'tag-color-orange'
+    ];
+
+    function saveCustomLabel(val) {
+      let clean = val.trim().replace(/^#+/, '').toLowerCase();
+      if (clean) {
+        if (!tagColorMap[clean]) {
+          const randomColor = RANDOM_TAG_COLORS[Math.floor(Math.random() * RANDOM_TAG_COLORS.length)];
+          tagColorMap[clean] = randomColor;
+        }
+        if (!availableTags.includes(clean)) {
+          availableTags.push(clean);
+        }
+        if (!labels.includes(clean)) {
+          labels.push(clean);
+        }
+      }
+      isAddingCustomLabel = false;
+      renderLabels();
+    }
+
+    function toggleUrgency(checked) {
+      setUrgencyState(checked, true);
+    }
+
+    function setUrgencyState(active, syncTag = false) {
+      isUrgent = active;
+      const card = document.getElementById('urgencyCard');
+      const checkbox = document.getElementById('urgencyCheckbox');
+      if (checkbox) checkbox.checked = active;
+      if (card) {
+        if (active) {
+          card.classList.add('is-active');
+        } else {
+          card.classList.remove('is-active');
+        }
+      }
+
+      if (syncTag) {
+        const urgentBtn = document.querySelector('[data-tag="urgent"]');
+        if (active) {
+          if (!labels.includes('urgent')) labels.push('urgent');
+          if (urgentBtn) {
+            urgentBtn.classList.add('is-active');
+            urgentBtn.setAttribute('aria-pressed', 'true');
+            urgentBtn.title = 'Click to deselect urgent';
+          }
+        } else {
+          labels = labels.filter(t => t !== 'urgent' && t !== '#urgent');
+          if (urgentBtn) {
+            urgentBtn.classList.remove('is-active');
+            urgentBtn.setAttribute('aria-pressed', 'false');
+            urgentBtn.title = 'Click to select urgent';
+          }
+        }
+        const countHint = document.getElementById('labels-count-hint');
+        if (countHint) {
+          countHint.innerText = labels.length === 0 ? 'Click + to select tags' : `${labels.length} selected`;
+        }
+      }
+    }
+
+    function selectType(el, type) {
+      document.querySelectorAll('.type-radio-card').forEach(c => c.classList.remove('is-selected'));
+      el.classList.add('is-selected');
+    }
+
+    function applyMarkdown(prefix, suffix = prefix) {
+      const textarea = document.getElementById('issue-description');
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const value = textarea.value;
+      const selectedText = value.substring(start, end);
+
+      if (selectedText.length > 0) {
+        const isWrapped =
+          selectedText.startsWith(prefix) &&
+          selectedText.endsWith(suffix) &&
+          selectedText.length >= prefix.length + suffix.length;
+
+        let nextVal;
+        let newStart;
+        let newEnd;
+
+        if (isWrapped) {
+          const unwrapped = selectedText.substring(prefix.length, selectedText.length - suffix.length);
+          nextVal = value.substring(0, start) + unwrapped + value.substring(end);
+          newStart = start;
+          newEnd = start + unwrapped.length;
+        } else {
+          const before = start >= prefix.length ? value.substring(start - prefix.length, start) : '';
+          const after = end + suffix.length <= value.length ? value.substring(end, end + suffix.length) : '';
+
+          if (before === prefix && after === suffix) {
+            nextVal = value.substring(0, start - prefix.length) + selectedText + value.substring(end + suffix.length);
+            newStart = start - prefix.length;
+            newEnd = newStart + selectedText.length;
+          } else {
+            const wrapped = `${prefix}${selectedText}${suffix}`;
+            nextVal = value.substring(0, start) + wrapped + value.substring(end);
+            newStart = start + prefix.length;
+            newEnd = newStart + selectedText.length;
+          }
+        }
+
+        textarea.value = nextVal;
+        textarea.focus();
+        textarea.setSelectionRange(newStart, newEnd);
+      } else {
+        const replacement = `${prefix}${suffix}`;
+        textarea.value = value.substring(0, start) + replacement + value.substring(end);
+        textarea.focus();
+        const cursorInside = start + prefix.length;
+        textarea.setSelectionRange(cursorInside, cursorInside);
+      }
+    }
+
+    function toggleBulletList() {
+      const textarea = document.getElementById('issue-description');
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const value = textarea.value;
+
+      const lineStart = value.lastIndexOf('\n', start - 1) + 1;
+      const lineEnd = value.indexOf('\n', end);
+      const currentLine = value.substring(lineStart, lineEnd === -1 ? value.length : lineEnd);
+      const isCurrentLineBullet = /^(\s*[•\-*]\s+)/.test(currentLine);
+
+      let nextValue;
+      let newCursorPos;
+
+      if (isCurrentLineBullet) {
+        const replacedLine = currentLine.replace(/^(\s*)[•\-*]\s+/, '$1');
+        nextValue = value.substring(0, lineStart) + replacedLine + (lineEnd === -1 ? '' : value.substring(lineEnd));
+        newCursorPos = Math.max(lineStart, start - 2);
+        setListActiveState(false);
+      } else {
+        const bullet = '• ';
+        const replacedLine = bullet + currentLine;
+        nextValue = value.substring(0, lineStart) + replacedLine + (lineEnd === -1 ? '' : value.substring(lineEnd));
+        newCursorPos = start + bullet.length;
+        setListActiveState(true);
+      }
+
+      textarea.value = nextValue;
+      textarea.focus();
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+    }
+
+    function handleDescriptionKeyDown(e) {
+      const textarea = document.getElementById('issue-description');
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const value = textarea.value;
+
+      const lineStart = value.lastIndexOf('\n', start - 1) + 1;
+      const lineEnd = value.indexOf('\n', start);
+      const currentLine = value.substring(lineStart, lineEnd === -1 ? value.length : lineEnd);
+      const bulletMatch = currentLine.match(/^(\s*[•\-*]\s+)(.*)$/);
+
+      if (e.key === 'Enter') {
+        if (bulletMatch) {
+          e.preventDefault();
+          const bulletPrefix = bulletMatch[1];
+          const textAfterBullet = bulletMatch[2];
+
+          if (textAfterBullet.trim() === '') {
+            textarea.value = value.substring(0, lineStart) + (lineEnd === -1 ? '' : value.substring(lineEnd));
+            setListActiveState(false);
+            textarea.focus();
+            textarea.setSelectionRange(lineStart, lineStart);
+            return;
+          }
+
+          const continuation = `\n${bulletPrefix}`;
+          textarea.value = value.substring(0, start) + continuation + value.substring(end);
+          setListActiveState(true);
+          textarea.focus();
+          const nextPos = start + continuation.length;
+          textarea.setSelectionRange(nextPos, nextPos);
+        }
+      } else if (e.key === 'Backspace') {
+        if (bulletMatch && bulletMatch[2] === '' && start === lineStart + bulletMatch[1].length) {
+          e.preventDefault();
+          textarea.value = value.substring(0, lineStart) + (lineEnd === -1 ? '' : value.substring(lineEnd));
+          setListActiveState(false);
+          textarea.focus();
+          textarea.setSelectionRange(lineStart, lineStart);
+        }
+      }
+    }
+
+    function setListActiveState(active) {
+      const btn = document.getElementById('bulletListBtn');
+      if (btn) {
+        if (active) btn.classList.add('is-active');
+        else btn.classList.remove('is-active');
+      }
+    }
+
+    function updateListActiveState() {
+      const textarea = document.getElementById('issue-description');
+      const start = textarea.selectionStart;
+      const value = textarea.value;
+
+      const lineStart = value.lastIndexOf('\n', start - 1) + 1;
+      const lineEnd = value.indexOf('\n', start);
+      const currentLine = value.substring(lineStart, lineEnd === -1 ? value.length : lineEnd);
+      setListActiveState(/^(\s*[•\-*]\s+)/.test(currentLine));
+    }
+
+    // Attachment Handlers
+    function handleDropzoneClick() {
+      document.getElementById('fileInput').click();
+    }
+
+    function handleFileSelected(event) {
+      const file = event.target.files && event.target.files[0];
+      if (file) {
+        renderAttachmentCard(file.name, (file.size / (1024 * 1024)).toFixed(1) + ' MB');
+      }
+    }
+
+    function handleFileDrop(event) {
+      event.preventDefault();
+      event.currentTarget.classList.remove('is-dragover');
+      const file = event.dataTransfer.files && event.dataTransfer.files[0];
+      if (file) {
+        renderAttachmentCard(file.name, (file.size / (1024 * 1024)).toFixed(1) + ' MB');
+      }
+    }
+
+    function renderAttachmentCard(name, size) {
+      const container = document.getElementById('attachment-container');
+      container.innerHTML = `
+        <div class="attachment-preview-card" onclick="event.stopPropagation()">
+          <i class="ph-fill ph-file-image attachment-preview-icon"></i>
+          <span class="attachment-filename">${name}</span>
+          <span class="attachment-filesize">(${size})</span>
+          <button type="button" class="attachment-remove-btn" aria-label="Remove attachment" onclick="removeAttachment(event)">
+            <i class="ph-bold ph-x"></i>
+          </button>
+        </div>
+      `;
+    }
+
+    function removeAttachment(event) {
+      if (event) event.stopPropagation();
+      document.getElementById('attachment-container').innerHTML = '';
+      document.getElementById('fileInput').value = '';
+    }
+
+    // Ctrl+V Paste handler for screenshots
+    window.addEventListener('paste', (event) => {
+      const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+      for (const item of items) {
+        if (item.type.indexOf('image') === 0) {
+          const file = item.getAsFile();
+          if (file) {
+            const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+            renderAttachmentCard(file.name || 'clipboard_screenshot.png', `${sizeMB} MB`);
+          }
+        }
+      }
+    });
+
+    // Title Character Counter
+    const titleInput = document.getElementById('issue-title');
+    const titleCounter = document.getElementById('title-char-counter');
+    if (titleInput && titleCounter) {
+      titleInput.addEventListener('input', () => {
+        const len = titleInput.value.length;
+        titleCounter.textContent = `(${len}/120)`;
+        if (len >= 120) {
+          titleCounter.classList.add('is-max');
+        } else {
+          titleCounter.classList.remove('is-max');
+        }
+      });
+    }
+
+    // Init
+    renderLabels();
+    setUrgencyState(false);
+  </script>
+</body>
+
+</html>
