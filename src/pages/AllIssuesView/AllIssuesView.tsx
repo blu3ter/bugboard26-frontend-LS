@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './AllIssuesView.css';
 import { IssuesFilterBar } from '../../components/IssuesFilterBar';
+import { useIssuesFilter } from '../../hooks/useIssuesFilter';
 import { issueService } from '../../service/issueService';
 import type { IssueDto } from '../../types/issue.types';
 
@@ -11,6 +12,19 @@ interface AllIssuesViewProps {
 export const AllIssuesView: React.FC<AllIssuesViewProps> = ({ isAdmin = true }) => {
   const [issues, setIssues] = useState<IssueDto[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  
+  const {
+    search,
+    setSearch,
+    type,
+    setType,
+    state,
+    setState,
+    urgentOnly,
+    setUrgentOnly,
+    filteredIssues,
+    resetFilters,
+  } = useIssuesFilter(issues);
 
   useEffect(() => {
     const fetchIssues = async () => {
@@ -64,16 +78,27 @@ export const AllIssuesView: React.FC<AllIssuesViewProps> = ({ isAdmin = true }) 
   return (
     <div className="issues-view-container">
       {/* Filters & Search */}
-      <IssuesFilterBar searchPlaceholder="Search ID, title, project..." />
+      <IssuesFilterBar 
+        searchPlaceholder="Search ID, title, project..." 
+        search={search}
+        onSearchChange={setSearch}
+        type={type}
+        onTypeChange={setType}
+        state={state}
+        onStateChange={setState}
+        urgentOnly={urgentOnly}
+        onUrgentChange={setUrgentOnly}
+        onReset={resetFilters}
+      />
 
       {/* Grid of Issues */}
       <div className="issues-grid">
         {loading ? (
           <p>Loading issues...</p>
-        ) : issues.length === 0 ? (
+        ) : filteredIssues.length === 0 ? (
           <p>No issues found.</p>
         ) : (
-          issues.map((issue) => {
+          filteredIssues.map((issue) => {
             const typeStyle = getTypeStyles(issue.type);
             return (
               <article

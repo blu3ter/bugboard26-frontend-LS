@@ -2,12 +2,26 @@ import React, { useEffect, useState } from 'react';
 import '../AllIssuesView/AllIssuesView.css';
 import './MyIssuesView.css';
 import { IssuesFilterBar } from '../../components/IssuesFilterBar';
+import { useIssuesFilter } from '../../hooks/useIssuesFilter';
 import { issueService } from '../../service/issueService';
 import type { IssueDto } from '../../types/issue.types';
 
 export const MyIssuesView: React.FC = () => {
   const [issues, setIssues] = useState<IssueDto[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  
+  const {
+    search,
+    setSearch,
+    type,
+    setType,
+    state,
+    setState,
+    urgentOnly,
+    setUrgentOnly,
+    filteredIssues,
+    resetFilters,
+  } = useIssuesFilter(issues);
 
   useEffect(() => {
     const fetchIssues = async () => {
@@ -58,17 +72,28 @@ export const MyIssuesView: React.FC = () => {
     }
   };
 
-  const todoCount = issues.filter(i => i.state === 'TODO').length;
-  const inProgressCount = issues.filter(i => i.state === 'IN_PROGRESS').length;
-  const doneCount = issues.filter(i => i.state === 'DONE').length;
-  const urgentCount = issues.filter(i => i.isUrgent).length;
-  const totalCount = issues.length;
+  const todoCount = filteredIssues.filter(i => i.state === 'TODO').length;
+  const inProgressCount = filteredIssues.filter(i => i.state === 'IN_PROGRESS').length;
+  const doneCount = filteredIssues.filter(i => i.state === 'DONE').length;
+  const urgentCount = filteredIssues.filter(i => i.isUrgent).length;
+  const totalCount = filteredIssues.length;
   const completedPercentage = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
 
   return (
     <div className="issues-view-container">
       {/* Search Bar Full Width */}
-      <IssuesFilterBar searchPlaceholder="Search your issues..." />
+      <IssuesFilterBar 
+        searchPlaceholder="Search your issues..." 
+        search={search}
+        onSearchChange={setSearch}
+        type={type}
+        onTypeChange={setType}
+        state={state}
+        onStateChange={setState}
+        urgentOnly={urgentOnly}
+        onUrgentChange={setUrgentOnly}
+        onReset={resetFilters}
+      />
 
       {/* Split Layout (Left: Grid, Right: Sidebar) */}
       <div className="my-issues-layout" style={{ marginTop: '24px' }}>
@@ -76,11 +101,11 @@ export const MyIssuesView: React.FC = () => {
         <div className="my-issues-main-content">
           {loading ? (
             <p>Loading issues...</p>
-          ) : issues.length === 0 ? (
+          ) : filteredIssues.length === 0 ? (
             <p>No issue  found.</p>
           ) : (
             <div className="issues-grid">
-              {issues.map(issue => {
+              {filteredIssues.map(issue => {
                 const typeStyle = getTypeStyles(issue.type);
                 return (
                   <article key={issue.id} className={`issue-card ${issue.state === 'DONE' ? 'card-closed' : ''}`} style={issue.isUrgent ? { borderColor: 'rgba(186,26,26,0.5)' } : {}}>
