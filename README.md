@@ -34,3 +34,6 @@ In conformità con le specifiche del progetto, questo applicativo implementa le 
 4) Apri l'applicazione :
    Visita http://localhost:5173 nel tuo browser. 
    **Nota: Assicurati che il Back-end SpringBoot sia in esecuzione parallela affinché le API REST rispondano correttamente per il login e il caricamento dei dati.**
+
+
+

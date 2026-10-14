@@ -9,7 +9,7 @@ import type { IssueDto } from '../../types/issue.types';
 export const MyIssuesView: React.FC = () => {
   const [issues, setIssues] = useState<IssueDto[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  
+
   const {
     search,
     setSearch,
@@ -72,7 +72,6 @@ export const MyIssuesView: React.FC = () => {
     }
   };
 
-  const todoCount = filteredIssues.filter(i => i.state === 'TODO').length;
   const inProgressCount = filteredIssues.filter(i => i.state === 'IN_PROGRESS').length;
   const doneCount = filteredIssues.filter(i => i.state === 'DONE').length;
   const urgentCount = filteredIssues.filter(i => i.isUrgent).length;
@@ -82,8 +81,8 @@ export const MyIssuesView: React.FC = () => {
   return (
     <div className="issues-view-container">
       {/* Search Bar Full Width */}
-      <IssuesFilterBar 
-        searchPlaceholder="Search your issues..." 
+      <IssuesFilterBar
+        searchPlaceholder="Search your issues..."
         search={search}
         onSearchChange={setSearch}
         type={type}
@@ -162,19 +161,6 @@ export const MyIssuesView: React.FC = () => {
             </div>
 
             <div className="metrics-list">
-              <div className="metric-item metric-todo">
-                <div className="metric-item-left">
-                  <div className="metric-icon-wrapper">
-                    <span className="material-symbols-outlined">pending_actions</span>
-                  </div>
-                  <div className="metric-info">
-                    <span className="metric-name">To Do</span>
-                    <span className="metric-desc">In priority queue</span>
-                  </div>
-                </div>
-                <span className="metric-value">{todoCount}</span>
-              </div>
-
               <div className="metric-item metric-urgent">
                 <div className="metric-item-left">
                   <div className="metric-icon-wrapper">
