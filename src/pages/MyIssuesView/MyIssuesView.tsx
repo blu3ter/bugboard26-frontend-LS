@@ -72,11 +72,28 @@ export const MyIssuesView: React.FC = () => {
     }
   };
 
-  const inProgressCount = filteredIssues.filter(i => i.state === 'IN_PROGRESS').length;
+  // Partizione senza sovrapposizioni: ogni issue cade in una sola categoria
   const doneCount = filteredIssues.filter(i => i.state === 'DONE').length;
-  const urgentCount = filteredIssues.filter(i => i.isUrgent).length;
+  const urgentCount = filteredIssues.filter(i => i.state !== 'DONE' && i.isUrgent).length;
+  const inProgressCount = filteredIssues.filter(i => i.state !== 'DONE' && !i.isUrgent).length;
   const totalCount = filteredIssues.length;
   const completedPercentage = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
+
+  // Segmenti del grafico a ciambella (r = 48)
+  const CIRCUMFERENCE = 2 * Math.PI * 48;
+  const chartSegments = [
+    { key: 'urgent', className: 'segment-urgent', count: urgentCount },
+    { key: 'progress', className: 'segment-progress', count: inProgressCount },
+    { key: 'done', className: 'segment-done', count: doneCount },
+  ];
+  let accumulatedLength = 0;
+  const donutSegments = chartSegments.map(segment => {
+    const length = totalCount > 0 ? (segment.count / totalCount) * CIRCUMFERENCE : 0;
+    const offset = -accumulatedLength;
+    accumulatedLength += length;
+    return { ...segment, length, offset };
+  });
+  const getPercentage = (count: number) => (totalCount > 0 ? Math.round((count / totalCount) * 100) : 0);
 
   return (
     <div className="issues-view-container">
@@ -119,9 +136,12 @@ export const MyIssuesView: React.FC = () => {
                           </span>
                         )}
                       </div>
-                      <button className={`btn-check ${issue.state === 'DONE' ? 'btn-checked' : ''}`} disabled={issue.state === 'DONE'}>
-                        <span className="material-symbols-outlined" style={issue.state === 'DONE' ? { fontVariationSettings: '"FILL" 1' } : {}}>check_circle</span>
-                      </button>
+                      {issue.state === 'IN_PROGRESS' && (
+                        <button type="button" className="btn-send">
+                          <span className="material-symbols-outlined">send</span>
+                          <span>SEND</span>
+                        </button>
+                      )}
                     </div>
 
                     <h3 className={`issue-title ${issue.state === 'DONE' ? 'issue-title-closed' : ''}`}>{issue.title}</h3>
@@ -213,7 +233,19 @@ export const MyIssuesView: React.FC = () => {
               <div className="donut-container">
                 <svg className="donut-svg" viewBox="0 0 120 120">
                   <circle className="donut-bg" cx="60" cy="60" r="48"></circle>
-                  <circle className="donut-segment segment-todo" cx="60" cy="60" r="48" style={{ strokeDashoffset: '0' }}></circle>
+                  {donutSegments.map(segment => segment.length > 0 && (
+                    <circle
+                      key={segment.key}
+                      className={`donut-segment ${segment.className}`}
+                      cx="60"
+                      cy="60"
+                      r="48"
+                      style={{
+                        strokeDasharray: `${segment.length} ${CIRCUMFERENCE}`,
+                        strokeDashoffset: segment.offset,
+                      }}
+                    ></circle>
+                  ))}
                 </svg>
                 <div className="donut-text">
                   <span className="donut-percentage">{completedPercentage}%</span>
@@ -223,20 +255,16 @@ export const MyIssuesView: React.FC = () => {
 
               <div className="chart-legend">
                 <div className="legend-item">
-                  <span className="legend-dot bg-todo"></span>
-                  <span className="legend-text">To Do</span>
-                </div>
-                <div className="legend-item">
                   <span className="legend-dot bg-urgent"></span>
-                  <span className="legend-text">Urgent</span>
+                  <span className="legend-text">Urgent ({getPercentage(urgentCount)}%)</span>
                 </div>
                 <div className="legend-item">
                   <span className="legend-dot bg-progress"></span>
-                  <span className="legend-text">In Progress</span>
+                  <span className="legend-text">In Progress ({getPercentage(inProgressCount)}%)</span>
                 </div>
                 <div className="legend-item">
                   <span className="legend-dot bg-done"></span>
-                  <span className="legend-text">Completed</span>
+                  <span className="legend-text">Completed ({getPercentage(doneCount)}%)</span>
                 </div>
               </div>
             </div>
