@@ -38,6 +38,20 @@ class IssueService {
 
     return await response.json();
   }
+
+  /** Manda la issue in revisione (IN_PROGRESS → IN_REVIEW). */
+  public async sendToReview(id: number): Promise<IssueDto> {
+    const response = await fetch(`${API_BASE_URL}/issues/${id}/review`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to send issue to review');
+    }
+
+    return await response.json();
+  }
 }
 
 export const issueService = new IssueService();

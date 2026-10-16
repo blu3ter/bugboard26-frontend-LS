@@ -324,6 +324,12 @@
   transform: scale(0.98);
 }
 
+.btn-send:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .btn-send .material-symbols-outlined {
   font-size: 14px;
 }

@@ -9,6 +9,7 @@ import type { IssueDto } from '../../types/issue.types';
 export const MyIssuesView: React.FC = () => {
   const [issues, setIssues] = useState<IssueDto[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [sendingId, setSendingId] = useState<number | null>(null);
 
   const {
     search,
@@ -37,6 +38,19 @@ export const MyIssuesView: React.FC = () => {
     fetchIssues();
   }, []);
 
+  const handleSendToReview = async (id: number) => {
+    setSendingId(id);
+    try {
+      const updated = await issueService.sendToReview(id);
+      setIssues(prev => prev.map(i => (i.id === id ? { ...i, ...updated } : i)));
+    } catch (error) {
+      console.error("Failed to send issue to review", error);
+      alert("Impossibile inviare la issue in revisione.");
+    } finally {
+      setSendingId(null);
+    }
+  };
+
   const getTypeStyles = (type: string) => {
     switch (type) {
       case 'BUG':
@@ -56,7 +70,8 @@ export const MyIssuesView: React.FC = () => {
     switch (state) {
       case 'TODO': return 'To do';
       case 'IN_PROGRESS': return 'In progress';
-      case 'REVIEW': return 'Review';
+      case 'REVIEW':
+      case 'IN_REVIEW': return 'Review';
       case 'DONE': return 'Closed';
       default: return state;
     }
@@ -66,7 +81,8 @@ export const MyIssuesView: React.FC = () => {
     switch (state) {
       case 'TODO': return 'badge-todo';
       case 'IN_PROGRESS': return 'badge-in-progress';
-      case 'REVIEW': return 'badge-in-review';
+      case 'REVIEW':
+      case 'IN_REVIEW': return 'badge-in-review';
       case 'DONE': return 'badge-closed';
       default: return 'badge-todo';
     }
@@ -137,9 +153,14 @@ export const MyIssuesView: React.FC = () => {
                         )}
                       </div>
                       {issue.state === 'IN_PROGRESS' && (
-                        <button type="button" className="btn-send">
+                        <button
+                          type="button"
+                          className="btn-send"
+                          onClick={() => handleSendToReview(issue.id)}
+                          disabled={sendingId === issue.id}
+                        >
                           <span className="material-symbols-outlined">send</span>
-                          <span>SEND</span>
+                          <span>{sendingId === issue.id ? 'SENDING...' : 'SEND'}</span>
                         </button>
                       )}
                     </div>
