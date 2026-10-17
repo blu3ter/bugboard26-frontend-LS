@@ -30,6 +30,16 @@ export const DashboardLayout: React.FC = () => {
     navigate('/login');
   };
 
+  const getInitials = (name: string) => {
+    const parts = name.trim().split(/[\s._-]+/).filter(Boolean);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name.trim().substring(0, 2).toUpperCase();
+  };
+  const initials = getInitials(userName);
+  const roleDisplay = user?.role?.toUpperCase() === 'ADMIN' ? 'Admin' : 'User';
+
   return (
     <div className="dashboard-root">
       {/* Sidebar Navigation */}
@@ -98,14 +108,13 @@ export const DashboardLayout: React.FC = () => {
             <p className="topbar-subtitle">{getSubtitle()}</p>
           </div>
           <div className="topbar-actions">
-            <button className="btn-icon" title="Notifiche">
-              <span className="material-symbols-outlined">notifications</span>
-            </button>
-            <div className="profile-avatar">
-              <img
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBis87CkE9qyDcWc8fR6Z8G3Ule7pXCxqtaUjoyjd2qEGCCzWouDyIn9uLtytL_dvigICoAXMAcnApUl9xNvJv9TAlkar-iPlEf3uXHMjjnc8g4NPR1TDF1ZWaxXhS22v-dQjigLhbSH-k6wAK9apl2dpu8bB9ojpvhYjEcQ_qM_dYX7B__zLoT-_L-bb-lSxiw4EB9bR2gvZ029EB5Sj2OtiQ1tNu2EDWIPZ4nGSv45QG1MKmOTDzDNF9mth94mt6TJ1jMFYqg5gw"
-                alt={userName}
-              />
+            <div className="user-profile-container" title={`${userName} (${roleDisplay})`}>
+              <div className="user-avatar-initials">
+                {initials}
+              </div>
+              <span className={`user-role-badge ${roleDisplay === 'Admin' ? 'badge-admin' : 'badge-user'}`}>
+                {roleDisplay}
+              </span>
             </div>
           </div>
         </header>
