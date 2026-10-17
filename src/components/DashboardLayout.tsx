@@ -31,10 +31,14 @@ export const DashboardLayout: React.FC = () => {
   };
 
   const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+    const parts = name.trim().split(/[\s._-]+/).filter(Boolean);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name.trim().substring(0, 2).toUpperCase();
   };
   const initials = getInitials(userName);
-  const userRole = user?.role || 'USER';
+  const roleDisplay = user?.role?.toUpperCase() === 'ADMIN' ? 'Admin' : 'User';
 
   return (
     <div className="dashboard-root">
@@ -104,13 +108,13 @@ export const DashboardLayout: React.FC = () => {
             <p className="topbar-subtitle">{getSubtitle()}</p>
           </div>
           <div className="topbar-actions">
-            <div className="user-profile-badge">
-              <span className={`user-role-label ${userRole === 'ADMIN' ? 'role-admin' : 'role-user'}`}>
-                {userRole}
-              </span>
+            <div className="user-profile-container" title={`${userName} (${roleDisplay})`}>
               <div className="user-avatar-initials">
                 {initials}
               </div>
+              <span className={`user-role-badge ${roleDisplay === 'Admin' ? 'badge-admin' : 'badge-user'}`}>
+                {roleDisplay}
+              </span>
             </div>
           </div>
         </header>
