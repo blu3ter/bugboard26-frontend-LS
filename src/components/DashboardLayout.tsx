@@ -14,6 +14,7 @@ export const DashboardLayout: React.FC = () => {
 
   const getSubtitle = () => {
     if (location.pathname.includes('all-issues')) return 'Overview of all team issues.';
+    if (location.pathname.includes('management')) return 'Workflow Review and Team Assignment Control Panel.';
     if (location.pathname.includes('users')) return 'System user management and configuration.';
     return 'Overview of your open issues.';
   };
@@ -58,14 +59,22 @@ export const DashboardLayout: React.FC = () => {
             </NavLink>
           </li>
 
-          {/* Admin Only Link */}
+          {/* Admin Links */}
           {isAdmin && (
-            <li>
-              <NavLink to="/dashboard/users" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: '"FILL" 0' }}>person_add</span>
-                <span>Create new user</span>
-              </NavLink>
-            </li>
+            <>
+              <li>
+                <NavLink to="/dashboard/management" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                  <span className="material-symbols-outlined">rule</span>
+                  <span>Issue Management</span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/dashboard/users" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                  <span className="material-symbols-outlined" style={{ fontVariationSettings: '"FILL" 0' }}>person_add</span>
+                  <span>Create new user</span>
+                </NavLink>
+              </li>
+            </>
           )}
         </ul>
 

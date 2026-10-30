@@ -6,6 +6,7 @@ import { MyIssuesView } from './pages/MyIssuesView/MyIssuesView';
 import { UsersManagementView } from './pages/UsersManagementView/UsersManagementView';
 import { CreateIssueView } from './pages/CreateIssueView/CreateIssueView';
 import { IssueDetailsView } from './pages/IssueDetailsView/IssueDetailsView';
+import { IssueManagementView } from './pages/IssueManagementView/IssueManagementView';
 import './App.css';
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
         <Route index element={<Navigate to="my-issues" replace />} />
         <Route path="my-issues" element={<MyIssuesView />} />
         <Route path="all-issues" element={<AllIssuesView />} />
+        <Route path="management" element={<IssueManagementView />} />
         <Route path="users" element={<UsersManagementView />} />
         <Route path="create-issue" element={<CreateIssueView />} />
         <Route path="issue-details" element={<IssueDetailsView />} />
