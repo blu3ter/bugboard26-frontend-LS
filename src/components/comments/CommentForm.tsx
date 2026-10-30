@@ -52,3 +52,4 @@ export const CommentForm: React.FC<CommentFormProps> = ({ onSubmit, disabled = f
     </form>
   );
 };
+

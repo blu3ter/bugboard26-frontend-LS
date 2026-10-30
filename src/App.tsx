@@ -12,12 +12,11 @@ import './App.css';
 function App() {
   return (
     <Routes>
-      {/* Questo path reinderizza al login */}
+      {/* Reindirizzamento alla schermata di login */}
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<LoginPage />} />
 
-      {/* Questo è il modo in cui, in base al componente che scegli 
-       (/dashboard di default), vieni reinderizzato su quel componenete */}
+      {/* Layout principale della Dashboard */}
       <Route path="/dashboard" element={<DashboardLayout />}>
         {/* Default dashboard view */}
         <Route index element={<Navigate to="my-issues" replace />} />

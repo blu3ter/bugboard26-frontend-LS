@@ -109,3 +109,4 @@ export class IssueService {
 }
 
 export const issueService = new IssueService();
+

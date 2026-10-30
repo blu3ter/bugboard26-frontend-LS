@@ -239,3 +239,4 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({
     </div>
   );
 };
+

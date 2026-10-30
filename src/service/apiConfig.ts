@@ -21,3 +21,4 @@ export const getAuthHeaders = (isJson: boolean = true): HeadersInit => {
 
   return headers;
 };
+
