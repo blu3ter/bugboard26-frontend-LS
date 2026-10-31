@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import './AllIssuesView.css';
 import { IssuesFilterBar } from '../../components/IssuesFilterBar';
 import { issueService } from '../../service/issueService';
+import { TagBadge } from '../../components/tags';
+import { IssueDetailModal } from '../../components/modals';
 import type { IssueDto } from '../../types/issue.types';
 
 interface AllIssuesViewProps {
@@ -11,20 +13,23 @@ interface AllIssuesViewProps {
 export const AllIssuesView: React.FC<AllIssuesViewProps> = ({ isAdmin = true }) => {
   const [issues, setIssues] = useState<IssueDto[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [selectedIssueId, setSelectedIssueId] = useState<number | null>(null);
+
+  const fetchIssues = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await issueService.getAllIssues();
+      setIssues(data);
+    } catch (error) {
+      console.error("Failed to fetch all issues", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchIssues = async () => {
-      try {
-        const data = await issueService.getAllIssues();
-        setIssues(data);
-      } catch (error) {
-        console.error("Failed to fetch all issues", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchIssues();
-  }, []);
+  }, [fetchIssues]);
 
   const getAccentColor = (issue: IssueDto) => {
     if (issue.isUrgent) return '#ba1a1a';
@@ -77,7 +82,11 @@ export const AllIssuesView: React.FC<AllIssuesViewProps> = ({ isAdmin = true }) 
             <article 
               key={issue.id} 
               className={`issue-card ${issue.state === 'DONE' ? 'card-closed' : ''}`}
-              style={issue.isUrgent ? { borderColor: 'rgba(186,26,26,0.5)' } : {}}
+              style={{
+                cursor: 'pointer',
+                ...(issue.isUrgent ? { borderColor: 'rgba(186,26,26,0.5)' } : {})
+              }}
+              onClick={() => setSelectedIssueId(issue.id)}
             >
               <div className="card-accent-line" style={{ backgroundColor: getAccentColor(issue) }}></div>
               
@@ -99,6 +108,15 @@ export const AllIssuesView: React.FC<AllIssuesViewProps> = ({ isAdmin = true }) 
               {issue.reporterFullName && (
                 <p className="issue-project">Reporter: {issue.reporterFullName}</p>
               )}
+
+              {/* Tag Badges (Req. 10) */}
+              {issue.tags && issue.tags.length > 0 && (
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', margin: '8px 0' }}>
+                  {issue.tags.map((tag) => (
+                    <TagBadge key={tag} name={tag} size="sm" />
+                  ))}
+                </div>
+              )}
               
               <div className="card-footer">
                 <span className={`badge ${getBadgeClass(issue.type)}`}>
@@ -115,7 +133,15 @@ export const AllIssuesView: React.FC<AllIssuesViewProps> = ({ isAdmin = true }) 
                 </div>
                 
                 {isAdmin && (
-                  <button className="btn-assign" style={!issue.assigneeFullName ? { marginLeft: 'auto' } : {}} title="Assegna/Riassegna">
+                  <button 
+                    className="btn-assign" 
+                    style={!issue.assigneeFullName ? { marginLeft: 'auto' } : {}} 
+                    title="Assegna/Riassegna"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedIssueId(issue.id);
+                    }}
+                  >
                     <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>{issue.assigneeFullName ? 'sync' : 'person_add'}</span>
                     <span>Assegna</span>
                   </button>
@@ -125,6 +151,14 @@ export const AllIssuesView: React.FC<AllIssuesViewProps> = ({ isAdmin = true }) 
           ))
         )}
       </div>
+
+      {/* Modale Dettaglio Issue (Req. 2, 5, 10) */}
+      <IssueDetailModal
+        issueId={selectedIssueId}
+        onClose={() => setSelectedIssueId(null)}
+        onIssueUpdated={fetchIssues}
+        isAdmin={isAdmin}
+      />
     </div>
   );
 };

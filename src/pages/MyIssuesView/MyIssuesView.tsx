@@ -1,27 +1,32 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import '../AllIssuesView/AllIssuesView.css';
 import './MyIssuesView.css';
 import { IssuesFilterBar } from '../../components/IssuesFilterBar';
 import { issueService } from '../../service/issueService';
+import { TagBadge } from '../../components/tags';
+import { IssueDetailModal } from '../../components/modals';
 import type { IssueDto } from '../../types/issue.types';
 
 export const MyIssuesView: React.FC = () => {
   const [issues, setIssues] = useState<IssueDto[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [selectedIssueId, setSelectedIssueId] = useState<number | null>(null);
+
+  const fetchIssues = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await issueService.getMyIssues();
+      setIssues(data);
+    } catch (error) {
+      console.error("Failed to fetch my issues", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchIssues = async () => {
-      try {
-        const data = await issueService.getMyIssues();
-        setIssues(data);
-      } catch (error) {
-        console.error("Failed to fetch my issues", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchIssues();
-  }, []);
+  }, [fetchIssues]);
 
   const getTypeStyles = (type: string) => {
     switch (type) {
@@ -83,7 +88,15 @@ export const MyIssuesView: React.FC = () => {
               {issues.map(issue => {
                 const typeStyle = getTypeStyles(issue.type);
                 return (
-                  <article key={issue.id} className={`issue-card ${issue.state === 'DONE' ? 'card-closed' : ''}`} style={issue.isUrgent ? { borderColor: 'rgba(186,26,26,0.5)' } : {}}>
+                  <article 
+                    key={issue.id} 
+                    className={`issue-card ${issue.state === 'DONE' ? 'card-closed' : ''}`} 
+                    style={{
+                      cursor: 'pointer',
+                      ...(issue.isUrgent ? { borderColor: 'rgba(186,26,26,0.5)' } : {})
+                    }}
+                    onClick={() => setSelectedIssueId(issue.id)}
+                  >
                     <div className="card-accent-line" style={{ backgroundColor: typeStyle.color }}></div>
                     
                     <div className="card-header">
@@ -102,6 +115,15 @@ export const MyIssuesView: React.FC = () => {
                     
                     <h3 className={`issue-title ${issue.state === 'DONE' ? 'issue-title-closed' : ''}`}>{issue.title}</h3>
                     {issue.reporterFullName && <p className="issue-project" style={{ marginBottom: '8px' }}>Assegnato da: {issue.reporterFullName}</p>}
+
+                    {/* Tag Badges (Req. 10) */}
+                    {issue.tags && issue.tags.length > 0 && (
+                      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', margin: '8px 0' }}>
+                        {issue.tags.map((tag) => (
+                          <TagBadge key={tag} name={tag} size="sm" />
+                        ))}
+                      </div>
+                    )}
                     
                     <div className="card-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -147,93 +169,71 @@ export const MyIssuesView: React.FC = () => {
                     <span className="metric-desc">In priority queue</span>
                   </div>
                 </div>
-                <span className="metric-value">{todoCount}</span>
-              </div>
-
-              <div className="metric-item metric-urgent">
-                <div className="metric-item-left">
-                  <div className="metric-icon-wrapper">
-                    <span className="material-symbols-outlined">priority_high</span>
-                  </div>
-                  <div className="metric-info">
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <span className="metric-name">Urgent</span>
-                      <span className="active-badge">Active</span>
-                    </div>
-                    <span className="metric-desc">Immediate action</span>
-                  </div>
-                </div>
-                <span className="metric-value">{urgentCount}</span>
+                <span className="metric-count">{todoCount}</span>
               </div>
 
               <div className="metric-item metric-progress">
                 <div className="metric-item-left">
                   <div className="metric-icon-wrapper">
-                    <span className="material-symbols-outlined">autorenew</span>
+                    <span className="material-symbols-outlined">schedule</span>
                   </div>
                   <div className="metric-info">
                     <span className="metric-name">In Progress</span>
-                    <span className="metric-desc">Under development</span>
+                    <span className="metric-desc">Actively working</span>
                   </div>
                 </div>
-                <span className="metric-value">{inProgressCount}</span>
+                <span className="metric-count">{inProgressCount}</span>
               </div>
 
               <div className="metric-item metric-done">
                 <div className="metric-item-left">
                   <div className="metric-icon-wrapper">
-                    <span className="material-symbols-outlined">done_all</span>
+                    <span className="material-symbols-outlined">check_circle</span>
                   </div>
                   <div className="metric-info">
-                    <span className="metric-name">Completed</span>
-                    <span className="metric-desc">Resolved & verified</span>
+                    <span className="metric-name">Closed / Done</span>
+                    <span className="metric-desc">Completed</span>
                   </div>
                 </div>
-                <span className="metric-value">{doneCount}</span>
+                <span className="metric-count">{doneCount}</span>
               </div>
+
+              {urgentCount > 0 && (
+                <div className="metric-item" style={{ borderLeft: '3px solid #ba1a1a', background: 'rgba(186, 26, 26, 0.05)' }}>
+                  <div className="metric-item-left">
+                    <div className="metric-icon-wrapper" style={{ color: '#ba1a1a' }}>
+                      <span className="material-symbols-outlined">warning</span>
+                    </div>
+                    <div className="metric-info">
+                      <span className="metric-name" style={{ color: '#ba1a1a' }}>Urgent</span>
+                      <span className="metric-desc">Critical attention</span>
+                    </div>
+                  </div>
+                  <span className="metric-count" style={{ color: '#ba1a1a' }}>{urgentCount}</span>
+                </div>
+              )}
             </div>
 
-            <div className="chart-section">
-              <div className="chart-header">
-                <span className="chart-title">Progress Status</span>
-                <span className="chart-badge">{doneCount} of {totalCount} resolved</span>
+            <div className="progress-section">
+              <div className="progress-labels">
+                <span className="progress-title">Completion Rate</span>
+                <span className="progress-value">{completedPercentage}%</span>
               </div>
-              
-              <div className="donut-container">
-                <svg className="donut-svg" viewBox="0 0 120 120">
-                  <circle className="donut-bg" cx="60" cy="60" r="48"></circle>
-                  <circle className="donut-segment segment-todo" cx="60" cy="60" r="48" style={{ strokeDashoffset: '0' }}></circle>
-                </svg>
-                <div className="donut-text">
-                  <span className="donut-percentage">{completedPercentage}%</span>
-                  <span className="donut-label">Completed</span>
-                </div>
-              </div>
-
-              <div className="chart-legend">
-                <div className="legend-item">
-                  <span className="legend-dot bg-todo"></span>
-                  <span className="legend-text">To Do</span>
-                </div>
-                <div className="legend-item">
-                  <span className="legend-dot bg-urgent"></span>
-                  <span className="legend-text">Urgent</span>
-                </div>
-                <div className="legend-item">
-                  <span className="legend-dot bg-progress"></span>
-                  <span className="legend-text">In Progress</span>
-                </div>
-                <div className="legend-item">
-                  <span className="legend-dot bg-done"></span>
-                  <span className="legend-text">Completed</span>
-                </div>
+              <div className="progress-bar-container">
+                <div className="progress-bar-fill" style={{ width: `${completedPercentage}%` }}></div>
               </div>
             </div>
 
           </div>
         </aside>
       </div>
+
+      {/* Modale Dettaglio Issue (Req. 2, 5, 10) */}
+      <IssueDetailModal
+        issueId={selectedIssueId}
+        onClose={() => setSelectedIssueId(null)}
+        onIssueUpdated={fetchIssues}
+      />
     </div>
   );
 };
-
