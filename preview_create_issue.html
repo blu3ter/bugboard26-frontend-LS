@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
-  <link rel="stylesheet" href="./src/pages/CreateIssueView/CreateIssueView.css">
+  <link rel="stylesheet" href="./src/pages/CreateIssueView/CreateIssueView.css?v=5">
   <style>
     body {
       margin: 0;
@@ -17,6 +18,7 @@
       overflow: hidden;
       font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
+
     .preview-info-banner {
       position: fixed;
       top: 12px;
@@ -37,6 +39,7 @@
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
       user-select: none;
     }
+
     .preview-info-banner .badge {
       background: #2563eb;
       color: #ffffff;
@@ -45,37 +48,194 @@
       font-size: 11px;
       font-weight: 700;
     }
+
+    /* Force Horizontal 2-Column Layout */
+    .create-issue-modal {
+      max-width: 1120px !important;
+      border-radius: 20px !important;
+    }
+
+    .modal-header {
+      padding: 24px 36px 20px !important;
+    }
+
+    .modal-form {
+      padding: 24px 36px 28px !important;
+    }
+
+    .modal-horizontal-grid {
+      display: grid !important;
+      grid-template-columns: 1.18fr 1fr !important;
+      gap: 36px !important;
+      align-items: stretch !important;
+    }
+
+    .modal-col-main,
+    .modal-col-sidebar {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 20px !important;
+    }
+
+    .modal-col-main {
+      height: 100% !important;
+    }
+
+    .flex-grow-field,
+    .flex-grow-editor {
+      flex: 1 !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+
+    .flex-grow-editor .editor-textarea {
+      flex: 1 !important;
+      min-height: 280px !important;
+      padding: 16px 18px !important;
+      font-size: 13.5px !important;
+      line-height: 1.65 !important;
+      scrollbar-width: thin !important;
+      scrollbar-color: #334155 transparent !important;
+    }
+
+    .editor-textarea::-webkit-scrollbar {
+      width: 6px !important;
+    }
+
+    .editor-textarea::-webkit-scrollbar-track {
+      background: transparent !important;
+      margin: 6px 0 !important;
+    }
+
+    .editor-textarea::-webkit-scrollbar-thumb {
+      background-color: #334155 !important;
+      border-radius: 9999px !important;
+      transition: background-color 0.2s ease !important;
+    }
+
+    .editor-textarea::-webkit-scrollbar-thumb:hover {
+      background-color: #475569 !important;
+    }
+
+    .editor-textarea::-webkit-scrollbar-thumb:active {
+      background-color: #3b82f6 !important;
+    }
+
+    .editor-textarea::-webkit-scrollbar-button {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+
+    .title-input {
+      padding: 14px 18px !important;
+      font-size: 14.5px !important;
+    }
+
+    .title-char-counter {
+      font-size: 11px !important;
+      font-family: inherit !important;
+      color: #94a3b8 !important;
+      margin-left: 2px !important;
+      transition: color 0.15s ease !important;
+    }
+
+    .title-char-counter.is-max {
+      color: #f87171 !important;
+      font-weight: 600 !important;
+    }
+
+    .type-selector-grid {
+      grid-template-columns: repeat(4, 1fr) !important;
+      gap: 10px !important;
+    }
+
+    .type-radio-card {
+      padding: 14px 8px !important;
+    }
+
+    .labels-box-grid {
+      padding: 16px 18px !important;
+      gap: 10px !important;
+      border-radius: 14px !important;
+    }
+
+    .selectable-tag-chip {
+      padding: 7px 14px !important;
+      font-size: 12.5px !important;
+      border-radius: 9999px !important;
+    }
+
+    .btn-add-label-trigger {
+      padding: 7px 16px !important;
+      font-size: 12.5px !important;
+      border-radius: 9999px !important;
+    }
+
+    .urgency-card {
+      padding: 18px 20px !important;
+      border-radius: 14px !important;
+    }
+
+    .urgency-icon-box {
+      width: 44px !important;
+      height: 44px !important;
+      font-size: 22px !important;
+    }
+
+    .dropzone-box {
+      padding: 20px 18px !important;
+      border-radius: 14px !important;
+    }
+
+    .modal-footer {
+      padding: 20px 36px 24px !important;
+      border-bottom-left-radius: 20px !important;
+      border-bottom-right-radius: 20px !important;
+    }
   </style>
 </head>
+
 <body>
 
   <!-- Preview Floating Helper -->
   <div class="preview-info-banner">
     <span class="badge">LIVE PREVIEW</span>
-    <span>Clicca sui tag per vedere il <strong>+ ruotare in &times;</strong> e lo switch <strong>Mark as URGENT</strong> sincronizzato!</span>
+    <span>Clicca sui tag per vedere il <strong>+ ruotare in &times;</strong> e lo switch <strong>Mark as URGENT</strong>
+      sincronizzato!</span>
   </div>
 
   <div class="create-issue-page-wrapper">
     <!-- Background Floating Tags Layer -->
     <div class="issue-bg-layer" aria-hidden="true">
       <div class="bg-floating-tag" style="top: 7%; left: 4%; background-color: rgba(37, 66, 160, 0.85);">#backend</div>
-      <div class="bg-floating-tag" style="top: 5%; left: 37%; background-color: rgba(204, 26, 40, 0.9);">#dangerous</div>
-      <div class="bg-floating-tag" style="top: 6%; left: 60%; background-color: rgba(51, 65, 85, 0.9); color: #e2e8f0;">#closed</div>
+      <div class="bg-floating-tag" style="top: 5%; left: 37%; background-color: rgba(204, 26, 40, 0.9);">#dangerous
+      </div>
+      <div class="bg-floating-tag" style="top: 6%; left: 60%; background-color: rgba(51, 65, 85, 0.9); color: #e2e8f0;">
+        #closed</div>
       <div class="bg-floating-tag" style="top: 8%; right: 7%; background-color: rgba(220, 38, 38, 0.9);">#hotfix</div>
       <div class="bg-floating-tag" style="top: 19%; left: 15%; background-color: rgba(234, 88, 12, 0.9);">#open</div>
-      <div class="bg-floating-tag" style="top: 16%; right: 15%; background-color: rgba(2, 132, 199, 0.9);">#frontend</div>
+      <div class="bg-floating-tag" style="top: 16%; right: 15%; background-color: rgba(2, 132, 199, 0.9);">#frontend
+      </div>
       <div class="bg-floating-tag" style="top: 26%; right: 6%; background-color: rgba(185, 28, 28, 0.9);">#bug</div>
       <div class="bg-floating-tag" style="top: 30%; left: 3%; background-color: rgba(225, 29, 72, 0.9);">#urgent</div>
-      <div class="bg-floating-tag" style="top: 38%; left: 16%; background-color: rgba(245, 158, 11, 0.9); color: #000; font-weight: bold;">#meeting</div>
-      <div class="bg-floating-tag" style="top: 40%; right: 19%; background-color: rgba(124, 58, 237, 0.9);">#question</div>
+      <div class="bg-floating-tag"
+        style="top: 38%; left: 16%; background-color: rgba(245, 158, 11, 0.9); color: #000; font-weight: bold;">#meeting
+      </div>
+      <div class="bg-floating-tag" style="top: 40%; right: 19%; background-color: rgba(124, 58, 237, 0.9);">#question
+      </div>
       <div class="bg-floating-tag" style="top: 49%; left: 3%; background-color: rgba(13, 148, 136, 0.9);">#fast</div>
       <div class="bg-floating-tag" style="top: 49%; right: 6%; background-color: rgba(22, 163, 74, 0.9);">#feature</div>
       <div class="bg-floating-tag" style="top: 61%; left: 15%; background-color: rgba(219, 39, 119, 0.9);">#ui/ux</div>
-      <div class="bg-floating-tag" style="top: 60%; right: 18%; background-color: rgba(14, 165, 233, 0.9);">#in progress</div>
+      <div class="bg-floating-tag" style="top: 60%; right: 18%; background-color: rgba(14, 165, 233, 0.9);">#in progress
+      </div>
       <div class="bg-floating-tag" style="top: 69%; right: 5%; background-color: rgba(29, 78, 216, 0.9);">#backend</div>
-      <div class="bg-floating-tag" style="bottom: 23%; left: 3%; background-color: rgba(2, 132, 199, 0.9);">#frontend</div>
-      <div class="bg-floating-tag" style="bottom: 17%; left: 16%; background-color: rgba(21, 128, 61, 0.9);">#feature</div>
-      <div class="bg-floating-tag" style="bottom: 14%; right: 19%; background-color: rgba(13, 148, 136, 0.9);">#fast</div>
+      <div class="bg-floating-tag" style="bottom: 23%; left: 3%; background-color: rgba(2, 132, 199, 0.9);">#frontend
+      </div>
+      <div class="bg-floating-tag" style="bottom: 17%; left: 16%; background-color: rgba(21, 128, 61, 0.9);">#feature
+      </div>
+      <div class="bg-floating-tag" style="bottom: 14%; right: 19%; background-color: rgba(13, 148, 136, 0.9);">#fast
+      </div>
       <div class="bg-floating-tag" style="bottom: 7%; left: 4%; background-color: rgba(2, 132, 199, 0.9);">#devops</div>
       <div class="bg-floating-tag" style="bottom: 5%; left: 36%; background-color: rgba(217, 119, 6, 0.9);">#chill</div>
       <div class="bg-floating-tag" style="bottom: 4%; right: 38%; background-color: rgba(185, 28, 28, 0.9);">#bug</div>
@@ -83,8 +243,9 @@
 
     <!-- Modal Overlay -->
     <div class="create-issue-overlay">
-      <div class="create-issue-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" onclick="event.stopPropagation()">
-        
+      <div class="create-issue-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"
+        onclick="event.stopPropagation()">
+
         <!-- Header -->
         <div class="modal-header">
           <div class="modal-header-left">
@@ -101,165 +262,175 @@
           </button>
         </div>
 
-        <!-- Form Body -->
+        <!-- Form Body with 2-Column Grid -->
         <form class="modal-form custom-scroll" onsubmit="event.preventDefault(); alert('Issue created!');">
-          <!-- Title -->
-          <div class="form-field">
-            <div class="field-header">
-              <label class="field-label" htmlFor="issue-title">
-                Title <span class="required-mark">*</span>
-              </label>
-              <span class="field-hint">Max 120 characters</span>
-            </div>
-            <input
-              id="issue-title"
-              name="issue-title"
-              type="text"
-              class="title-input"
-              placeholder="Enter a descriptive title for the issue or request..."
-              maxlength="120"
-              required
-            />
-          </div>
+          <div class="modal-horizontal-grid">
 
-          <!-- Description & Rich Text Editor -->
-          <div class="form-field">
-            <label class="field-label" htmlFor="issue-description">
-              Description <span class="required-mark">*</span>
-            </label>
-            <div class="editor-container">
-              <div class="editor-toolbar">
-                <button type="button" class="editor-toolbar-btn" title="Bold" onclick="applyMarkdown('**', '**')">
-                  <i class="ph-bold ph-text-b"></i>
-                </button>
-                <button type="button" class="editor-toolbar-btn" title="Italic" onclick="applyMarkdown('*', '*')">
-                  <i class="ph-bold ph-text-italic"></i>
-                </button>
-                <span class="editor-toolbar-divider"></span>
-                <button type="button" class="editor-toolbar-btn font-code" title="Inline code" onclick="applyMarkdown('`', '`')">
-                  &lt;/&gt;
-                </button>
-                <button type="button" class="editor-toolbar-btn" id="bulletListBtn" title="Bullet list" onclick="toggleBulletList()">
-                  <i class="ph-bold ph-list-bullets"></i>
-                </button>
-                <span class="editor-support-text">Markdown supported</span>
-              </div>
-              <textarea
-                id="issue-description"
-                class="editor-textarea"
-                rows="3"
-                placeholder="Describe the issue in detail, precise steps to reproduce, expected behavior..."
-                onkeydown="handleDescriptionKeyDown(event)"
-                onclick="updateListActiveState()"
-                onkeyup="updateListActiveState()"
-                required
-              ></textarea>
-            </div>
-          </div>
-
-          <!-- Issue Type (D6) -->
-          <div class="form-field">
-            <label class="field-label">Issue Type (D6) <span class="required-mark">*</span></label>
-            <div class="type-selector-grid" role="radiogroup">
-              <label class="type-radio-card type-bug is-selected" onclick="selectType(this, 'bug')">
-                <input type="radio" name="issue_type" value="bug" checked />
-                <i class="ph-fill ph-bug type-icon"></i>
-                <span class="type-label">Bug</span>
-              </label>
-
-              <label class="type-radio-card type-feature" onclick="selectType(this, 'feature')">
-                <input type="radio" name="issue_type" value="feature" />
-                <i class="ph-bold ph-sparkle type-icon"></i>
-                <span class="type-label">Feature</span>
-              </label>
-
-              <label class="type-radio-card type-question" onclick="selectType(this, 'question')">
-                <input type="radio" name="issue_type" value="question" />
-                <i class="ph-bold ph-question type-icon"></i>
-                <span class="type-label">Question</span>
-              </label>
-
-              <label class="type-radio-card type-docs" onclick="selectType(this, 'documentation')">
-                <input type="radio" name="issue_type" value="documentation" />
-                <i class="ph-bold ph-file-text type-icon"></i>
-                <span class="type-label">Docs</span>
-              </label>
-            </div>
-          </div>
-
-          <!-- Labels & Scope (D7) -->
-          <div class="form-field">
-            <div class="field-header">
-              <label class="field-label">Labels &amp; Scope (D7)</label>
-              <span class="field-hint" id="labels-count-hint">Click + to select tags</span>
-            </div>
-            <div class="labels-box-grid" id="labels-container">
-              <!-- Rendered dynamically via JS -->
-            </div>
-          </div>
-
-          <!-- Priority & Urgency Section (D3) -->
-          <div class="form-field">
-            <label class="field-label">Priority &amp; Urgency Level (D3)</label>
-            <div class="urgency-card" id="urgencyCard">
-              <div class="urgency-info">
-                <div class="urgency-icon-box">
-                  <i class="ph-bold ph-warning animate-pulse-icon"></i>
+            <!-- LEFT COLUMN: Primary Details & Content -->
+            <div class="modal-col-main">
+              <!-- Title -->
+              <div class="form-field">
+                <div class="field-header">
+                  <label class="field-label" for="issue-title">
+                    Title <span class="required-mark">*</span>
+                  </label>
+                  <span class="field-hint">
+                    Max 120 characters <span id="title-char-counter" class="title-char-counter">(0/120)</span>
+                  </span>
                 </div>
-                <div class="urgency-text-group">
-                  <div class="urgency-title-row">
-                    <span class="urgency-title-text">Mark as URGENT</span>
-                    <span class="urgency-badge-block">Blocker</span>
+                <input
+                  id="issue-title"
+                  name="issue-title"
+                  type="text"
+                  class="title-input"
+                  placeholder="Enter a descriptive title for the issue or request..."
+                  maxlength="120"
+                  required
+                />
+              </div>
+
+              <!-- Description & Rich Text Editor -->
+              <div class="form-field flex-grow-field">
+                <label class="field-label" for="issue-description">
+                  Description <span class="required-mark">*</span>
+                </label>
+                <div class="editor-container flex-grow-editor">
+                  <div class="editor-toolbar">
+                    <button type="button" class="editor-toolbar-btn" title="Bold" onclick="applyMarkdown('**', '**')">
+                      <i class="ph-bold ph-text-b"></i>
+                    </button>
+                    <button type="button" class="editor-toolbar-btn" title="Italic" onclick="applyMarkdown('*', '*')">
+                      <i class="ph-bold ph-text-italic"></i>
+                    </button>
+                    <span class="editor-toolbar-divider"></span>
+                    <button type="button" class="editor-toolbar-btn font-code" title="Inline code" onclick="applyMarkdown('`', '`')">
+                      &lt;/&gt;
+                    </button>
+                    <button type="button" class="editor-toolbar-btn" id="bulletListBtn" title="Bullet list" onclick="toggleBulletList()">
+                      <i class="ph-bold ph-list-bullets"></i>
+                    </button>
+                    <span class="editor-support-text">Ctrl+B / Ctrl+I</span>
                   </div>
-                  <p class="urgency-subtext">
-                    Highlights issue with top priority and pins it to the board
-                  </p>
+                  <textarea
+                    id="issue-description"
+                    class="editor-textarea"
+                    placeholder="Describe the issue in detail, precise steps to reproduce, expected behavior... Use • for lists."
+                    onkeydown="handleDescriptionKeyDown(event)"
+                    onclick="updateListActiveState()"
+                    onkeyup="updateListActiveState()"
+                    required
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Properties, Classification & Scope -->
+            <div class="modal-col-sidebar">
+              <!-- Issue Type (D6) -->
+              <div class="form-field">
+                <label class="field-label">Issue Type (D6) <span class="required-mark">*</span></label>
+                <div class="type-selector-grid" role="radiogroup">
+                  <label class="type-radio-card type-bug is-selected" onclick="selectType(this, 'bug')">
+                    <input type="radio" name="issue_type" value="bug" checked />
+                    <i class="ph-fill ph-bug type-icon"></i>
+                    <span class="type-label">Bug</span>
+                  </label>
+
+                  <label class="type-radio-card type-feature" onclick="selectType(this, 'feature')">
+                    <input type="radio" name="issue_type" value="feature" />
+                    <i class="ph-bold ph-sparkle type-icon"></i>
+                    <span class="type-label">Feature</span>
+                  </label>
+
+                  <label class="type-radio-card type-question" onclick="selectType(this, 'question')">
+                    <input type="radio" name="issue_type" value="question" />
+                    <i class="ph-bold ph-question type-icon"></i>
+                    <span class="type-label">Question</span>
+                  </label>
+
+                  <label class="type-radio-card type-docs" onclick="selectType(this, 'documentation')">
+                    <input type="radio" name="issue_type" value="documentation" />
+                    <i class="ph-bold ph-file-text type-icon"></i>
+                    <span class="type-label">Docs</span>
+                  </label>
                 </div>
               </div>
 
-              <!-- Switch Toggle -->
-              <label class="urgency-switch">
-                <input type="checkbox" id="urgencyCheckbox" onchange="toggleUrgency(this.checked)" />
-                <span class="switch-slider"></span>
-              </label>
-            </div>
-          </div>
-
-          <!-- Attachments Section -->
-          <div class="form-field">
-            <div class="field-header">
-              <label class="field-label">
-                Attach a screenshot <span class="field-optional">(optional)</span>
-              </label>
-              <span class="field-hint">PNG, JPG or GIF up to 10MB</span>
-            </div>
-
-            <!-- Hidden File Input -->
-            <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileSelected(event)" />
-
-            <div
-              class="dropzone-box"
-              id="dropzoneBox"
-              onclick="handleDropzoneClick()"
-              ondragover="event.preventDefault(); this.classList.add('is-dragover');"
-              ondragleave="this.classList.remove('is-dragover');"
-              ondrop="handleFileDrop(event)"
-            >
-              <div class="dropzone-icon-circle">
-                <i class="ph ph-upload-simple"></i>
+              <!-- Labels & Scope (D7) -->
+              <div class="form-field">
+                <div class="field-header">
+                  <label class="field-label">Labels &amp; Scope (D7)</label>
+                  <span class="field-hint" id="labels-count-hint">Click + to select tags</span>
+                </div>
+                <div class="labels-box-grid" id="labels-container">
+                  <!-- Rendered dynamically via JS -->
+                </div>
               </div>
-              <p class="dropzone-prompt">
-                <span class="dropzone-link-text">Choose file</span> or drag image here
-              </p>
-              <p class="dropzone-keyboard-hint">
-                You can paste screenshots directly with <kbd class="kbd-badge">Ctrl+V</kbd>
-              </p>
 
-              <!-- Attached File Container (empty by default) -->
-              <div id="attachment-container"></div>
+              <!-- Priority & Urgency Section (D3) -->
+              <div class="form-field">
+                <label class="field-label">Priority &amp; Urgency Level (D3)</label>
+                <div class="urgency-card" id="urgencyCard">
+                  <div class="urgency-info">
+                    <div class="urgency-icon-box">
+                      <i class="ph-bold ph-warning animate-pulse-icon"></i>
+                    </div>
+                    <div class="urgency-text-group">
+                      <div class="urgency-title-row">
+                        <span class="urgency-title-text">Mark as URGENT</span>
+                        <span class="urgency-badge-block">Blocker</span>
+                      </div>
+                      <p class="urgency-subtext">
+                        Highlights issue with top priority and pins it to the board
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Switch Toggle -->
+                  <label class="urgency-switch">
+                    <input type="checkbox" id="urgencyCheckbox" onchange="toggleUrgency(this.checked)" />
+                    <span class="switch-slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Attachments Section -->
+              <div class="form-field">
+                <div class="field-header">
+                  <label class="field-label">
+                    Attach a screenshot <span class="field-optional">(optional)</span>
+                  </label>
+                  <span class="field-hint">PNG, JPG or GIF up to 10MB</span>
+                </div>
+
+                <!-- Hidden File Input -->
+                <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileSelected(event)" />
+
+                <div
+                  class="dropzone-box"
+                  id="dropzoneBox"
+                  onclick="handleDropzoneClick()"
+                  ondragover="event.preventDefault(); this.classList.add('is-dragover');"
+                  ondragleave="this.classList.remove('is-dragover');"
+                  ondrop="handleFileDrop(event)"
+                >
+                  <div class="dropzone-icon-circle">
+                    <i class="ph ph-upload-simple"></i>
+                  </div>
+                  <p class="dropzone-prompt">
+                    <span class="dropzone-link-text">Choose file</span> or drag image here
+                  </p>
+                  <p class="dropzone-keyboard-hint">
+                    You can paste screenshots directly with <kbd class="kbd-badge">Ctrl+V</kbd>
+                  </p>
+
+                  <!-- Attached File Container (empty by default) -->
+                  <div id="attachment-container"></div>
+                </div>
+              </div>
             </div>
-          </div>
 
+          </div>
         </form>
 
         <!-- Footer -->
@@ -670,9 +841,25 @@
       }
     });
 
+    // Title Character Counter
+    const titleInput = document.getElementById('issue-title');
+    const titleCounter = document.getElementById('title-char-counter');
+    if (titleInput && titleCounter) {
+      titleInput.addEventListener('input', () => {
+        const len = titleInput.value.length;
+        titleCounter.textContent = `(${len}/120)`;
+        if (len >= 120) {
+          titleCounter.classList.add('is-max');
+        } else {
+          titleCounter.classList.remove('is-max');
+        }
+      });
+    }
+
     // Init
     renderLabels();
     setUrgencyState(false);
   </script>
 </body>
+
 </html>

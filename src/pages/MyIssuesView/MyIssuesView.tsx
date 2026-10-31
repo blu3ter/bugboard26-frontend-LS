@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import '../AllIssuesView/AllIssuesView.css';
 import './MyIssuesView.css';
 import { IssuesFilterBar } from '../../components/IssuesFilterBar';
+import { useIssuesFilter } from '../../hooks/useIssuesFilter';
 import { issueService } from '../../service/issueService';
 import { TagBadge } from '../../components/tags';
 import { IssueDetailModal } from '../../components/modals';
@@ -10,7 +11,21 @@ import type { IssueDto } from '../../types/issue.types';
 export const MyIssuesView: React.FC = () => {
   const [issues, setIssues] = useState<IssueDto[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [sendingId, setSendingId] = useState<number | null>(null);
   const [selectedIssueId, setSelectedIssueId] = useState<number | null>(null);
+
+  const {
+    search,
+    setSearch,
+    type,
+    setType,
+    state,
+    setState,
+    urgentOnly,
+    setUrgentOnly,
+    filteredIssues,
+    resetFilters,
+  } = useIssuesFilter(issues);
 
   const fetchIssues = useCallback(async () => {
     try {
@@ -28,26 +43,40 @@ export const MyIssuesView: React.FC = () => {
     fetchIssues();
   }, [fetchIssues]);
 
+  const handleSendToReview = async (id: number) => {
+    setSendingId(id);
+    try {
+      const updated = await issueService.sendToReview(id);
+      setIssues(prev => prev.map(i => (i.id === id ? { ...i, ...updated } : i)));
+    } catch (error) {
+      console.error("Failed to send issue to review", error);
+      alert("Impossibile inviare la issue in revisione.");
+    } finally {
+      setSendingId(null);
+    }
+  };
+
   const getTypeStyles = (type: string) => {
     switch (type) {
-      case 'BUG': 
+      case 'BUG':
         return { color: '#ef4444', icon: 'bug_report', badgeBg: 'rgba(239, 68, 68, 0.1)', badgeBorder: '#ef4444', textColor: '#ef4444' };
-      case 'FEATURE': 
-        return { color: '#fef08a', icon: 'stars', badgeBg: 'rgba(254, 240, 138, 0.1)', badgeBorder: '#fef08a', textColor: '#ca8a04' };
-      case 'QUESTION': 
-        return { color: '#3b82f6', icon: 'help', badgeBg: 'rgba(59, 130, 246, 0.1)', badgeBorder: '#3b82f6', textColor: '#3b82f6' };
-      case 'DOCUMENTATION': 
-        return { color: '#86efac', icon: 'description', badgeBg: 'rgba(134, 239, 172, 0.1)', badgeBorder: '#86efac', textColor: '#16a34a' };
-      default: 
+      case 'FEATURE':
+        return { color: '#10b981', icon: 'add_box', badgeBg: 'rgba(16, 185, 129, 0.1)', badgeBorder: '#10b981', textColor: '#10b981' };
+      case 'QUESTION':
+        return { color: '#fbbf24', icon: 'help', badgeBg: 'rgba(251, 191, 36, 0.1)', badgeBorder: '#fbbf24', textColor: '#fbbf24' };
+      case 'DOCUMENTATION':
+        return { color: '#2563eb', icon: 'description', badgeBg: 'rgba(37, 99, 235, 0.1)', badgeBorder: '#2563eb', textColor: '#2563eb' };
+      default:
         return { color: 'var(--primary)', icon: 'list', badgeBg: 'var(--surface-container-high)', badgeBorder: 'var(--border-color)', textColor: 'var(--text-secondary)' };
     }
   };
 
   const getStateText = (state: string) => {
     switch (state) {
-      case 'TODO': return 'Todo';
-      case 'IN_PROGRESS': return 'In Progress';
-      case 'REVIEW': return 'Review';
+      case 'TODO': return 'To do';
+      case 'IN_PROGRESS': return 'In progress';
+      case 'REVIEW':
+      case 'IN_REVIEW': return 'Review';
       case 'DONE': return 'Closed';
       default: return state;
     }
@@ -57,23 +86,51 @@ export const MyIssuesView: React.FC = () => {
     switch (state) {
       case 'TODO': return 'badge-todo';
       case 'IN_PROGRESS': return 'badge-in-progress';
-      case 'REVIEW': return 'badge-in-review';
+      case 'REVIEW':
+      case 'IN_REVIEW': return 'badge-in-review';
       case 'DONE': return 'badge-closed';
       default: return 'badge-todo';
     }
   };
 
-  const todoCount = issues.filter(i => i.state === 'TODO').length;
-  const inProgressCount = issues.filter(i => i.state === 'IN_PROGRESS').length;
-  const doneCount = issues.filter(i => i.state === 'DONE').length;
-  const urgentCount = issues.filter(i => i.isUrgent).length;
-  const totalCount = issues.length;
+  // Partizione senza sovrapposizioni: ogni issue cade in una sola categoria
+  const doneCount = filteredIssues.filter(i => i.state === 'DONE').length;
+  const urgentCount = filteredIssues.filter(i => i.state !== 'DONE' && i.isUrgent).length;
+  const inProgressCount = filteredIssues.filter(i => i.state !== 'DONE' && !i.isUrgent).length;
+  const totalCount = filteredIssues.length;
   const completedPercentage = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
-  
+
+  // Segmenti del grafico a ciambella (r = 48)
+  const CIRCUMFERENCE = 2 * Math.PI * 48;
+  const chartSegments = [
+    { key: 'urgent', className: 'segment-urgent', count: urgentCount },
+    { key: 'progress', className: 'segment-progress', count: inProgressCount },
+    { key: 'done', className: 'segment-done', count: doneCount },
+  ];
+  let accumulatedLength = 0;
+  const donutSegments = chartSegments.map(segment => {
+    const length = totalCount > 0 ? (segment.count / totalCount) * CIRCUMFERENCE : 0;
+    const offset = -accumulatedLength;
+    accumulatedLength += length;
+    return { ...segment, length, offset };
+  });
+  const getPercentage = (count: number) => (totalCount > 0 ? Math.round((count / totalCount) * 100) : 0);
+
   return (
     <div className="issues-view-container">
       {/* Search Bar Full Width */}
-      <IssuesFilterBar searchPlaceholder="Search your issues..." />
+      <IssuesFilterBar
+        searchPlaceholder="Search your issues..."
+        search={search}
+        onSearchChange={setSearch}
+        type={type}
+        onTypeChange={setType}
+        state={state}
+        onStateChange={setState}
+        urgentOnly={urgentOnly}
+        onUrgentChange={setUrgentOnly}
+        onReset={resetFilters}
+      />
 
       {/* Split Layout (Left: Grid, Right: Sidebar) */}
       <div className="my-issues-layout" style={{ marginTop: '24px' }}>
@@ -81,16 +138,16 @@ export const MyIssuesView: React.FC = () => {
         <div className="my-issues-main-content">
           {loading ? (
             <p>Loading issues...</p>
-          ) : issues.length === 0 ? (
+          ) : filteredIssues.length === 0 ? (
             <p>No issues found.</p>
           ) : (
             <div className="issues-grid">
-              {issues.map(issue => {
+              {filteredIssues.map(issue => {
                 const typeStyle = getTypeStyles(issue.type);
                 return (
-                  <article 
-                    key={issue.id} 
-                    className={`issue-card ${issue.state === 'DONE' ? 'card-closed' : ''}`} 
+                  <article
+                    key={issue.id}
+                    className={`issue-card ${issue.state === 'DONE' ? 'card-closed' : ''}`}
                     style={{
                       cursor: 'pointer',
                       ...(issue.isUrgent ? { borderColor: 'rgba(186,26,26,0.5)' } : {})
@@ -98,7 +155,7 @@ export const MyIssuesView: React.FC = () => {
                     onClick={() => setSelectedIssueId(issue.id)}
                   >
                     <div className="card-accent-line" style={{ backgroundColor: typeStyle.color }}></div>
-                    
+
                     <div className="card-header">
                       <div className="card-id-group">
                         <span className="issue-id">BB-{issue.id}</span>
@@ -108,15 +165,24 @@ export const MyIssuesView: React.FC = () => {
                           </span>
                         )}
                       </div>
-                      <button className={`btn-check ${issue.state === 'DONE' ? 'btn-checked' : ''}`} disabled={issue.state === 'DONE'}>
-                        <span className="material-symbols-outlined" style={issue.state === 'DONE' ? { fontVariationSettings: '"FILL" 1' } : {}}>check_circle</span>
-                      </button>
+                      {issue.state === 'IN_PROGRESS' && (
+                        <button
+                          type="button"
+                          className="btn-send"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSendToReview(issue.id);
+                          }}
+                          disabled={sendingId === issue.id}
+                        >
+                          <span className="material-symbols-outlined">send</span>
+                          <span>{sendingId === issue.id ? 'SENDING...' : 'SEND'}</span>
+                        </button>
+                      )}
                     </div>
-                    
+
                     <h3 className={`issue-title ${issue.state === 'DONE' ? 'issue-title-closed' : ''}`}>{issue.title}</h3>
-                    {issue.reporterFullName && (
-                      <p className="issue-project" style={{ marginBottom: '8px' }}>Assigned by: {issue.reporterFullName}</p>
-                    )}
+                    {issue.reporterFullName && <p className="issue-project" style={{ marginBottom: '8px' }}>Assigned by: {issue.reporterFullName}</p>}
 
                     {/* Tag Badges (Req. 10) */}
                     {issue.tags && issue.tags.length > 0 && (
@@ -126,7 +192,7 @@ export const MyIssuesView: React.FC = () => {
                         ))}
                       </div>
                     )}
-                    
+
                     <div className="card-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                         <span className="badge" style={{ backgroundColor: typeStyle.badgeBg, border: `1px solid ${typeStyle.badgeBorder}`, color: typeStyle.textColor }}>
@@ -151,37 +217,40 @@ export const MyIssuesView: React.FC = () => {
         {/* Sidebar Area (Right side) */}
         <aside className="my-issues-sidebar">
           <div className="summary-panel">
-            
+
             <div className="summary-header">
               <h2 className="summary-title">
-                <span className="material-symbols-outlined" style={{ color: 'var(--primary)' }}>analytics</span> 
+                <span className="material-symbols-outlined" style={{ color: 'var(--primary)' }}>analytics</span>
                 Tasks Summary
               </h2>
               <span className="summary-total-badge">{totalCount} Total</span>
             </div>
 
             <div className="metrics-list">
-              <div className="metric-item metric-todo">
+              <div className="metric-item metric-urgent">
                 <div className="metric-item-left">
                   <div className="metric-icon-wrapper">
-                    <span className="material-symbols-outlined">pending_actions</span>
+                    <span className="material-symbols-outlined">priority_high</span>
                   </div>
                   <div className="metric-info">
-                    <span className="metric-name">To Do</span>
-                    <span className="metric-desc">In priority queue</span>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <span className="metric-name">Urgent</span>
+                      <span className="active-badge">Active</span>
+                    </div>
+                    <span className="metric-desc">Immediate action</span>
                   </div>
                 </div>
-                <span className="metric-value">{todoCount}</span>
+                <span className="metric-value">{urgentCount}</span>
               </div>
 
               <div className="metric-item metric-progress">
                 <div className="metric-item-left">
                   <div className="metric-icon-wrapper">
-                    <span className="material-symbols-outlined">schedule</span>
+                    <span className="material-symbols-outlined">autorenew</span>
                   </div>
                   <div className="metric-info">
                     <span className="metric-name">In Progress</span>
-                    <span className="metric-desc">Actively working</span>
+                    <span className="metric-desc">Under development</span>
                   </div>
                 </div>
                 <span className="metric-value">{inProgressCount}</span>
@@ -199,21 +268,6 @@ export const MyIssuesView: React.FC = () => {
                 </div>
                 <span className="metric-value">{doneCount}</span>
               </div>
-
-              {urgentCount > 0 && (
-                <div className="metric-item" style={{ borderLeft: '3px solid #ba1a1a', background: 'rgba(186, 26, 26, 0.05)' }}>
-                  <div className="metric-item-left">
-                    <div className="metric-icon-wrapper" style={{ color: '#ba1a1a' }}>
-                      <span className="material-symbols-outlined">warning</span>
-                    </div>
-                    <div className="metric-info">
-                      <span className="metric-name" style={{ color: '#ba1a1a' }}>Urgent</span>
-                      <span className="metric-desc">Critical attention</span>
-                    </div>
-                  </div>
-                  <span className="metric-value" style={{ color: '#ba1a1a' }}>{urgentCount}</span>
-                </div>
-              )}
             </div>
 
             <div className="chart-section">
@@ -225,7 +279,19 @@ export const MyIssuesView: React.FC = () => {
               <div className="donut-container">
                 <svg className="donut-svg" viewBox="0 0 120 120">
                   <circle className="donut-bg" cx="60" cy="60" r="48"></circle>
-                  <circle className="donut-segment segment-todo" cx="60" cy="60" r="48" style={{ strokeDashoffset: '0' }}></circle>
+                  {donutSegments.map(segment => segment.length > 0 && (
+                    <circle
+                      key={segment.key}
+                      className={`donut-segment ${segment.className}`}
+                      cx="60"
+                      cy="60"
+                      r="48"
+                      style={{
+                        strokeDasharray: `${segment.length} ${CIRCUMFERENCE}`,
+                        strokeDashoffset: segment.offset,
+                      }}
+                    ></circle>
+                  ))}
                 </svg>
                 <div className="donut-text">
                   <span className="donut-percentage">{completedPercentage}%</span>
@@ -235,20 +301,16 @@ export const MyIssuesView: React.FC = () => {
 
               <div className="chart-legend">
                 <div className="legend-item">
-                  <span className="legend-dot bg-todo"></span>
-                  <span className="legend-text">To Do</span>
-                </div>
-                <div className="legend-item">
                   <span className="legend-dot bg-urgent"></span>
-                  <span className="legend-text">Urgent</span>
+                  <span className="legend-text">Urgent ({getPercentage(urgentCount)}%)</span>
                 </div>
                 <div className="legend-item">
                   <span className="legend-dot bg-progress"></span>
-                  <span className="legend-text">In Progress</span>
+                  <span className="legend-text">In Progress ({getPercentage(inProgressCount)}%)</span>
                 </div>
                 <div className="legend-item">
                   <span className="legend-dot bg-done"></span>
-                  <span className="legend-text">Completed</span>
+                  <span className="legend-text">Completed ({getPercentage(doneCount)}%)</span>
                 </div>
               </div>
             </div>

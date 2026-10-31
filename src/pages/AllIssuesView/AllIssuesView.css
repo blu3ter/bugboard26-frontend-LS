@@ -226,8 +226,8 @@
 }
 
 .badge-in-progress {
-  background-color: #FFF59D;
-  color: #424242;
+  background-color: transparent;
+  color: var(--on-surface-variant);
 }
 
 .badge-feature {
@@ -236,13 +236,13 @@
 }
 
 .badge-todo {
-  background-color: var(--surface-container-highest);
+  background-color: transparent;
   color: var(--on-surface-variant);
 }
 
 .badge-in-review {
-  background-color: var(--tertiary-container);
-  color: var(--on-tertiary-container);
+  background-color: transparent;
+  color: var(--on-surface-variant);
 }
 
 .badge-documentation {
@@ -256,8 +256,8 @@
 }
 
 .badge-closed {
-  background-color: var(--secondary-container);
-  color: var(--on-secondary-container);
+  background-color: transparent;
+  color: var(--on-surface-variant);
 }
 
 .card-closed {
