@@ -80,9 +80,9 @@ export const MyIssuesView: React.FC = () => {
         {/* Main Content Area (Left side) */}
         <div className="my-issues-main-content">
           {loading ? (
-            <p>Caricamento issues...</p>
+            <p>Loading issues...</p>
           ) : issues.length === 0 ? (
-            <p>Nessuna issue trovata.</p>
+            <p>No issues found.</p>
           ) : (
             <div className="issues-grid">
               {issues.map(issue => {
@@ -104,7 +104,7 @@ export const MyIssuesView: React.FC = () => {
                         <span className="issue-id">BB-{issue.id}</span>
                         {issue.isUrgent && (
                           <span className="badge-urgent">
-                            <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>warning</span> URGENTE
+                            <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>warning</span> URGENT
                           </span>
                         )}
                       </div>
@@ -114,7 +114,9 @@ export const MyIssuesView: React.FC = () => {
                     </div>
                     
                     <h3 className={`issue-title ${issue.state === 'DONE' ? 'issue-title-closed' : ''}`}>{issue.title}</h3>
-                    {issue.reporterFullName && <p className="issue-project" style={{ marginBottom: '8px' }}>Assegnato da: {issue.reporterFullName}</p>}
+                    {issue.reporterFullName && (
+                      <p className="issue-project" style={{ marginBottom: '8px' }}>Assigned by: {issue.reporterFullName}</p>
+                    )}
 
                     {/* Tag Badges (Req. 10) */}
                     {issue.tags && issue.tags.length > 0 && (
@@ -169,7 +171,7 @@ export const MyIssuesView: React.FC = () => {
                     <span className="metric-desc">In priority queue</span>
                   </div>
                 </div>
-                <span className="metric-count">{todoCount}</span>
+                <span className="metric-value">{todoCount}</span>
               </div>
 
               <div className="metric-item metric-progress">
@@ -182,20 +184,20 @@ export const MyIssuesView: React.FC = () => {
                     <span className="metric-desc">Actively working</span>
                   </div>
                 </div>
-                <span className="metric-count">{inProgressCount}</span>
+                <span className="metric-value">{inProgressCount}</span>
               </div>
 
               <div className="metric-item metric-done">
                 <div className="metric-item-left">
                   <div className="metric-icon-wrapper">
-                    <span className="material-symbols-outlined">check_circle</span>
+                    <span className="material-symbols-outlined">done_all</span>
                   </div>
                   <div className="metric-info">
-                    <span className="metric-name">Closed / Done</span>
-                    <span className="metric-desc">Completed</span>
+                    <span className="metric-name">Completed</span>
+                    <span className="metric-desc">Resolved & verified</span>
                   </div>
                 </div>
-                <span className="metric-count">{doneCount}</span>
+                <span className="metric-value">{doneCount}</span>
               </div>
 
               {urgentCount > 0 && (
@@ -209,18 +211,45 @@ export const MyIssuesView: React.FC = () => {
                       <span className="metric-desc">Critical attention</span>
                     </div>
                   </div>
-                  <span className="metric-count" style={{ color: '#ba1a1a' }}>{urgentCount}</span>
+                  <span className="metric-value" style={{ color: '#ba1a1a' }}>{urgentCount}</span>
                 </div>
               )}
             </div>
 
-            <div className="progress-section">
-              <div className="progress-labels">
-                <span className="progress-title">Completion Rate</span>
-                <span className="progress-value">{completedPercentage}%</span>
+            <div className="chart-section">
+              <div className="chart-header">
+                <span className="chart-title">Progress Status</span>
+                <span className="chart-badge">{doneCount} of {totalCount} resolved</span>
               </div>
-              <div className="progress-bar-container">
-                <div className="progress-bar-fill" style={{ width: `${completedPercentage}%` }}></div>
+
+              <div className="donut-container">
+                <svg className="donut-svg" viewBox="0 0 120 120">
+                  <circle className="donut-bg" cx="60" cy="60" r="48"></circle>
+                  <circle className="donut-segment segment-todo" cx="60" cy="60" r="48" style={{ strokeDashoffset: '0' }}></circle>
+                </svg>
+                <div className="donut-text">
+                  <span className="donut-percentage">{completedPercentage}%</span>
+                  <span className="donut-label">Completed</span>
+                </div>
+              </div>
+
+              <div className="chart-legend">
+                <div className="legend-item">
+                  <span className="legend-dot bg-todo"></span>
+                  <span className="legend-text">To Do</span>
+                </div>
+                <div className="legend-item">
+                  <span className="legend-dot bg-urgent"></span>
+                  <span className="legend-text">Urgent</span>
+                </div>
+                <div className="legend-item">
+                  <span className="legend-dot bg-progress"></span>
+                  <span className="legend-text">In Progress</span>
+                </div>
+                <div className="legend-item">
+                  <span className="legend-dot bg-done"></span>
+                  <span className="legend-text">Completed</span>
+                </div>
               </div>
             </div>
 

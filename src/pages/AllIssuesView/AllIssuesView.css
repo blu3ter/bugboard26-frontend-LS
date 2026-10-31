@@ -221,7 +221,7 @@
 }
 
 .badge-bug {
-  background-color: #ba1a1a;
+  background-color: #ef4444;
   color: white;
 }
 
@@ -231,7 +231,7 @@
 }
 
 .badge-feature {
-  background-color: var(--primary);
+  background-color: #10b981;
   color: white;
 }
 
@@ -246,8 +246,13 @@
 }
 
 .badge-documentation {
-  background-color: var(--secondary);
-  color: var(--on-secondary);
+  background-color: #2563eb;
+  color: white;
+}
+
+.badge-question {
+  background-color: #fbbf24;
+  color: #1e293b;
 }
 
 .badge-closed {

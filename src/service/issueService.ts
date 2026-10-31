@@ -19,7 +19,10 @@ export class IssueService {
       headers: getAuthHeaders(),
     });
 
-    if (!response.ok) throw new Error('Errore nel caricamento delle issue');
+    if (!response.ok) {
+      throw new Error('Failed to fetch issues');
+    }
+
     return response.json();
   }
 
@@ -32,7 +35,10 @@ export class IssueService {
       headers: getAuthHeaders(),
     });
 
-    if (!response.ok) throw new Error('Errore nel caricamento delle tue issue');
+    if (!response.ok) {
+      throw new Error('Failed to fetch assigned issues');
+    }
+
     return response.json();
   }
 
@@ -45,7 +51,7 @@ export class IssueService {
       headers: getAuthHeaders(),
     });
 
-    if (!response.ok) throw new Error('Impossibile caricare il dettaglio della issue');
+    if (!response.ok) throw new Error('Failed to load issue details');
     return response.json();
   }
 
@@ -72,7 +78,7 @@ export class IssueService {
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(errorText || 'Errore durante la creazione della issue');
+      throw new Error(errorText || 'Failed to create issue');
     }
 
     return response.json();
@@ -90,7 +96,7 @@ export class IssueService {
       body: JSON.stringify(payload),
     });
 
-    if (!response.ok) throw new Error("Errore durante l'assegnazione della issue");
+    if (!response.ok) throw new Error('Failed to assign issue');
     return response.json();
   }
 
@@ -103,7 +109,7 @@ export class IssueService {
       headers: getAuthHeaders(true),
     });
 
-    if (!response.ok) throw new Error("Errore durante l'invio in revisione");
+    if (!response.ok) throw new Error('Failed to send issue to review');
     return response.json();
   }
 
@@ -116,7 +122,7 @@ export class IssueService {
       headers: getAuthHeaders(true),
     });
 
-    if (!response.ok) throw new Error('Errore durante il rinvio in lavorazione');
+    if (!response.ok) throw new Error('Failed to send issue back to in progress');
     return response.json();
   }
 
@@ -129,7 +135,7 @@ export class IssueService {
       headers: getAuthHeaders(true),
     });
 
-    if (!response.ok) throw new Error('Errore durante la chiusura della issue');
+    if (!response.ok) throw new Error('Failed to close issue');
     return response.json();
   }
 
@@ -147,7 +153,7 @@ export class IssueService {
     if (normalized === 'DONE' || normalized === 'CLOSED') {
       return this.closeIssue(issueId);
     }
-    throw new Error(`Transizione verso lo stato ${newState} non supportata.`);
+    throw new Error(`State transition to ${newState} is not supported.`);
   }
 
   /**
