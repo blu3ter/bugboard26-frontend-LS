@@ -3,16 +3,22 @@ import type { IssueDto, IssueCreateDto, IssueAssignDto, IssueState } from '../ty
 
 /**
  * Service per la gestione delle Issue (CRUD, Workflow State, Assegnazioni)
- * Completamente sincronizzato con gli endpoint REST di IssueController.java
+ * Completamente integrato con supporto a filtri per tag e gestione multipart per allegati.
  */
 export class IssueService {
   /**
-   * Recupera tutte le issue registrate a sistema
+   * Recupera tutte le issue registrate a sistema, con eventuale filtro per tag
    */
-  public async getAllIssues(): Promise<IssueDto[]> {
-    const response = await fetch(`${API_BASE_URL}/issues`, {
+  public async getAllIssues(tag?: string): Promise<IssueDto[]> {
+    const url = tag
+      ? `${API_BASE_URL}/issues?tag=${encodeURIComponent(tag)}`
+      : `${API_BASE_URL}/issues`;
+
+    const response = await fetch(url, {
+      method: 'GET',
       headers: getAuthHeaders(),
     });
+
     if (!response.ok) throw new Error('Errore nel caricamento delle issue');
     return response.json();
   }
@@ -22,8 +28,10 @@ export class IssueService {
    */
   public async getMyIssues(): Promise<IssueDto[]> {
     const response = await fetch(`${API_BASE_URL}/issues/me`, {
+      method: 'GET',
       headers: getAuthHeaders(),
     });
+
     if (!response.ok) throw new Error('Errore nel caricamento delle tue issue');
     return response.json();
   }
@@ -33,8 +41,10 @@ export class IssueService {
    */
   public async getIssueById(id: number): Promise<IssueDto> {
     const response = await fetch(`${API_BASE_URL}/issues/${id}`, {
+      method: 'GET',
       headers: getAuthHeaders(),
     });
+
     if (!response.ok) throw new Error('Impossibile caricare il dettaglio della issue');
     return response.json();
   }
@@ -92,7 +102,8 @@ export class IssueService {
       method: 'POST',
       headers: getAuthHeaders(true),
     });
-    if (!response.ok) throw new Error('Errore durante l\'invio in revisione');
+
+    if (!response.ok) throw new Error("Errore durante l'invio in revisione");
     return response.json();
   }
 
@@ -104,6 +115,7 @@ export class IssueService {
       method: 'POST',
       headers: getAuthHeaders(true),
     });
+
     if (!response.ok) throw new Error('Errore durante il rinvio in lavorazione');
     return response.json();
   }
@@ -116,6 +128,7 @@ export class IssueService {
       method: 'POST',
       headers: getAuthHeaders(true),
     });
+
     if (!response.ok) throw new Error('Errore durante la chiusura della issue');
     return response.json();
   }
@@ -138,7 +151,7 @@ export class IssueService {
   }
 
   /**
-   * Recupera le issue in stato di revisione filtrando per lo stato IN_REVIEW
+   * Recupera le issue in stato di revisione filtrando per lo stato IN_REVIEW o REVIEW
    */
   public async getReviewIssues(): Promise<IssueDto[]> {
     const all = await this.getAllIssues();

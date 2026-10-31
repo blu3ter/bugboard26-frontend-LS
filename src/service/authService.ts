@@ -1,5 +1,5 @@
-import type { LoginRequestDto, LoginResponseDto } from '../types';
-import { validateLoginCredentials } from '../controller/authController';
+import type { LoginRequestDto, LoginResponseDto, RegisterRequestDto } from '../types';
+import { validateLoginCredentials, validateRegisterCredentials } from '../controller/authController';
 
 /**
  * Service Layer
@@ -98,6 +98,44 @@ export class AuthService {
     this.saveSession(responseData);
 
     return responseData;
+  }
+
+  /**
+   * Chiamata di rete verso l'endpoint di registrazione del backend
+   */
+  public async registerApi(credentials: RegisterRequestDto): Promise<void> {
+    const token = this.getToken();
+    const response = await fetch(`${API_BASE_URL}/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify(credentials),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || 'Errore durante la registrazione dell\'utente');
+    }
+  }
+
+  /**
+   * Orchestrazione del flusso completo di registrazione:
+   * 1. Validazione tramite regole di business del Controller Layer
+   * 2. Esecuzione della chiamata API verso il backend
+   */
+  /* Questo è il codice principale chiamato per la registrazione */
+  public async executeRegisterWorkflow(credentials: RegisterRequestDto): Promise<void> {
+    // 1. Validazione regole di business
+    const validation = validateRegisterCredentials(credentials);
+    if (!validation.isValid) {
+      const firstError = Object.values(validation.errors)[0];
+      throw new Error(firstError || 'Dati di registrazione non validi');
+    }
+
+    // 2. Chiamata API
+    await this.registerApi(credentials);
   }
 }
 
