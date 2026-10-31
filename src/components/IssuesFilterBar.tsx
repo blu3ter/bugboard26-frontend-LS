@@ -13,7 +13,7 @@ interface IssuesFilterBarProps {
   onReset: () => void;
 }
 
-export const IssuesFilterBar: React.FC<IssuesFilterBarProps> = ({ 
+export const IssuesFilterBar: React.FC<IssuesFilterBarProps> = ({
   searchPlaceholder = "Search...",
   search,
   onSearchChange,
@@ -29,14 +29,14 @@ export const IssuesFilterBar: React.FC<IssuesFilterBarProps> = ({
     <section className="filters-section">
       <div className="search-box">
         <span className="material-symbols-outlined">search</span>
-        <input 
-          type="text" 
-          placeholder={searchPlaceholder} 
+        <input
+          type="text"
+          placeholder={searchPlaceholder}
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
         />
       </div>
-      
+
       <div className="dropdowns-group">
         <div className="custom-select">
           <select value={type} onChange={(e) => onTypeChange(e.target.value)}>
@@ -50,19 +50,22 @@ export const IssuesFilterBar: React.FC<IssuesFilterBarProps> = ({
         </div>
 
         <div className="custom-select">
-          <select value={state} onChange={(e) => onStateChange(e.target.value)}>
-            <option value="">Status (All)</option>
-            <option value="TODO">To Do</option>
-            <option value="IN_PROGRESS">In Progress</option>
-            <option value="REVIEW">In Review</option>
-            <option value="DONE">Closed</option>
-          </select>
-          <span className="material-symbols-outlined">arrow_drop_down</span>
+            <select
+              value={state === 'REVIEW' ? 'IN_REVIEW' : state}
+              onChange={(e) => onStateChange(e.target.value)}
+            >
+              <option value="">Status (All)</option>
+              <option value="TODO">To Do</option>
+              <option value="IN_PROGRESS">In Progress</option>
+              <option value="IN_REVIEW">In Review</option>
+              <option value="DONE">Closed</option>
+            </select>
+            <span className="material-symbols-outlined">arrow_drop_down</span>
         </div>
 
         <div className="custom-select">
-          <select 
-            value={urgentOnly ? "urgente" : ""} 
+          <select
+            value={urgentOnly ? "urgente" : ""}
             onChange={(e) => onUrgentChange(e.target.value === "urgente")}
           >
             <option value="">Priority (All)</option>
@@ -70,7 +73,7 @@ export const IssuesFilterBar: React.FC<IssuesFilterBarProps> = ({
           </select>
           <span className="material-symbols-outlined">arrow_drop_down</span>
         </div>
-        
+
         <button className="btn-ghost" title="Clear Filters" onClick={onReset}>
           <span className="material-symbols-outlined">filter_alt_off</span>
         </button>

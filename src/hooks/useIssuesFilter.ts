@@ -14,7 +14,11 @@ export const useIssuesFilter = (issues: IssueDto[]) => {
         issue.title.toLowerCase().includes(search.toLowerCase()) ||
         issue.id.toString().includes(search);
       const matchType = !type || issue.type === type;
-      const matchState = !state || issue.state === state;
+      const matchState =
+        !state ||
+        issue.state === state ||
+        ((state === 'REVIEW' || state === 'IN_REVIEW') &&
+          (issue.state === 'REVIEW' || issue.state === 'IN_REVIEW'));
       const matchUrgent = !urgentOnly || issue.isUrgent === true;
 
       return matchSearch && matchType && matchState && matchUrgent;
