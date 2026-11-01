@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { authService } from '../service/authService';
-import logoImg from '../assets/logobb26.png';
 import titleImg from '../assets/title BugBoard26.png';
+import { TutorialOverlay } from './tutorial/TutorialOverlay';
+import { adminTutorialSteps, userTutorialSteps } from './tutorial/tutorialSteps';
 import './DashboardLayout.css';
 
 export const DashboardLayout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [showTutorial, setShowTutorial] = useState(false);
 
   const user = authService.getUser();
   const userName = user?.name?.trim() || user?.email?.split('@')[0] || 'User';
@@ -23,6 +25,11 @@ export const DashboardLayout: React.FC = () => {
 
   const handleReportBug = () => {
     navigate('/dashboard/create-issue');
+  };
+
+  const handleHelp = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowTutorial(true);
   };
 
   const handleLogout = (e: React.MouseEvent) => {
@@ -46,7 +53,6 @@ export const DashboardLayout: React.FC = () => {
       {/* Sidebar Navigation */}
       <nav className="dashboard-sidebar">
         <div className="sidebar-header">
-          <img src={logoImg} alt="BugBoard26 Logo" className="sidebar-logo-img" />
           <img src={titleImg} alt="BugBoard26" className="sidebar-title-img" />
         </div>
 
@@ -90,7 +96,7 @@ export const DashboardLayout: React.FC = () => {
 
         <ul className="sidebar-footer-list">
           <li>
-            <a className="nav-link" href="#">
+            <a className="nav-link" href="#" onClick={handleHelp}>
               <span className="material-symbols-outlined">help_outline</span>
               <span>Help</span>
             </a>
@@ -133,6 +139,13 @@ export const DashboardLayout: React.FC = () => {
           <Outlet />
         </div>
       </main>
+
+      {showTutorial && (
+        <TutorialOverlay
+          steps={user?.role === 'ADMIN' ? adminTutorialSteps : userTutorialSteps}
+          onClose={() => setShowTutorial(false)}
+        />
+      )}
     </div>
   );
 };
