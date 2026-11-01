@@ -77,7 +77,8 @@ export const MyIssuesView: React.FC = () => {
       case 'IN_PROGRESS': return 'In progress';
       case 'REVIEW':
       case 'IN_REVIEW': return 'Review';
-      case 'DONE': return 'Closed';
+      case 'DONE':
+      case 'CLOSED': return 'Closed';
       default: return state;
     }
   };
@@ -88,15 +89,16 @@ export const MyIssuesView: React.FC = () => {
       case 'IN_PROGRESS': return 'badge-in-progress';
       case 'REVIEW':
       case 'IN_REVIEW': return 'badge-in-review';
-      case 'DONE': return 'badge-closed';
+      case 'DONE':
+      case 'CLOSED': return 'badge-closed';
       default: return 'badge-todo';
     }
   };
 
   // Partizione senza sovrapposizioni: ogni issue cade in una sola categoria
-  const doneCount = filteredIssues.filter(i => i.state === 'DONE').length;
-  const urgentCount = filteredIssues.filter(i => i.state !== 'DONE' && i.isUrgent).length;
-  const inProgressCount = filteredIssues.filter(i => i.state !== 'DONE' && !i.isUrgent).length;
+  const doneCount = filteredIssues.filter(i => i.state === 'DONE' || i.state === 'CLOSED').length;
+  const urgentCount = filteredIssues.filter(i => i.state !== 'DONE' && i.state !== 'CLOSED' && i.isUrgent).length;
+  const inProgressCount = filteredIssues.filter(i => i.state !== 'DONE' && i.state !== 'CLOSED' && !i.isUrgent).length;
   const totalCount = filteredIssues.length;
   const completedPercentage = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
 
@@ -147,7 +149,7 @@ export const MyIssuesView: React.FC = () => {
                 return (
                   <article
                     key={issue.id}
-                    className={`issue-card ${issue.state === 'DONE' ? 'card-closed' : ''}`}
+                    className={`issue-card ${issue.state === 'DONE' || issue.state === 'CLOSED' ? 'card-closed' : ''}`}
                     style={{
                       cursor: 'pointer',
                       ...(issue.isUrgent ? { borderColor: 'rgba(186,26,26,0.5)' } : {})
@@ -181,7 +183,7 @@ export const MyIssuesView: React.FC = () => {
                       )}
                     </div>
 
-                    <h3 className={`issue-title ${issue.state === 'DONE' ? 'issue-title-closed' : ''}`}>{issue.title}</h3>
+                    <h3 className={`issue-title ${issue.state === 'DONE' || issue.state === 'CLOSED' ? 'issue-title-closed' : ''}`}>{issue.title}</h3>
                     {issue.reporterFullName && <p className="issue-project" style={{ marginBottom: '8px' }}>Assigned by: {issue.reporterFullName}</p>}
 
                     {/* Tag Badges (Req. 10) */}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { isReviewState, isClosedState } from '../hooks/useIssuesFilter';
 
 interface IssuesFilterBarProps {
   searchPlaceholder?: string;
@@ -25,6 +26,12 @@ export const IssuesFilterBar: React.FC<IssuesFilterBarProps> = ({
   onUrgentChange,
   onReset
 }) => {
+  const selectedStateValue = isReviewState(state)
+    ? 'IN_REVIEW'
+    : isClosedState(state)
+    ? 'DONE'
+    : state;
+
   return (
     <section className="filters-section">
       <div className="search-box">
@@ -50,17 +57,17 @@ export const IssuesFilterBar: React.FC<IssuesFilterBarProps> = ({
         </div>
 
         <div className="custom-select">
-            <select
-              value={state === 'REVIEW' ? 'IN_REVIEW' : state}
-              onChange={(e) => onStateChange(e.target.value)}
-            >
-              <option value="">Status (All)</option>
-              <option value="TODO">To Do</option>
-              <option value="IN_PROGRESS">In Progress</option>
-              <option value="IN_REVIEW">In Review</option>
-              <option value="DONE">Closed</option>
-            </select>
-            <span className="material-symbols-outlined">arrow_drop_down</span>
+          <select
+            value={selectedStateValue}
+            onChange={(e) => onStateChange(e.target.value)}
+          >
+            <option value="">Status (All)</option>
+            <option value="TODO">To Do</option>
+            <option value="IN_PROGRESS">In Progress</option>
+            <option value="IN_REVIEW">In Review</option>
+            <option value="DONE">Closed</option>
+          </select>
+          <span className="material-symbols-outlined">arrow_drop_down</span>
         </div>
 
         <div className="custom-select">

@@ -66,7 +66,8 @@ export const AllIssuesView: React.FC<AllIssuesViewProps> = ({ isAdmin = true }) 
       case 'IN_PROGRESS': return 'In progress';
       case 'REVIEW':
       case 'IN_REVIEW': return 'Review';
-      case 'DONE': return 'Closed';
+      case 'DONE':
+      case 'CLOSED': return 'Closed';
       default: return state;
     }
   };
@@ -77,7 +78,8 @@ export const AllIssuesView: React.FC<AllIssuesViewProps> = ({ isAdmin = true }) 
       case 'IN_PROGRESS': return 'badge-in-progress';
       case 'REVIEW':
       case 'IN_REVIEW': return 'badge-in-review';
-      case 'DONE': return 'badge-closed';
+      case 'DONE':
+      case 'CLOSED': return 'badge-closed';
       default: return 'badge-todo';
     }
   };
@@ -110,7 +112,7 @@ export const AllIssuesView: React.FC<AllIssuesViewProps> = ({ isAdmin = true }) 
             return (
               <article
                 key={issue.id}
-                className={`issue-card ${issue.state === 'DONE' ? 'card-closed' : ''}`}
+                className={`issue-card ${issue.state === 'DONE' || issue.state === 'CLOSED' ? 'card-closed' : ''}`}
                 style={{
                   cursor: 'pointer',
                   ...(issue.isUrgent ? { borderColor: 'rgba(186,26,26,0.5)' } : {})
@@ -130,7 +132,7 @@ export const AllIssuesView: React.FC<AllIssuesViewProps> = ({ isAdmin = true }) 
                   </div>
                 </div>
 
-                <h3 className={`issue-title ${issue.state === 'DONE' ? 'issue-title-closed' : ''}`}>{issue.title}</h3>
+                <h3 className={`issue-title ${issue.state === 'DONE' || issue.state === 'CLOSED' ? 'issue-title-closed' : ''}`}>{issue.title}</h3>
                 {issue.reporterFullName && (
                   <p className="issue-project">Reporter: {issue.reporterFullName}</p>
                 )}

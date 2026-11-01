@@ -183,7 +183,7 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({
                       Invia in Review
                     </button>
                   )}
-                  {isAdmin && issue.state === 'REVIEW' && (
+                  {isAdmin && (issue.state === 'REVIEW' || issue.state === 'IN_REVIEW') && (
                     <>
                       <button
                         type="button"
