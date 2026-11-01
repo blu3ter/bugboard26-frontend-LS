@@ -157,21 +157,6 @@ export const AllIssuesView: React.FC<AllIssuesViewProps> = ({ isAdmin = true }) 
                       <span className="assignee-text">Assigned to: {issue.assigneeFullName}</span>
                     </div>
                   )}
-
-                  {isAdmin && (
-                    <button
-                      className="btn-assign"
-                      style={!issue.assigneeFullName ? { marginLeft: 'auto' } : {}}
-                      title="Assign / Reassign"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedIssueId(issue.id);
-                      }}
-                    >
-                      <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>{issue.assigneeFullName ? 'sync' : 'person_add'}</span>
-                      <span>{issue.assigneeFullName ? 'Reassign' : 'Assign'}</span>
-                    </button>
-                  )}
                 </div>
               </article>
             );
