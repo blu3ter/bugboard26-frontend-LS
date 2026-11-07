@@ -1,5 +1,4 @@
 import mascotte1 from '../../assets/MascotteBugBoard1.png';
-// Note: in the repo this file is named "MascotteBug2.png" (not "MascotteBugBoard2.png").
 import mascotte2 from '../../assets/MascotteBug2.png';
 import mascotte3 from '../../assets/MascotteBugBoard3.png';
 import mascotte4 from '../../assets/MascotteBugBoard4.png';

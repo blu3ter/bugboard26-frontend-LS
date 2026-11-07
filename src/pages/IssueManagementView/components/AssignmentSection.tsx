@@ -43,14 +43,14 @@ export const AssignmentSection: React.FC<AssignmentSectionProps> = ({
   if (loading) {
     return (
       <div style={{ padding: '40px', textAlign: 'center', color: '#94a3b8' }}>
-        Caricamento issue e membri del team...
+        Loading issues and team members...
       </div>
     );
   }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      {/* Filtro Rapido */}
+      {/* Quick Filter */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.88rem' }}>
           <input
@@ -58,10 +58,10 @@ export const AssignmentSection: React.FC<AssignmentSectionProps> = ({
             checked={onlyUnassigned}
             onChange={(e) => setOnlyUnassigned(e.target.checked)}
           />
-          <span>Mostra solo issue non assegnate ({issues.filter((i) => !i.assigneeId).length})</span>
+          <span>Show only unassigned issues ({issues.filter((i) => !i.assigneeId).length})</span>
         </label>
         <span style={{ fontSize: '0.8rem', color: '#64748b' }}>
-          Totale mostrate: {displayedIssues.length}
+          Total shown: {displayedIssues.length}
         </span>
       </div>
 
@@ -70,18 +70,18 @@ export const AssignmentSection: React.FC<AssignmentSectionProps> = ({
           <thead>
             <tr>
               <th>ID</th>
-              <th>Titolo</th>
-              <th>Stato</th>
-              <th>Assegnatario Attuale</th>
-              <th>Nuova Assegnazione</th>
-              <th>Azione</th>
+              <th>Title</th>
+              <th>Status</th>
+              <th>Current Assignee</th>
+              <th>New Assignment</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {displayedIssues.length === 0 ? (
               <tr>
                 <td colSpan={6} style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
-                  Nessuna issue trovata con i filtri correnti.
+                  No issues found with the current filters.
                 </td>
               </tr>
             ) : (
@@ -110,7 +110,7 @@ export const AssignmentSection: React.FC<AssignmentSectionProps> = ({
                       {issue.assigneeFullName || issue.assigneeEmail ? (
                         <span style={{ color: '#38bdf8' }}>{issue.assigneeFullName || issue.assigneeEmail}</span>
                       ) : (
-                        <span style={{ color: '#f59e0b', fontSize: '0.78rem' }}>Non assegnata</span>
+                        <span style={{ color: '#f59e0b', fontSize: '0.78rem' }}>Unassigned</span>
                       )}
                     </td>
                     <td>
@@ -119,7 +119,7 @@ export const AssignmentSection: React.FC<AssignmentSectionProps> = ({
                         value={currentSelectedUser}
                         onChange={(e) => handleUserChange(issue.id, Number(e.target.value))}
                       >
-                        <option value="">Seleziona membro...</option>
+                        <option value="">Select member...</option>
                         {users.map((u) => (
                           <option key={u.id} value={u.id}>
                             {u.firstName} {u.lastName} ({u.role})
@@ -134,7 +134,7 @@ export const AssignmentSection: React.FC<AssignmentSectionProps> = ({
                         disabled={!selectedUserMap[issue.id] || assigningId === issue.id}
                         onClick={() => handleExecuteAssign(issue.id)}
                       >
-                        {assigningId === issue.id ? 'Assegnazione...' : 'Assegna'}
+                        {assigningId === issue.id ? 'Assigning...' : 'Assign'}
                       </button>
                     </td>
                   </tr>

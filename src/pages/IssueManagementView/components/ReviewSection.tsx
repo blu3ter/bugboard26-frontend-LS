@@ -20,7 +20,7 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
   if (loading) {
     return (
       <div style={{ padding: '40px', textAlign: 'center', color: '#94a3b8' }}>
-        Caricamento issue in revisione...
+        Loading issues in review...
       </div>
     );
   }
@@ -38,9 +38,9 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
         <span className="material-symbols-outlined" style={{ fontSize: '36px', opacity: 0.5, marginBottom: '8px' }}>
           task_alt
         </span>
-        <p style={{ margin: 0, fontWeight: 500 }}>Nessuna issue in attesa di revisione!</p>
+        <p style={{ margin: 0, fontWeight: 500 }}>No issues waiting for review!</p>
         <span style={{ fontSize: '0.8rem', color: '#64748b' }}>
-          Tutti i ticket inviati per verifica sono stati completati o elaborati.
+          All tickets submitted for verification have been resolved or processed.
         </span>
       </div>
     );
@@ -52,11 +52,11 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
         <thead>
           <tr>
             <th>ID</th>
-            <th>Titolo</th>
-            <th>Tipologia</th>
-            <th>Etichette</th>
-            <th>Segnalato da</th>
-            <th>Azioni di Revisione</th>
+            <th>Title</th>
+            <th>Type</th>
+            <th>Tags</th>
+            <th>Reported by</th>
+            <th>Review Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -90,21 +90,21 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
                     className="btn-action-sm details"
                     onClick={() => onOpenDetail(issue.id)}
                   >
-                    Dettagli
+                    Details
                   </button>
                   <button
                     type="button"
                     className="btn-action-sm approve"
                     onClick={() => onApprove(issue.id)}
                   >
-                    Approva
+                    Approve
                   </button>
                   <button
                     type="button"
                     className="btn-action-sm reject"
                     onClick={() => onReject(issue.id)}
                   >
-                    Rifiuta
+                    Reject
                   </button>
                 </div>
               </td>

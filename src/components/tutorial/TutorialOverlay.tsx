@@ -32,26 +32,53 @@ export const TutorialOverlay: React.FC<TutorialOverlayProps> = ({ steps, onClose
   if (!step) return null;
 
   return (
-    <div className="tutorial-backdrop" role="dialog" aria-modal="true" aria-label="Tutorial">
-      <div className="tutorial-modal">
-        <div className="tutorial-slide">
-          <img src={step.image} alt="BugBoard26 mascot" className="tutorial-mascot" />
-          <div className="tutorial-bubble" key={currentIndex}>
+    <div
+      className="tutorial-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Tutorial"
+      onClick={onClose}
+    >
+      <div className="tutorial-stage" onClick={(e) => e.stopPropagation()}>
+        <img
+          src={step.image}
+          alt="BugBoard26 mascot"
+          className="tutorial-mascot"
+          key={`mascot-${currentIndex}`}
+        />
+        <div className="tutorial-bubble" key={`bubble-${currentIndex}`}>
+          <button
+            type="button"
+            className="tutorial-btn-close"
+            onClick={onClose}
+            aria-label="Close tutorial"
+          >
+            ×
+          </button>
+          <div className="tutorial-bubble-content">
             <p className="tutorial-text">{step.text}</p>
           </div>
-        </div>
 
-        <div className="tutorial-footer">
-          <span className="tutorial-progress">
-            {currentIndex + 1} / {steps.length}
-          </span>
-          <div className="tutorial-actions">
-            <button type="button" className="tutorial-btn tutorial-btn-skip" onClick={onClose}>
-              Skip
-            </button>
-            <button type="button" className="tutorial-btn tutorial-btn-next" onClick={handleNext}>
-              {isLast ? 'Finish' : 'Next'}
-            </button>
+          <div className="tutorial-footer">
+            <span className="tutorial-progress">
+              {currentIndex + 1} / {steps.length}
+            </span>
+            <div className="tutorial-actions">
+              <button
+                type="button"
+                className="tutorial-btn tutorial-btn-skip"
+                onClick={onClose}
+              >
+                Skip
+              </button>
+              <button
+                type="button"
+                className="tutorial-btn tutorial-btn-next"
+                onClick={handleNext}
+              >
+                {isLast ? 'Finish' : 'Next'}
+              </button>
+            </div>
           </div>
         </div>
       </div>

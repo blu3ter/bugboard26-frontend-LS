@@ -29,7 +29,7 @@ export const IssueManagementView: React.FC = () => {
       setAllIssues(allData);
       setUsers(usersData);
     } catch (err) {
-      console.error('Errore nel caricamento dei dati di gestione:', err);
+      console.error('Error loading management data:', err);
     } finally {
       setLoading(false);
     }
@@ -56,11 +56,11 @@ export const IssueManagementView: React.FC = () => {
 
   return (
     <div className="management-container">
-      {/* Header Pannello Gestionale */}
+      {/* Management Panel Header */}
       <div className="management-header-card">
         <div className="management-title-group">
-          <h1>Pannello di Gestione Issue & Workflow</h1>
-          <p>Supervisiona le issue inviate in revisione e gestisci le assegnazioni operative del team.</p>
+          <h1>Issue Management & Workflow</h1>
+          <p>Supervise issues submitted for review and manage team assignments.</p>
         </div>
         <button
           type="button"
@@ -69,7 +69,7 @@ export const IssueManagementView: React.FC = () => {
           style={{ padding: '8px 14px', fontSize: '0.85rem' }}
         >
           <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>refresh</span>
-          Aggiorna
+          Refresh
         </button>
       </div>
 
@@ -81,7 +81,7 @@ export const IssueManagementView: React.FC = () => {
           onClick={() => setActiveTab('review')}
         >
           <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>rate_review</span>
-          <span>In Revisione (Workflow Review)</span>
+          <span>In Review (Workflow Review)</span>
           <span className="tab-badge-counter">{reviewIssues.length}</span>
         </button>
 
@@ -91,7 +91,7 @@ export const IssueManagementView: React.FC = () => {
           onClick={() => setActiveTab('assignment')}
         >
           <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>group_add</span>
-          <span>Assegnazione Membri Team</span>
+          <span>Team Member Assignment</span>
           <span className="tab-badge-counter">
             {allIssues.filter((i) => !i.assigneeId).length}
           </span>
