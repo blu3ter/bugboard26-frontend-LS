@@ -93,7 +93,7 @@ export const IssueManagementView: React.FC = () => {
           <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>group_add</span>
           <span>Team Member Assignment</span>
           <span className="tab-badge-counter">
-            {allIssues.filter((i) => !i.assigneeId).length}
+            {allIssues.filter((i) => !i.assigneeId && !i.assigneeFullName && !i.assigneeEmail).length}
           </span>
         </button>
       </div>

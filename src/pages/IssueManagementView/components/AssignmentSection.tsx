@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import type { IssueDto, UserSummaryDto } from '../../../types';
 
 export interface AssignmentSectionProps {
@@ -19,6 +19,40 @@ export const AssignmentSection: React.FC<AssignmentSectionProps> = ({
   const [onlyUnassigned, setOnlyUnassigned] = useState(true);
   const [selectedUserMap, setSelectedUserMap] = useState<Record<number, number>>({});
   const [assigningId, setAssigningId] = useState<number | null>(null);
+
+  const sortedUsersWithWorkload = useMemo(() => {
+    return users
+      .map((user) => {
+        const displayName =
+          `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() ||
+          user.fullName ||
+          `User #${user.id}`;
+
+        const activeIssuesCount = issues.filter((issue) => {
+          const isActive = issue.state !== 'DONE' && issue.state !== 'CLOSED';
+          if (!isActive) return false;
+          if (issue.assigneeId != null) {
+            return issue.assigneeId === user.id;
+          }
+          return (
+            Boolean(issue.assigneeFullName) &&
+            issue.assigneeFullName!.trim().toLowerCase() === displayName.toLowerCase()
+          );
+        }).length;
+
+        return {
+          ...user,
+          displayName,
+          activeIssuesCount,
+        };
+      })
+      .sort((a, b) => {
+        if (a.activeIssuesCount !== b.activeIssuesCount) {
+          return a.activeIssuesCount - b.activeIssuesCount;
+        }
+        return a.displayName.localeCompare(b.displayName);
+      });
+  }, [users, issues]);
 
   const displayedIssues = onlyUnassigned
     ? issues.filter((i) => !i.assigneeId)
@@ -50,6 +84,46 @@ export const AssignmentSection: React.FC<AssignmentSectionProps> = ({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      {/* Team Members Active Issues Summary (Sorted Ascending) */}
+      <div className="team-workload-card">
+        <div className="team-workload-header">
+          <div className="team-workload-title">
+            <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#38bdf8' }}>
+              groups
+            </span>
+            <span>Team Members & Active Issues (Least to Most Busy)</span>
+          </div>
+          <span className="team-workload-subtitle">
+            {sortedUsersWithWorkload.length} members
+          </span>
+        </div>
+
+        {sortedUsersWithWorkload.length === 0 ? (
+          <div style={{ fontSize: '0.84rem', color: '#94a3b8' }}>
+            No users available.
+          </div>
+        ) : (
+          <div className="team-workload-list">
+            {sortedUsersWithWorkload.map((u) => (
+              <div key={u.id} className="team-workload-pill">
+                <span className="team-workload-name">{u.displayName}</span>
+                <span
+                  className={`team-workload-badge ${
+                    u.activeIssuesCount === 0
+                      ? 'workload-zero'
+                      : u.activeIssuesCount <= 2
+                      ? 'workload-low'
+                      : 'workload-high'
+                  }`}
+                >
+                  {u.activeIssuesCount} {u.activeIssuesCount === 1 ? 'active issue' : 'active issues'}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Quick Filter */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.88rem' }}>
@@ -120,9 +194,10 @@ export const AssignmentSection: React.FC<AssignmentSectionProps> = ({
                         onChange={(e) => handleUserChange(issue.id, Number(e.target.value))}
                       >
                         <option value="">Select member...</option>
-                        {users.map((u) => (
+                        {sortedUsersWithWorkload.map((u) => (
                           <option key={u.id} value={u.id}>
-                            {u.firstName} {u.lastName} ({u.role})
+                            {u.displayName} — {u.activeIssuesCount}{' '}
+                            {u.activeIssuesCount === 1 ? 'active issue' : 'active issues'}
                           </option>
                         ))}
                       </select>
@@ -147,4 +222,3 @@ export const AssignmentSection: React.FC<AssignmentSectionProps> = ({
     </div>
   );
 };
-
