@@ -44,7 +44,9 @@ export const MyIssuesView: React.FC = () => {
     switch (state) {
       case 'TODO': return 'Todo';
       case 'IN_PROGRESS': return 'In Progress';
+      case 'IN_REVIEW':
       case 'REVIEW': return 'Review';
+      case 'CLOSED':
       case 'DONE': return 'Closed';
       default: return state;
     }
@@ -54,7 +56,9 @@ export const MyIssuesView: React.FC = () => {
     switch (state) {
       case 'TODO': return 'badge-todo';
       case 'IN_PROGRESS': return 'badge-in-progress';
+      case 'IN_REVIEW':
       case 'REVIEW': return 'badge-in-review';
+      case 'CLOSED':
       case 'DONE': return 'badge-closed';
       default: return 'badge-todo';
     }
@@ -62,7 +66,7 @@ export const MyIssuesView: React.FC = () => {
 
   const todoCount = issues.filter(i => i.state === 'TODO').length;
   const inProgressCount = issues.filter(i => i.state === 'IN_PROGRESS').length;
-  const doneCount = issues.filter(i => i.state === 'DONE').length;
+  const doneCount = issues.filter(i => i.state === 'DONE' || i.state === 'CLOSED').length;
   const urgentCount = issues.filter(i => i.isUrgent).length;
   const totalCount = issues.length;
   const completedPercentage = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
@@ -84,10 +88,11 @@ export const MyIssuesView: React.FC = () => {
             <div className="issues-grid">
               {issues.map(issue => {
                 const typeStyle = getTypeStyles(issue.type);
+                const isClosed = issue.state === 'DONE' || issue.state === 'CLOSED';
                 return (
                   <article
                     key={issue.id}
-                    className={`issue-card ${issue.state === 'DONE' ? 'card-closed' : ''}`}
+                    className={`issue-card ${isClosed ? 'card-closed' : ''}`}
                     style={issue.isUrgent ? { borderColor: 'rgba(186,26,26,0.5)' } : {}}
                     onClick={() => navigate(`/dashboard/issue/${issue.id}`)}
                   >
@@ -103,15 +108,15 @@ export const MyIssuesView: React.FC = () => {
                         )}
                       </div>
                       <button
-                        className={`btn-check ${issue.state === 'DONE' ? 'btn-checked' : ''}`}
-                        disabled={issue.state === 'DONE'}
+                        className={`btn-check ${isClosed ? 'btn-checked' : ''}`}
+                        disabled={isClosed}
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <span className="material-symbols-outlined" style={issue.state === 'DONE' ? { fontVariationSettings: '"FILL" 1' } : {}}>check_circle</span>
+                        <span className="material-symbols-outlined" style={isClosed ? { fontVariationSettings: '"FILL" 1' } : {}}>check_circle</span>
                       </button>
                     </div>
 
-                    <h3 className={`issue-title ${issue.state === 'DONE' ? 'issue-title-closed' : ''}`}>{issue.title}</h3>
+                    <h3 className={`issue-title ${isClosed ? 'issue-title-closed' : ''}`}>{issue.title}</h3>
                     {issue.reporterFullName && <p className="issue-project" style={{ marginBottom: '8px' }}>Assigned by: {issue.reporterFullName}</p>}
 
                     <div className="card-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

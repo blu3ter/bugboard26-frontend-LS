@@ -72,6 +72,67 @@ function getTagColorClass(tagName: string): string {
   return TAG_COLOR_CLASS[tagName.toLowerCase()] || 'tag-default-color';
 }
 
+function renderInlineMarkdown(line: string): React.ReactNode[] {
+  const tokenRegex = /(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g;
+  const parts = line.split(tokenRegex);
+
+  return parts.map((part, idx) => {
+    if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
+      return <strong key={idx}>{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith('*') && part.endsWith('*') && part.length > 2) {
+      return <em key={idx}>{part.slice(1, -1)}</em>;
+    }
+    if (part.startsWith('`') && part.endsWith('`') && part.length > 2) {
+      return (
+        <code key={idx} className="inline-code">
+          {part.slice(1, -1)}
+        </code>
+      );
+    }
+    return <React.Fragment key={idx}>{part}</React.Fragment>;
+  });
+}
+
+function renderFormattedMarkdown(text: string): React.ReactNode {
+  const lines = text.split('\n');
+  const blocks: React.ReactNode[] = [];
+  let listItems: React.ReactNode[] = [];
+
+  const flushList = (keyPrefix: number) => {
+    if (listItems.length > 0) {
+      blocks.push(
+        <ul key={`ul-${keyPrefix}`} className="reproduction-list">
+          {listItems}
+        </ul>
+      );
+      listItems = [];
+    }
+  };
+
+  lines.forEach((line, index) => {
+    const bulletMatch = line.match(/^\s*[-•*]\s+(.*)$/);
+    if (bulletMatch) {
+      listItems.push(<li key={`li-${index}`}>{renderInlineMarkdown(bulletMatch[1])}</li>);
+      return;
+    }
+
+    flushList(index);
+    if (line.trim() === '') {
+      blocks.push(<br key={`br-${index}`} />);
+    } else {
+      blocks.push(
+        <p key={`p-${index}`} className="description-text">
+          {renderInlineMarkdown(line)}
+        </p>
+      );
+    }
+  });
+
+  flushList(lines.length);
+  return blocks;
+}
+
 function renderTypeIcon(type: string) {
   switch (type?.toUpperCase()) {
     case 'FEATURE':
@@ -400,7 +461,7 @@ export const IssueDetailsView: React.FC = () => {
 
                 <div className="description-card">
                   {issue.description?.trim() ? (
-                    <p className="description-text">{issue.description}</p>
+                    renderFormattedMarkdown(issue.description)
                   ) : (
                     <p className="empty-section-hint">Nessuna descrizione fornita per questa issue.</p>
                   )}
@@ -456,7 +517,7 @@ export const IssueDetailsView: React.FC = () => {
                           </div>
                           <time className="comment-timestamp">{formatCommentDate(comment.creationDate)}</time>
                         </div>
-                        <p className="comment-message-text">{comment.text}</p>
+                        <p className="comment-message-text">{renderInlineMarkdown(comment.text)}</p>
                       </div>
                     </div>
                   ))
