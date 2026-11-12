@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { authService } from '../../service/authService';
 import { commentService } from '../../service/commentService';
 import { issueService } from '../../service/issueService';
 import type { CommentDto } from '../../types/comment.types';
@@ -234,11 +235,58 @@ export const IssueDetailsView: React.FC = () => {
     }
   };
 
+  const [actionLoading, setActionLoading] = useState<'review' | 'send-back' | 'close' | null>(null);
+  const [actionFeedback, setActionFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  const handleStateAction = async (action: 'review' | 'send-back' | 'close') => {
+    if (!id || actionLoading) return;
+
+    const actionConfig = {
+      review: {
+        call: () => issueService.sendToReview(id),
+        successMessage: 'Issue inviata in verifica con successo.',
+      },
+      'send-back': {
+        call: () => issueService.sendBackToProgress(id),
+        successMessage: 'Issue rimandata in lavorazione.',
+      },
+      close: {
+        call: () => issueService.closeIssue(id),
+        successMessage: 'Issue chiusa con successo.',
+      },
+    }[action];
+
+    setActionLoading(action);
+    setActionFeedback(null);
+    try {
+      const updatedIssue = await actionConfig.call();
+      setIssue(updatedIssue);
+      setActionFeedback({ type: 'success', message: actionConfig.successMessage });
+    } catch (err) {
+      setActionFeedback({
+        type: 'error',
+        message: err instanceof Error ? err.message : 'Operazione non riuscita.',
+      });
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const typeKey = issue?.type?.toUpperCase() || 'BUG';
   const typeMeta = TYPE_META[typeKey] || { label: issue?.type || 'Issue', className: 'type-bug' };
 
   const stateKey = issue?.state?.toUpperCase() || 'TODO';
   const stateMeta = STATE_META[stateKey] || { label: issue?.state || 'TODO', className: 'badge-todo' };
+
+  const currentUser = authService.getUser();
+  const isAdmin = currentUser?.role?.toUpperCase().includes('ADMIN') ?? false;
+  const isAssignee =
+    Boolean(currentUser?.email) &&
+    issue?.assigneeEmail?.toLowerCase() === currentUser?.email?.toLowerCase();
+
+  const canSendToReview = stateKey === 'IN_PROGRESS' && (isAdmin || isAssignee);
+  const canSendBack = (stateKey === 'IN_REVIEW' || stateKey === 'REVIEW') && isAdmin;
+  const canCloseIssue = stateKey !== 'CLOSED' && stateKey !== 'DONE' && isAdmin;
 
   return (
     <div className="issue-detail-overlay">
@@ -477,6 +525,16 @@ export const IssueDetailsView: React.FC = () => {
               </section>
             </div>
 
+            {/* Feedback banner for state transitions */}
+            {actionFeedback && (
+              <div
+                className={`action-feedback-bar ${actionFeedback.type === 'error' ? 'is-error' : 'is-success'}`}
+                role="status"
+              >
+                {actionFeedback.message}
+              </div>
+            )}
+
             {/* Modal Footer */}
             <footer className="issue-detail-footer" data-purpose="modal-footer">
               <div className="footer-visibility-info">
@@ -495,12 +553,42 @@ export const IssueDetailsView: React.FC = () => {
                 <button type="button" className="btn-footer-cancel" onClick={handleClose}>
                   Chiudi
                 </button>
-                <button type="button" className="btn-footer-submit">
-                  <svg className="submit-check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                  </svg>
-                  Invia in Verifica
-                </button>
+
+                {canSendBack && (
+                  <button
+                    type="button"
+                    className="btn-footer-warning"
+                    disabled={actionLoading !== null}
+                    onClick={() => handleStateAction('send-back')}
+                  >
+                    {actionLoading === 'send-back' ? 'Invio...' : 'Rimanda in Lavorazione'}
+                  </button>
+                )}
+
+                {canCloseIssue && (
+                  <button
+                    type="button"
+                    className="btn-footer-success"
+                    disabled={actionLoading !== null}
+                    onClick={() => handleStateAction('close')}
+                  >
+                    {actionLoading === 'close' ? 'Chiusura...' : 'Chiudi Issue'}
+                  </button>
+                )}
+
+                {canSendToReview && (
+                  <button
+                    type="button"
+                    className="btn-footer-submit"
+                    disabled={actionLoading !== null}
+                    onClick={() => handleStateAction('review')}
+                  >
+                    <svg className="submit-check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    {actionLoading === 'review' ? 'Invio...' : 'Invia in Verifica'}
+                  </button>
+                )}
               </div>
             </footer>
           </>
