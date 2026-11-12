@@ -9,7 +9,7 @@ export interface TagSelectorProps {
   readOnly?: boolean;
 }
 
-const DEFAULT_SUGGESTIONS = ['backend', 'frontend', 'security', 'database', 'ui/ux', 'urgent'];
+const DEFAULT_SUGGESTIONS = ['backend', 'frontend', 'security', 'ui/ux', 'fast', 'urgent'];
 
 /**
  * Componente Molecolare TagSelector (Req. 10)

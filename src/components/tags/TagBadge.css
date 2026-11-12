@@ -20,41 +20,89 @@
   font-size: 0.82rem;
 }
 
-/* Palette Predefinita */
+/* Palette Vivace (allineata con CreateIssueView) */
 .tag-badge.color-backend {
-  background-color: rgba(59, 130, 246, 0.15);
-  color: #60a5fa;
-  border-color: rgba(59, 130, 246, 0.3);
+  background: rgba(37, 99, 235, 0.16);
+  color: #93c5fd;
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.16);
 }
 
 .tag-badge.color-frontend {
-  background-color: rgba(14, 165, 233, 0.15);
-  color: #38bdf8;
-  border-color: rgba(14, 165, 233, 0.3);
+  background: rgba(2, 132, 199, 0.16);
+  color: #7dd3fc;
+  border-color: rgba(56, 189, 248, 0.5);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.16);
 }
 
 .tag-badge.color-security {
-  background-color: rgba(168, 85, 247, 0.15);
-  color: #c084fc;
-  border-color: rgba(168, 85, 247, 0.3);
+  background: rgba(124, 58, 237, 0.16);
+  color: #c4b5fd;
+  border-color: rgba(167, 139, 250, 0.5);
+  box-shadow: 0 0 10px rgba(167, 139, 250, 0.16);
+}
+
+.tag-badge.color-fast {
+  background: rgba(13, 148, 136, 0.16);
+  color: #5eead4;
+  border-color: rgba(45, 212, 191, 0.5);
+  box-shadow: 0 0 10px rgba(45, 212, 191, 0.16);
 }
 
 .tag-badge.color-database {
-  background-color: rgba(234, 179, 8, 0.15);
+  background: rgba(234, 179, 8, 0.16);
   color: #facc15;
-  border-color: rgba(234, 179, 8, 0.3);
+  border-color: rgba(234, 179, 8, 0.45);
+  box-shadow: 0 0 10px rgba(234, 179, 8, 0.16);
 }
 
 .tag-badge.color-urgent {
-  background-color: rgba(239, 68, 68, 0.18);
-  color: #f87171;
-  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(220, 38, 38, 0.18);
+  color: #fca5a5;
+  border-color: rgba(248, 113, 113, 0.55);
+  box-shadow: 0 0 10px rgba(248, 113, 113, 0.2);
 }
 
 .tag-badge.color-uiux {
-  background-color: rgba(236, 72, 153, 0.15);
+  background: rgba(219, 39, 119, 0.16);
   color: #f472b6;
-  border-color: rgba(236, 72, 153, 0.3);
+  border-color: rgba(244, 114, 182, 0.5);
+  box-shadow: 0 0 10px rgba(244, 114, 182, 0.16);
+}
+
+.tag-badge.color-amber {
+  background: rgba(245, 158, 11, 0.16);
+  color: #fde68a;
+  border-color: rgba(251, 191, 36, 0.55);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.18);
+}
+
+.tag-badge.color-emerald {
+  background: rgba(16, 185, 129, 0.16);
+  color: #a7f3d0;
+  border-color: rgba(52, 211, 153, 0.55);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.18);
+}
+
+.tag-badge.color-indigo {
+  background: rgba(99, 102, 241, 0.16);
+  color: #c7d2fe;
+  border-color: rgba(129, 140, 248, 0.55);
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.18);
+}
+
+.tag-badge.color-fuchsia {
+  background: rgba(217, 70, 239, 0.16);
+  color: #f5d0fe;
+  border-color: rgba(232, 121, 249, 0.55);
+  box-shadow: 0 0 10px rgba(217, 70, 239, 0.18);
+}
+
+.tag-badge.color-orange {
+  background: rgba(249, 115, 22, 0.16);
+  color: #fed7aa;
+  border-color: rgba(251, 146, 60, 0.55);
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.18);
 }
 
 .tag-badge.color-default {

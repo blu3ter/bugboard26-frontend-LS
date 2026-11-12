@@ -9,8 +9,21 @@ export interface TagBadgeProps {
   className?: string;
 }
 
+const VIBRANT_TAG_COLORS = [
+  'color-backend',
+  'color-frontend',
+  'color-security',
+  'color-fast',
+  'color-uiux',
+  'color-amber',
+  'color-emerald',
+  'color-indigo',
+  'color-fuchsia',
+  'color-orange',
+];
+
 /**
- * Risolve la classe di colore in base al nome del tag o restituisce default
+ * Risolve la classe di colore in base al nome del tag o assegna un colore vivace deterministico
  */
 const resolveTagColorClass = (tagName: string): string => {
   const normalized = tagName.toLowerCase().replace(/^#/, '').trim();
@@ -21,6 +34,8 @@ const resolveTagColorClass = (tagName: string): string => {
       return 'color-frontend';
     case 'security':
       return 'color-security';
+    case 'fast':
+      return 'color-fast';
     case 'database':
     case 'db':
       return 'color-database';
@@ -31,8 +46,14 @@ const resolveTagColorClass = (tagName: string): string => {
     case 'ui':
     case 'ux':
       return 'color-uiux';
-    default:
-      return 'color-default';
+    default: {
+      let hash = 0;
+      for (let i = 0; i < normalized.length; i++) {
+        hash = normalized.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      const index = Math.abs(hash) % VIBRANT_TAG_COLORS.length;
+      return VIBRANT_TAG_COLORS[index];
+    }
   }
 };
 
