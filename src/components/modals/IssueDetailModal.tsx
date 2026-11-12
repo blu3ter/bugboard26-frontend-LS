@@ -6,6 +6,65 @@ import { CommentList, CommentForm } from '../comments';
 import type { IssueDto, CommentDto, IssueState } from '../../types';
 import '../../pages/IssueDetailsView/IssueDetailsView.css';
 
+function renderInlineMarkdown(line: string): React.ReactNode[] {
+  const tokenRegex = /(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g;
+  return line.split(tokenRegex).map((part, idx) => {
+    if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
+      return <strong key={idx}>{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith('*') && part.endsWith('*') && part.length > 2) {
+      return <em key={idx}>{part.slice(1, -1)}</em>;
+    }
+    if (part.startsWith('`') && part.endsWith('`') && part.length > 2) {
+      return (
+        <code key={idx} className="inline-code">
+          {part.slice(1, -1)}
+        </code>
+      );
+    }
+    return <React.Fragment key={idx}>{part}</React.Fragment>;
+  });
+}
+
+function renderFormattedMarkdown(text: string): React.ReactNode {
+  const lines = text.split('\n');
+  const blocks: React.ReactNode[] = [];
+  let listItems: React.ReactNode[] = [];
+
+  const flushList = (keyPrefix: number) => {
+    if (listItems.length > 0) {
+      blocks.push(
+        <ul key={`ul-${keyPrefix}`} className="reproduction-list">
+          {listItems}
+        </ul>
+      );
+      listItems = [];
+    }
+  };
+
+  lines.forEach((line, index) => {
+    const bulletMatch = line.match(/^\s*[-•*]\s+(.*)$/);
+    if (bulletMatch) {
+      listItems.push(<li key={`li-${index}`}>{renderInlineMarkdown(bulletMatch[1])}</li>);
+      return;
+    }
+
+    flushList(index);
+    if (line.trim() === '') {
+      blocks.push(<br key={`br-${index}`} />);
+    } else {
+      blocks.push(
+        <p key={`p-${index}`} className="description-text">
+          {renderInlineMarkdown(line)}
+        </p>
+      );
+    }
+  });
+
+  flushList(lines.length);
+  return blocks;
+}
+
 export interface IssueDetailModalProps {
   issueId: number | null;
   onClose: () => void;
@@ -156,9 +215,11 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({
               {/* Descrizione */}
               <section className="issue-description-box">
                 <h3 className="section-label">Descrizione</h3>
-                <p className="description-text">
-                  {issue.description || 'Nessuna descrizione fornita.'}
-                </p>
+                {issue.description?.trim() ? (
+                  renderFormattedMarkdown(issue.description)
+                ) : (
+                  <p className="description-text">Nessuna descrizione fornita.</p>
+                )}
               </section>
 
               {/* Workflow Actions */}

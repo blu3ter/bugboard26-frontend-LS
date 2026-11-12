@@ -409,7 +409,7 @@
 
 .editor-toolbar-btn {
   background: transparent;
-  border: none;
+  border: 1px solid transparent;
   color: #94a3b8;
   padding: 6px 8px;
   border-radius: 6px;
@@ -428,9 +428,9 @@
 
 .editor-toolbar-btn.is-active {
   color: #60a5fa;
-  background-color: rgba(59, 130, 246, 0.2);
-  border: 1px solid rgba(59, 130, 246, 0.4);
-  box-shadow: 0 0 8px rgba(59, 130, 246, 0.25);
+  background-color: rgba(59, 130, 246, 0.22);
+  border-color: rgba(59, 130, 246, 0.55);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.28);
 }
 
 .editor-toolbar-btn.font-code {
@@ -459,12 +459,63 @@
   font-size: 13.5px;
   color: #f1f5f9;
   outline: none;
-  resize: none;
+  overflow-y: auto;
+  cursor: text;
   line-height: 1.65;
   font-family: inherit;
   box-sizing: border-box;
+  word-break: break-word;
   scrollbar-width: thin;
   scrollbar-color: #334155 transparent;
+}
+
+.editor-textarea:empty::before {
+  content: attr(data-placeholder);
+  color: #64748b;
+  pointer-events: none;
+}
+
+.editor-textarea b,
+.editor-textarea strong {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.editor-textarea i,
+.editor-textarea em {
+  font-style: italic;
+}
+
+.editor-textarea code {
+  font-family: 'Fira Code', monospace;
+  background-color: rgba(59, 130, 246, 0.18);
+  color: #93c5fd;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 12.5px;
+}
+
+.editor-textarea ul {
+  margin: 6px 0;
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+.editor-textarea li {
+  margin: 2px 0;
+}
+
+.title-input.is-invalid,
+.editor-container.is-invalid {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25);
+}
+
+.field-error-msg {
+  font-size: 12px;
+  color: #f87171;
+  font-weight: 500;
+  margin-top: 2px;
 }
 
 .editor-textarea::-webkit-scrollbar {
@@ -1204,14 +1255,30 @@
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
   background-color: #3b82f6;
   transform: translateY(-1px);
   box-shadow: 0 14px 20px -3px rgba(37, 99, 235, 0.45);
 }
 
-.btn-primary:active {
+.btn-primary:active:not(:disabled) {
   transform: translateY(0);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.submit-error-banner {
+  margin: 0 36px 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #fca5a5;
+  background-color: rgba(239, 68, 68, 0.14);
+  border: 1px solid rgba(239, 68, 68, 0.35);
 }
 
 /* Responsive Fallback for screens under 960px */
