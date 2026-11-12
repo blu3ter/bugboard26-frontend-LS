@@ -1,4 +1,4 @@
-import type { IssueAssignDto, IssueDto } from '../types/issue.types';
+import type { IssueAssignDto, IssueCreateDto, IssueDto } from '../types/issue.types';
 
 const API_BASE_URL = 'http://localhost:8080';
 const TOKEN_KEY = 'bugboard_token';
@@ -61,6 +61,28 @@ class IssueService {
 
   public async closeIssue(id: number | string): Promise<IssueDto> {
     return this.request<IssueDto>(`/issues/${id}/close`, { method: 'POST' }, 'Failed to close issue');
+  }
+
+  public async createIssue(dto: IssueCreateDto, image?: File): Promise<IssueDto> {
+    const formData = new FormData();
+    formData.append('data', new Blob([JSON.stringify(dto)], { type: 'application/json' }));
+    if (image) {
+      formData.append('image', image);
+    }
+
+    const token = sessionStorage.getItem(TOKEN_KEY);
+    const response = await fetch(`${API_BASE_URL}/issues`, {
+      method: 'POST',
+      headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => '');
+      throw new Error(errorText || 'Failed to create issue');
+    }
+
+    return await response.json();
   }
 }
 

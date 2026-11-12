@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
-import type { KeyboardEvent, ChangeEvent, FormEvent } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import type { ChangeEvent, ClipboardEvent, FormEvent, KeyboardEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { issueService } from '../../service/issueService';
 import './CreateIssueView.css';
 
 type IssueType = 'bug' | 'feature' | 'question' | 'documentation';
@@ -8,6 +9,63 @@ type IssueType = 'bug' | 'feature' | 'question' | 'documentation';
 interface AttachmentFile {
   name: string;
   size: string;
+  file: File;
+}
+
+interface FormErrors {
+  title?: string;
+  description?: string;
+  issueType?: string;
+}
+
+const MAX_FILE_SIZE_BYTES = 1 * 1024 * 1024; // 1 MB (matches backend Issue.image limit)
+const ALLOWED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/gif'];
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+}
+
+function serializeNodeToMarkdown(node: Node): string {
+  if (node.nodeType === Node.TEXT_NODE) {
+    return (node.textContent || '').replace(/\u200B/g, '');
+  }
+  if (node.nodeType !== Node.ELEMENT_NODE) {
+    return '';
+  }
+
+  const el = node as HTMLElement;
+  const tag = el.tagName;
+  const childrenMd = Array.from(el.childNodes).map(serializeNodeToMarkdown).join('');
+
+  switch (tag) {
+    case 'BR':
+      return '\n';
+    case 'B':
+    case 'STRONG':
+      return childrenMd.trim() ? `**${childrenMd}**` : childrenMd;
+    case 'I':
+    case 'EM':
+      return childrenMd.trim() ? `*${childrenMd}*` : childrenMd;
+    case 'CODE':
+      return childrenMd.trim() ? `\`${childrenMd}\`` : childrenMd;
+    case 'LI':
+      return `- ${childrenMd.replace(/\n+$/, '')}\n`;
+    case 'UL':
+    case 'OL':
+      return `\n${childrenMd}`;
+    case 'DIV':
+    case 'P':
+      return `\n${childrenMd}`;
+    default:
+      return childrenMd;
+  }
+}
+
+function serializeEditorToMarkdown(editor: HTMLElement): string {
+  const raw = Array.from(editor.childNodes).map(serializeNodeToMarkdown).join('');
+  return raw.replace(/^\n+/, '').replace(/\n{3,}/g, '\n\n').trim();
 }
 
 export const CreateIssueView: React.FC = () => {
@@ -15,7 +73,6 @@ export const CreateIssueView: React.FC = () => {
 
   // Form States
   const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
   const [issueType, setIssueType] = useState<IssueType>('bug');
   const [availableTags, setAvailableTags] = useState<string[]>([
     'backend',
@@ -30,15 +87,167 @@ export const CreateIssueView: React.FC = () => {
   const [newLabelInput, setNewLabelInput] = useState('');
   const [customTagColors, setCustomTagColors] = useState<Record<string, string>>({});
   const [isUrgent, setIsUrgent] = useState(false);
+
+  // Attachment States
   const [attachment, setAttachment] = useState<AttachmentFile | null>(null);
+  const [attachmentError, setAttachmentError] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
+
+  // Validation & Submit States
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Rich Editor Active States
+  const [isBoldActive, setIsBoldActive] = useState(false);
+  const [isItalicActive, setIsItalicActive] = useState(false);
+  const [isCodeActive, setIsCodeActive] = useState(false);
   const [isListActive, setIsListActive] = useState(false);
 
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const titleInputRef = useRef<HTMLInputElement>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleClose = () => {
     navigate('/dashboard/my-issues');
+  };
+
+  // Helper: check if current selection is inside a specific tag inside the editor
+  const findClosestTagInEditor = (tagName: string): HTMLElement | null => {
+    const editor = editorRef.current;
+    const selection = window.getSelection();
+    if (!editor || !selection || selection.rangeCount === 0) return null;
+
+    let node: Node | null = selection.anchorNode;
+    while (node && node !== editor) {
+      if (node.nodeType === Node.ELEMENT_NODE && (node as HTMLElement).tagName === tagName) {
+        return node as HTMLElement;
+      }
+      node = node.parentNode;
+    }
+    return null;
+  };
+
+  const syncToolbarState = () => {
+    const editor = editorRef.current;
+    const selection = window.getSelection();
+    if (!editor || !selection || selection.rangeCount === 0) return;
+
+    const anchorNode = selection.anchorNode;
+    if (!anchorNode || !editor.contains(anchorNode)) return;
+
+    try {
+      setIsBoldActive(document.queryCommandState('bold'));
+      setIsItalicActive(document.queryCommandState('italic'));
+      setIsListActive(document.queryCommandState('insertUnorderedList'));
+    } catch {
+      // Ignore browser command state query edge cases
+    }
+    setIsCodeActive(Boolean(findClosestTagInEditor('CODE')));
+  };
+
+  useEffect(() => {
+    const handleSelectionChange = () => {
+      syncToolbarState();
+    };
+    document.addEventListener('selectionchange', handleSelectionChange);
+    return () => {
+      document.removeEventListener('selectionchange', handleSelectionChange);
+    };
+  }, []);
+
+  const getDescriptionText = (): string => {
+    const editor = editorRef.current;
+    if (!editor) return '';
+    return editor.innerText.replace(/\u200B/g, '');
+  };
+
+  const handleEditorInput = () => {
+    const editor = editorRef.current;
+    if (!editor) return;
+
+    const cleanText = editor.innerText.replace(/\u200B/g, '').trim();
+    if (cleanText === '' && !editor.querySelector('ul, ol')) {
+      editor.innerHTML = '';
+    }
+
+    if (cleanText.length > 0 && formErrors.description) {
+      setFormErrors((prev) => ({ ...prev, description: undefined }));
+    }
+    syncToolbarState();
+  };
+
+  const applyRichCommand = (command: 'bold' | 'italic' | 'insertUnorderedList') => {
+    const editor = editorRef.current;
+    if (!editor) return;
+    editor.focus();
+    document.execCommand(command, false);
+    syncToolbarState();
+  };
+
+  const handleToggleCode = () => {
+    const editor = editorRef.current;
+    if (!editor) return;
+    editor.focus();
+
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+    const range = selection.getRangeAt(0);
+    const existingCode = findClosestTagInEditor('CODE');
+
+    if (existingCode) {
+      if (range.collapsed) {
+        const textContent = existingCode.textContent?.replace(/\u200B/g, '') || '';
+        const parent = existingCode.parentNode;
+        if (!parent) return;
+
+        if (textContent === '') {
+          parent.removeChild(existingCode);
+        } else {
+          const spacer = document.createTextNode('\u200B');
+          if (existingCode.nextSibling) {
+            parent.insertBefore(spacer, existingCode.nextSibling);
+          } else {
+            parent.appendChild(spacer);
+          }
+          const nextRange = document.createRange();
+          nextRange.setStart(spacer, 1);
+          nextRange.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(nextRange);
+        }
+      } else {
+        const textNode = document.createTextNode(existingCode.textContent || '');
+        existingCode.parentNode?.replaceChild(textNode, existingCode);
+        const nextRange = document.createRange();
+        nextRange.selectNodeContents(textNode);
+        selection.removeAllRanges();
+        selection.addRange(nextRange);
+      }
+    } else {
+      const codeEl = document.createElement('code');
+      if (range.collapsed) {
+        const zwsp = document.createTextNode('\u200B');
+        codeEl.appendChild(zwsp);
+        range.insertNode(codeEl);
+        const nextRange = document.createRange();
+        nextRange.setStart(zwsp, 1);
+        nextRange.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(nextRange);
+      } else {
+        const selectedText = range.toString();
+        codeEl.textContent = selectedText;
+        range.deleteContents();
+        range.insertNode(codeEl);
+        const nextRange = document.createRange();
+        nextRange.selectNodeContents(codeEl);
+        selection.removeAllRanges();
+        selection.addRange(nextRange);
+      }
+    }
+
+    syncToolbarState();
   };
 
   // Toggle Tag Handler (+ to x rotation)
@@ -110,185 +319,36 @@ export const CreateIssueView: React.FC = () => {
     }
   };
 
-  // Smart Markdown Formatting Helper
-  const applyMarkdown = (prefix: string, suffix: string = prefix) => {
-    if (!textareaRef.current) return;
-    const textarea = textareaRef.current;
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const value = description;
-    const selectedText = value.substring(start, end);
+  // File Upload Validation & Handler
+  const handleSelectedFile = (file: File) => {
+    const isValidType =
+      ALLOWED_IMAGE_TYPES.includes(file.type) ||
+      /\.(png|jpe?g|gif)$/i.test(file.name);
 
-    if (selectedText.length > 0) {
-      // Check if selection is already wrapped with prefix and suffix
-      const isWrapped =
-        selectedText.startsWith(prefix) &&
-        selectedText.endsWith(suffix) &&
-        selectedText.length >= prefix.length + suffix.length;
-
-      let nextVal: string;
-      let newStart: number;
-      let newEnd: number;
-
-      if (isWrapped) {
-        // Unwrap
-        const unwrapped = selectedText.substring(prefix.length, selectedText.length - suffix.length);
-        nextVal = value.substring(0, start) + unwrapped + value.substring(end);
-        newStart = start;
-        newEnd = start + unwrapped.length;
-      } else {
-        // Check if surroundings are already prefix/suffix
-        const before = start >= prefix.length ? value.substring(start - prefix.length, start) : '';
-        const after = end + suffix.length <= value.length ? value.substring(end, end + suffix.length) : '';
-
-        if (before === prefix && after === suffix) {
-          nextVal = value.substring(0, start - prefix.length) + selectedText + value.substring(end + suffix.length);
-          newStart = start - prefix.length;
-          newEnd = newStart + selectedText.length;
-        } else {
-          // Wrap
-          const wrapped = `${prefix}${selectedText}${suffix}`;
-          nextVal = value.substring(0, start) + wrapped + value.substring(end);
-          newStart = start + prefix.length;
-          newEnd = newStart + selectedText.length;
-        }
-      }
-
-      setDescription(nextVal);
-      setTimeout(() => {
-        textarea.focus();
-        textarea.setSelectionRange(newStart, newEnd);
-      }, 0);
-    } else {
-      // No text selected: insert prefix and suffix and place cursor in between (e.g. **|**)
-      const replacement = `${prefix}${suffix}`;
-      const nextVal = value.substring(0, start) + replacement + value.substring(end);
-      setDescription(nextVal);
-
-      setTimeout(() => {
-        textarea.focus();
-        const cursorInside = start + prefix.length;
-        textarea.setSelectionRange(cursorInside, cursorInside);
-      }, 0);
-    }
-  };
-
-  // Bullet List Toggle
-  const handleToggleList = () => {
-    if (!textareaRef.current) return;
-    const textarea = textareaRef.current;
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const value = description;
-
-    const lineStart = value.lastIndexOf('\n', start - 1) + 1;
-    const lineEnd = value.indexOf('\n', end);
-    const currentLine = value.substring(lineStart, lineEnd === -1 ? value.length : lineEnd);
-    const isCurrentLineBullet = /^(\s*[•\-*]\s+)/.test(currentLine);
-
-    let nextValue: string;
-    let newCursorPos: number;
-
-    if (isCurrentLineBullet) {
-      const replacedLine = currentLine.replace(/^(\s*)[•\-*]\s+/, '$1');
-      nextValue = value.substring(0, lineStart) + replacedLine + (lineEnd === -1 ? '' : value.substring(lineEnd));
-      newCursorPos = Math.max(lineStart, start - 2);
-      setIsListActive(false);
-    } else {
-      const bullet = '• ';
-      const replacedLine = bullet + currentLine;
-      nextValue = value.substring(0, lineStart) + replacedLine + (lineEnd === -1 ? '' : value.substring(lineEnd));
-      newCursorPos = start + bullet.length;
-      setIsListActive(true);
+    if (!isValidType) {
+      setAttachmentError('Unsupported format. Please select a PNG, JPG or GIF image.');
+      return;
     }
 
-    setDescription(nextValue);
-    setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(newCursorPos, newCursorPos);
-    }, 0);
-  };
-
-  // Auto-continue bullet list on Enter, cancel on empty bullet
-  const handleDescriptionKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (!textareaRef.current) return;
-    const textarea = textareaRef.current;
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const value = description;
-
-    const lineStart = value.lastIndexOf('\n', start - 1) + 1;
-    const lineEnd = value.indexOf('\n', start);
-    const currentLine = value.substring(lineStart, lineEnd === -1 ? value.length : lineEnd);
-    const bulletMatch = currentLine.match(/^(\s*[•\-*]\s+)(.*)$/);
-
-    if (e.key === 'Enter') {
-      if (bulletMatch) {
-        e.preventDefault();
-        const bulletPrefix = bulletMatch[1];
-        const textAfterBullet = bulletMatch[2];
-
-        // Empty bullet line -> exit list mode cleanly
-        if (textAfterBullet.trim() === '') {
-          const nextValue = value.substring(0, lineStart) + (lineEnd === -1 ? '' : value.substring(lineEnd));
-          setDescription(nextValue);
-          setIsListActive(false);
-          setTimeout(() => {
-            textarea.focus();
-            textarea.setSelectionRange(lineStart, lineStart);
-          }, 0);
-          return;
-        }
-
-        // Continue list with new bullet point
-        const continuation = `\n${bulletPrefix}`;
-        const nextValue = value.substring(0, start) + continuation + value.substring(end);
-        setDescription(nextValue);
-        setIsListActive(true);
-        setTimeout(() => {
-          textarea.focus();
-          const nextPos = start + continuation.length;
-          textarea.setSelectionRange(nextPos, nextPos);
-        }, 0);
-      }
-    } else if (e.key === 'Backspace') {
-      // If backspace on an empty bullet line right after the marker -> remove bullet
-      if (bulletMatch && bulletMatch[2] === '' && start === lineStart + bulletMatch[1].length) {
-        e.preventDefault();
-        const nextValue = value.substring(0, lineStart) + (lineEnd === -1 ? '' : value.substring(lineEnd));
-        setDescription(nextValue);
-        setIsListActive(false);
-        setTimeout(() => {
-          textarea.focus();
-          textarea.setSelectionRange(lineStart, lineStart);
-        }, 0);
-      }
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      setAttachmentError('File size exceeds the 1MB backend limit.');
+      return;
     }
+
+    setAttachmentError(null);
+    setAttachment({
+      name: file.name,
+      size: formatFileSize(file.size),
+      file,
+    });
   };
 
-  // Sync isListActive state when cursor moves
-  const updateActiveFormatting = () => {
-    if (!textareaRef.current) return;
-    const textarea = textareaRef.current;
-    const start = textarea.selectionStart;
-    const value = textarea.value;
-
-    const lineStart = value.lastIndexOf('\n', start - 1) + 1;
-    const lineEnd = value.indexOf('\n', start);
-    const currentLine = value.substring(lineStart, lineEnd === -1 ? value.length : lineEnd);
-    setIsListActive(/^(\s*[•\-*]\s+)/.test(currentLine));
-  };
-
-  // File Upload Handlers
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
-      setAttachment({
-        name: file.name,
-        size: `${sizeMB} MB`,
-      });
+      handleSelectedFile(file);
     }
+    e.target.value = '';
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -296,19 +356,97 @@ export const CreateIssueView: React.FC = () => {
     setIsDragOver(false);
     const file = e.dataTransfer.files?.[0];
     if (file) {
-      const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
-      setAttachment({
-        name: file.name,
-        size: `${sizeMB} MB`,
-      });
+      handleSelectedFile(file);
     }
   };
 
-  // Submit Handler
-  const handleSubmit = (e: FormEvent) => {
+  const handleModalPaste = (e: ClipboardEvent<HTMLDivElement>) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    for (const item of Array.from(items)) {
+      if (item.type.startsWith('image/')) {
+        const file = item.getAsFile();
+        if (file) {
+          e.preventDefault();
+          const extension = file.type.split('/')[1] || 'png';
+          const namedFile =
+            file.name && file.name !== 'image.png'
+              ? file
+              : new File([file], `screenshot-${Date.now()}.${extension}`, { type: file.type });
+          handleSelectedFile(namedFile);
+          return;
+        }
+      }
+    }
+  };
+
+  const handleEditorPaste = (e: ClipboardEvent<HTMLDivElement>) => {
+    const items = e.clipboardData?.items;
+    if (items) {
+      for (const item of Array.from(items)) {
+        if (item.type.startsWith('image/')) {
+          return; // Let handleModalPaste handle image clipboard paste
+        }
+      }
+    }
     e.preventDefault();
-    // Simulate issue creation
-    navigate('/dashboard/my-issues');
+    const plainText = e.clipboardData.getData('text/plain');
+    document.execCommand('insertText', false, plainText);
+  };
+
+  // Submit Handler with Required Field Validation & Backend API Call
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+
+    const errors: FormErrors = {};
+    if (!title.trim()) {
+      errors.title = 'Title is required.';
+    }
+    if (!getDescriptionText().trim()) {
+      errors.description = 'Description is required.';
+    }
+    if (!issueType) {
+      errors.issueType = 'Please select an issue type.';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      if (errors.title) {
+        titleInputRef.current?.focus();
+      } else if (errors.description) {
+        editorRef.current?.focus();
+      }
+      return;
+    }
+
+    setFormErrors({});
+    setSubmitError(null);
+    setIsSubmitting(true);
+
+    try {
+      const descriptionMarkdown = editorRef.current
+        ? serializeEditorToMarkdown(editorRef.current)
+        : getDescriptionText().trim();
+
+      await issueService.createIssue(
+        {
+          title: title.trim(),
+          description: descriptionMarkdown,
+          isUrgent,
+          type: issueType.toUpperCase(),
+          tagNames: labels,
+        },
+        attachment?.file
+      );
+
+      navigate('/dashboard/all-issues');
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : 'Failed to create issue.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Tag Color Mapper
@@ -369,7 +507,7 @@ export const CreateIssueView: React.FC = () => {
       </div>
 
       {/* Modal Overlay / Backdrop */}
-      <div className="create-issue-overlay" onClick={handleClose}>
+      <div className="create-issue-overlay" onClick={handleClose} onPaste={handleModalPaste}>
         {/* Modal Window Container */}
         <div
           className="create-issue-modal"
@@ -400,7 +538,7 @@ export const CreateIssueView: React.FC = () => {
           </div>
 
           {/* Form Body with 2-Column Grid */}
-          <form className="modal-form custom-scroll" onSubmit={handleSubmit}>
+          <form className="modal-form custom-scroll" onSubmit={handleSubmit} noValidate>
             <div className="modal-horizontal-grid">
               {/* LEFT COLUMN: Title & Description */}
               <div className="modal-col-main">
@@ -411,51 +549,67 @@ export const CreateIssueView: React.FC = () => {
                       Title <span className="required-mark">*</span>
                     </label>
                     <span className="field-hint">
-                      Max 120 characters <span className={`title-char-counter ${title.length >= 120 ? 'is-max' : ''}`}>({title.length}/120)</span>
+                      Max 120 characters{' '}
+                      <span className={`title-char-counter ${title.length >= 120 ? 'is-max' : ''}`}>
+                        ({title.length}/120)
+                      </span>
                     </span>
                   </div>
                   <input
+                    ref={titleInputRef}
                     id="issue-title"
                     name="issue-title"
                     type="text"
-                    className="title-input"
+                    className={`title-input ${formErrors.title ? 'is-invalid' : ''}`}
                     placeholder="Enter a descriptive title for the issue or request..."
                     maxLength={120}
                     value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    onChange={(e) => {
+                      setTitle(e.target.value);
+                      if (e.target.value.trim() && formErrors.title) {
+                        setFormErrors((prev) => ({ ...prev, title: undefined }));
+                      }
+                    }}
                     required
                   />
+                  {formErrors.title && <span className="field-error-msg">{formErrors.title}</span>}
                 </div>
 
-                {/* Description & Rich Text Editor */}
+                {/* Description & WYSIWYG Rich Text Editor */}
                 <div className="form-field flex-grow-field">
                   <label className="field-label" htmlFor="issue-description">
                     Description <span className="required-mark">*</span>
                   </label>
-                  <div className="editor-container flex-grow-editor">
+                  <div className={`editor-container flex-grow-editor ${formErrors.description ? 'is-invalid' : ''}`}>
                     <div className="editor-toolbar">
                       <button
                         type="button"
-                        className="editor-toolbar-btn"
+                        className={`editor-toolbar-btn ${isBoldActive ? 'is-active' : ''}`}
                         title="Bold"
-                        onClick={() => applyMarkdown('**', '**')}
+                        aria-pressed={isBoldActive}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => applyRichCommand('bold')}
                       >
                         <i className="ph-bold ph-text-b"></i>
                       </button>
                       <button
                         type="button"
-                        className="editor-toolbar-btn"
+                        className={`editor-toolbar-btn ${isItalicActive ? 'is-active' : ''}`}
                         title="Italic"
-                        onClick={() => applyMarkdown('*', '*')}
+                        aria-pressed={isItalicActive}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => applyRichCommand('italic')}
                       >
                         <i className="ph-bold ph-text-italic"></i>
                       </button>
                       <span className="editor-toolbar-divider"></span>
                       <button
                         type="button"
-                        className="editor-toolbar-btn font-code"
+                        className={`editor-toolbar-btn font-code ${isCodeActive ? 'is-active' : ''}`}
                         title="Inline code"
-                        onClick={() => applyMarkdown('`', '`')}
+                        aria-pressed={isCodeActive}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={handleToggleCode}
                       >
                         &lt;/&gt;
                       </button>
@@ -463,35 +617,42 @@ export const CreateIssueView: React.FC = () => {
                         type="button"
                         className={`editor-toolbar-btn ${isListActive ? 'is-active' : ''}`}
                         title="Bullet list"
-                        onClick={handleToggleList}
+                        aria-pressed={isListActive}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => applyRichCommand('insertUnorderedList')}
                       >
                         <i className="ph-bold ph-list-bullets"></i>
                       </button>
-                      <span className="editor-support-text">Ctrl+B / Ctrl+I</span>
                     </div>
-                    <textarea
+                    <div
                       id="issue-description"
-                      ref={textareaRef}
-                      name="issue-description"
+                      ref={editorRef}
+                      role="textbox"
+                      aria-multiline="true"
+                      aria-required="true"
+                      contentEditable
+                      suppressContentEditableWarning
                       className="editor-textarea"
-                      placeholder="Describe the issue in detail, precise steps to reproduce, expected behavior... Use • for lists."
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      onKeyDown={handleDescriptionKeyDown}
-                      onClick={updateActiveFormatting}
-                      onKeyUp={updateActiveFormatting}
-                      required
-                    ></textarea>
+                      data-placeholder="Describe the issue in detail, precise steps to reproduce, expected behavior..."
+                      onInput={handleEditorInput}
+                      onKeyUp={syncToolbarState}
+                      onMouseUp={syncToolbarState}
+                      onFocus={syncToolbarState}
+                      onPaste={handleEditorPaste}
+                    />
                   </div>
+                  {formErrors.description && (
+                    <span className="field-error-msg">{formErrors.description}</span>
+                  )}
                 </div>
               </div>
 
               {/* RIGHT COLUMN: Classification, Labels, Urgency, Attachments */}
               <div className="modal-col-sidebar">
-                {/* Issue Type (D6) */}
+                {/* Issue Type */}
                 <div className="form-field">
                   <label className="field-label">
-                    Issue Type (D6) <span className="required-mark">*</span>
+                    Issue Type <span className="required-mark">*</span>
                   </label>
                   <div className="type-selector-grid" role="radiogroup" aria-label="Issue Type">
                     {/* Bug */}
@@ -558,12 +719,15 @@ export const CreateIssueView: React.FC = () => {
                       <span className="type-label">Docs</span>
                     </label>
                   </div>
+                  {formErrors.issueType && (
+                    <span className="field-error-msg">{formErrors.issueType}</span>
+                  )}
                 </div>
 
-                {/* Labels & Scope (D7) */}
+                {/* Labels & Scope */}
                 <div className="form-field">
                   <div className="field-header">
-                    <label className="field-label">Labels &amp; Scope (D7)</label>
+                    <label className="field-label">Labels &amp; Scope</label>
                     <span className="field-hint">
                       {labels.length === 0 ? 'Click + to select tags' : `${labels.length} selected`}
                     </span>
@@ -614,9 +778,9 @@ export const CreateIssueView: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Priority & Urgency Section (D3) */}
+                {/* Priority & Urgency Section */}
                 <div className="form-field">
-                  <label className="field-label">Priority &amp; Urgency Level (D3)</label>
+                  <label className="field-label">Priority &amp; Urgency Level</label>
                   <div className={`urgency-card ${isUrgent ? 'is-active' : ''}`}>
                     <div className="urgency-info">
                       <div className="urgency-icon-box">
@@ -648,17 +812,15 @@ export const CreateIssueView: React.FC = () => {
                 {/* Attachments Section */}
                 <div className="form-field">
                   <div className="field-header">
-                    <label className="field-label">
-                      Attach a screenshot <span className="field-optional">(optional)</span>
-                    </label>
-                    <span className="field-hint">PNG, JPG or GIF up to 10MB</span>
+                    <label className="field-label">Attach a screenshot</label>
+                    <span className="field-hint">PNG, JPG or GIF up to 1MB</span>
                   </div>
 
                   {/* Hidden File Input */}
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept="image/*"
+                    accept=".png,.jpg,.jpeg,.gif,image/png,image/jpeg,image/gif"
                     style={{ display: 'none' }}
                     onChange={handleFileChange}
                   />
@@ -696,13 +858,17 @@ export const CreateIssueView: React.FC = () => {
                           type="button"
                           className="attachment-remove-btn"
                           aria-label="Remove attachment"
-                          onClick={() => setAttachment(null)}
+                          onClick={() => {
+                            setAttachment(null);
+                            setAttachmentError(null);
+                          }}
                         >
                           <i className="ph-bold ph-x"></i>
                         </button>
                       </div>
                     )}
                   </div>
+                  {attachmentError && <span className="field-error-msg">{attachmentError}</span>}
                 </div>
               </div>
             </div>
@@ -710,6 +876,12 @@ export const CreateIssueView: React.FC = () => {
             {/* Hidden Submit for Enter Key trigger */}
             <button type="submit" style={{ display: 'none' }} aria-hidden="true" />
           </form>
+
+          {submitError && (
+            <div className="submit-error-banner" role="alert">
+              {submitError}
+            </div>
+          )}
 
           {/* Modal Footer */}
           <div className="modal-footer">
@@ -722,6 +894,7 @@ export const CreateIssueView: React.FC = () => {
                 type="button"
                 className="btn-secondary"
                 onClick={handleClose}
+                disabled={isSubmitting}
               >
                 Cancel
               </button>
@@ -729,9 +902,10 @@ export const CreateIssueView: React.FC = () => {
                 type="button"
                 className="btn-primary"
                 onClick={handleSubmit}
+                disabled={isSubmitting}
               >
                 <i className="ph-bold ph-paper-plane-tilt"></i>
-                <span>Create Issue</span>
+                <span>{isSubmitting ? 'Creating...' : 'Create Issue'}</span>
               </button>
             </div>
           </div>
