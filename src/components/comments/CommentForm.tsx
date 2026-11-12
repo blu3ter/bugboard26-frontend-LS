@@ -5,6 +5,8 @@ export interface CommentFormProps {
   disabled?: boolean;
 }
 
+const MAX_COMMENT_LENGTH = 2000;
+
 /**
  * Componente Molecolare CommentForm (Req. 5)
  * Gestisce l'input controllato del nuovo commento e lo stato di invio.
@@ -28,9 +30,18 @@ export const CommentForm: React.FC<CommentFormProps> = ({ onSubmit, disabled = f
 
   return (
     <form className="new-comment-editor" onSubmit={handleSubmit}>
+      <div className="comment-form-header">
+        <span className="comment-char-hint">
+          Max {MAX_COMMENT_LENGTH} caratteri{' '}
+          <span className={`comment-char-counter ${text.length >= MAX_COMMENT_LENGTH ? 'is-max' : ''}`}>
+            ({text.length}/{MAX_COMMENT_LENGTH})
+          </span>
+        </span>
+      </div>
       <textarea
         className="comment-input-textarea"
         placeholder="Scrivi un aggiornamento o commento su questa issue..."
+        maxLength={MAX_COMMENT_LENGTH}
         value={text}
         onChange={(e) => setText(e.target.value)}
         disabled={isSubmitting || disabled}

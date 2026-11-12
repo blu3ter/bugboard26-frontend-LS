@@ -120,6 +120,29 @@
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
 }
 
+.comment-form-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.comment-char-hint {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.comment-char-counter {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-left: 2px;
+  transition: color 0.15s ease;
+}
+
+.comment-char-counter.is-max {
+  color: #f87171;
+  font-weight: 600;
+}
+
 .comment-input-textarea {
   background: transparent;
   border: none;
