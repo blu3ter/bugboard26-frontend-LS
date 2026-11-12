@@ -95,23 +95,40 @@
 .ambient-blue-2 { width: 192px; height: 64px; bottom: 14%; right: 12%; background-color: #1d4ed8; }
 .ambient-purple-1 { width: 176px; height: 56px; top: 50%; right: 25%; background-color: #7e22ce; }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar (allineata con CreateIssueView) */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #334155 transparent;
+}
+
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.4);
+  background: transparent;
+  margin: 6px 0;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #25334c;
-  border-radius: 4px;
+  background-color: #334155;
+  border-radius: 9999px;
+  transition: background-color 0.2s ease;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: var(--id-primary-blue-hover);
+  background-color: #475569;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:active {
+  background-color: #3b82f6;
+}
+
+.custom-scrollbar::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 /* Modal Window Container */
@@ -357,25 +374,26 @@
   height: 12px;
 }
 
-/* Close Button */
+/* Close Button (allineato con CreateIssueView) */
 .btn-close-modal {
-  color: var(--id-text-muted);
   background: transparent;
-  border: 1px solid transparent;
+  border: none;
+  color: #94a3b8;
   padding: 8px;
-  border-radius: 12px;
+  border-radius: 9999px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  font-size: 18px;
+  line-height: 1;
   transition: all 0.2s ease;
 }
 
 .btn-close-modal:hover {
   color: #ffffff;
-  background-color: rgba(30, 41, 59, 0.8);
-  border-color: rgba(51, 65, 85, 0.6);
+  background-color: #1e293b;
 }
 
 .close-icon-svg {

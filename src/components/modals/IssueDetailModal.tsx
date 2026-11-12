@@ -176,14 +176,14 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({
               </h1>
             </div>
 
-            <button type="button" className="close-action-button" onClick={onClose} aria-label="Chiudi modale">
+            <button type="button" className="btn-close-modal" onClick={onClose} aria-label="Chiudi modale">
               <span className="material-symbols-outlined">close</span>
             </button>
           </div>
         </header>
 
         {/* Content Body */}
-        <div className="issue-detail-body">
+        <div className="issue-detail-body custom-scrollbar">
           {error ? (
             <div style={{ color: '#f87171', padding: '20px', textAlign: 'center' }}>{error}</div>
           ) : loading || !issue ? (
