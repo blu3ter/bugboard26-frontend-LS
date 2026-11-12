@@ -15,13 +15,27 @@ dist-ssr
 # Editor directories and files
 .vscode/
 !.vscode/extensions.json
-.idea
+.idea/
+.settings/
+.classpath
+.project
 .DS_Store
+Thumbs.db
 *.suo
 .ntvs
 *.njsproj
 *.sln
 *.sw?
 
-#md
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Drafts, notes & temporary files
 promemoria.md
+todo.md
+appunti.txt
+test.html
+preview_*.html
+*.sql
