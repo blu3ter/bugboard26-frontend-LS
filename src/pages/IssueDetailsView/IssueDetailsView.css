@@ -228,8 +228,11 @@
   border: 1px solid rgba(59, 130, 246, 0.38);
 }
 
-/* Status Pill: In Lavorazione */
-.badge-in-progress {
+/* Status Pills */
+.badge-todo,
+.badge-in-progress,
+.badge-in-review,
+.badge-closed {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -237,9 +240,30 @@
   border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
+}
+
+.badge-todo {
+  background-color: rgba(148, 163, 184, 0.15);
+  color: #cbd5e1;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.badge-in-progress {
   background-color: rgba(245, 158, 11, 0.15);
   color: #fcd34d;
   border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge-in-review {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+}
+
+.badge-closed {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.35);
 }
 
 .pulse-indicator {
@@ -652,6 +676,10 @@
   background-color: #2563eb;
 }
 
+.tag-frontend-color {
+  background-color: #0284c7;
+}
+
 .tag-security-color {
   background-color: #9333ea;
 }
@@ -660,9 +688,17 @@
   background-color: #d97706;
 }
 
+.tag-uiux-color {
+  background-color: #db2777;
+}
+
 .tag-urgent-color {
   background-color: #e11d48;
   font-weight: 600;
+}
+
+.tag-default-color {
+  background-color: #334155;
 }
 
 .btn-remove-tag {
@@ -1025,4 +1061,37 @@
 .submit-check-icon {
   width: 16px;
   height: 16px;
+}
+
+/* Dynamic Content & State Helpers */
+.description-text {
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+  color: #cbd5e1;
+  line-height: 1.65;
+}
+
+.empty-section-hint {
+  font-size: 13px;
+  color: var(--id-text-subtle);
+  font-style: italic;
+  margin: 0;
+}
+
+.issue-detail-state-box {
+  padding: 64px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 16px;
+  color: #cbd5e1;
+}
+
+.issue-detail-error-text {
+  color: #fca5a5;
+  font-size: 14px;
+  margin: 0;
 }
