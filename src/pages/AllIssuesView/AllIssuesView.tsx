@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './AllIssuesView.css';
 import { IssuesFilterBar } from '../../components/IssuesFilterBar';
 import { issueService } from '../../service/issueService';
@@ -9,6 +10,7 @@ interface AllIssuesViewProps {
 }
 
 export const AllIssuesView: React.FC<AllIssuesViewProps> = ({ isAdmin = true }) => {
+  const navigate = useNavigate();
   const [issues, setIssues] = useState<IssueDto[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -70,6 +72,7 @@ export const AllIssuesView: React.FC<AllIssuesViewProps> = ({ isAdmin = true }) 
                 key={issue.id} 
                 className={`issue-card ${issue.state === 'DONE' ? 'card-closed' : ''}`}
                 style={issue.isUrgent ? { borderColor: 'rgba(186,26,26,0.5)' } : {}}
+                onClick={() => navigate(`/dashboard/issue/${issue.id}`)}
               >
                 <div className="card-accent-line" style={{ backgroundColor: typeStyle.color }}></div>
                 
@@ -104,7 +107,12 @@ export const AllIssuesView: React.FC<AllIssuesViewProps> = ({ isAdmin = true }) 
                   </div>
                   
                   {isAdmin && (
-                    <button className="btn-assign" style={!issue.assigneeFullName ? { marginLeft: 'auto' } : {}} title="Assign / Reassign">
+                    <button
+                      className="btn-assign"
+                      style={!issue.assigneeFullName ? { marginLeft: 'auto' } : {}}
+                      title="Assign / Reassign"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>{issue.assigneeFullName ? 'sync' : 'person_add'}</span>
                       <span>{issue.assigneeFullName ? 'Reassign' : 'Assign'}</span>
                     </button>

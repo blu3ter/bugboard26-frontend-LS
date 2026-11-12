@@ -129,6 +129,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  cursor: pointer;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../AllIssuesView/AllIssuesView.css';
 import './MyIssuesView.css';
 import { IssuesFilterBar } from '../../components/IssuesFilterBar';
@@ -6,6 +7,7 @@ import { issueService } from '../../service/issueService';
 import type { IssueDto } from '../../types/issue.types';
 
 export const MyIssuesView: React.FC = () => {
+  const navigate = useNavigate();
   const [issues, setIssues] = useState<IssueDto[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -83,7 +85,12 @@ export const MyIssuesView: React.FC = () => {
               {issues.map(issue => {
                 const typeStyle = getTypeStyles(issue.type);
                 return (
-                  <article key={issue.id} className={`issue-card ${issue.state === 'DONE' ? 'card-closed' : ''}`} style={issue.isUrgent ? { borderColor: 'rgba(186,26,26,0.5)' } : {}}>
+                  <article
+                    key={issue.id}
+                    className={`issue-card ${issue.state === 'DONE' ? 'card-closed' : ''}`}
+                    style={issue.isUrgent ? { borderColor: 'rgba(186,26,26,0.5)' } : {}}
+                    onClick={() => navigate(`/dashboard/issue/${issue.id}`)}
+                  >
                     <div className="card-accent-line" style={{ backgroundColor: typeStyle.color }}></div>
 
                     <div className="card-header">
@@ -95,7 +102,11 @@ export const MyIssuesView: React.FC = () => {
                           </span>
                         )}
                       </div>
-                      <button className={`btn-check ${issue.state === 'DONE' ? 'btn-checked' : ''}`} disabled={issue.state === 'DONE'}>
+                      <button
+                        className={`btn-check ${issue.state === 'DONE' ? 'btn-checked' : ''}`}
+                        disabled={issue.state === 'DONE'}
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <span className="material-symbols-outlined" style={issue.state === 'DONE' ? { fontVariationSettings: '"FILL" 1' } : {}}>check_circle</span>
                       </button>
                     </div>
