@@ -1,5 +1,5 @@
 export type IssueType = 'QUESTION' | 'BUG' | 'DOCUMENTATION' | 'FEATURE' | string;
-export type IssueState = 'TODO' | 'IN_PROGRESS' | 'REVIEW' | 'DONE' | string;
+export type IssueState = 'TODO' | 'IN_PROGRESS' | 'IN_REVIEW' | 'CLOSED' | 'REVIEW' | 'DONE' | string;
 
 export interface IssueAssignDto {
   assigneeId: number;
