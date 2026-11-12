@@ -1,17 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { commentService } from '../../service/commentService';
 import { issueService } from '../../service/issueService';
+import type { CommentDto } from '../../types/comment.types';
 import type { IssueDto } from '../../types/issue.types';
 import './IssueDetailsView.css';
-
-interface Comment {
-  id: string;
-  author: string;
-  role: string;
-  timestamp: string;
-  avatarText: string;
-  content: string;
-}
 
 const TYPE_META: Record<string, { label: string; className: string }> = {
   BUG: { label: 'Bug', className: 'type-bug' },
@@ -47,6 +40,31 @@ function formatIssueDate(isoDate?: string): string {
     month: 'short',
     year: 'numeric',
   });
+}
+
+function formatCommentDate(isoDate?: string): string {
+  if (!isoDate) return '';
+  const date = new Date(isoDate);
+  if (Number.isNaN(date.getTime())) return isoDate;
+  return date.toLocaleString('it-IT', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+function getCommentAuthorName(comment: CommentDto): string {
+  const full = `${comment.authorName || ''} ${comment.authorLastName || ''}`.trim();
+  return full || 'Collaboratore';
+}
+
+function getCommentInitials(comment: CommentDto): string {
+  const first = comment.authorName?.trim()?.[0] || '';
+  const last = comment.authorLastName?.trim()?.[0] || '';
+  const initials = `${first}${last}`.toUpperCase();
+  return initials || 'U';
 }
 
 function getTagColorClass(tagName: string): string {
@@ -104,9 +122,27 @@ export const IssueDetailsView: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Comments state (collegamento API reale nello Step 4)
-  const [comments, setComments] = useState<Comment[]>([]);
+  // Comments state
+  const [comments, setComments] = useState<CommentDto[]>([]);
+  const [commentsLoading, setCommentsLoading] = useState<boolean>(false);
+  const [commentsError, setCommentsError] = useState<string | null>(null);
   const [newComment, setNewComment] = useState('');
+  const [submittingComment, setSubmittingComment] = useState<boolean>(false);
+  const [commentSubmitError, setCommentSubmitError] = useState<string | null>(null);
+  const commentTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const loadComments = useCallback(async (issueId: string) => {
+    setCommentsLoading(true);
+    setCommentsError(null);
+    try {
+      const data = await commentService.getComments(issueId);
+      setComments(data);
+    } catch (err) {
+      setCommentsError(err instanceof Error ? err.message : 'Impossibile caricare i commenti.');
+    } finally {
+      setCommentsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (!id) {
@@ -116,13 +152,31 @@ export const IssueDetailsView: React.FC = () => {
     }
 
     let isMounted = true;
-    const fetchIssue = async () => {
+    const fetchIssueAndComments = async () => {
       setLoading(true);
       setError(null);
       try {
-        const data = await issueService.getIssueById(id);
-        if (isMounted) {
-          setIssue(data);
+        const issueData = await issueService.getIssueById(id);
+        if (!isMounted) return;
+        setIssue(issueData);
+
+        setCommentsLoading(true);
+        setCommentsError(null);
+        try {
+          const commentsData = await commentService.getComments(id);
+          if (isMounted) {
+            setComments(commentsData);
+          }
+        } catch (commentErr) {
+          if (isMounted) {
+            setCommentsError(
+              commentErr instanceof Error ? commentErr.message : 'Impossibile caricare i commenti.'
+            );
+          }
+        } finally {
+          if (isMounted) {
+            setCommentsLoading(false);
+          }
         }
       } catch (err) {
         if (isMounted) {
@@ -135,7 +189,7 @@ export const IssueDetailsView: React.FC = () => {
       }
     };
 
-    fetchIssue();
+    fetchIssueAndComments();
     return () => {
       isMounted = false;
     };
@@ -145,18 +199,39 @@ export const IssueDetailsView: React.FC = () => {
     navigate(-1);
   };
 
-  const handleAddComment = () => {
-    if (!newComment.trim()) return;
-    const commentItem: Comment = {
-      id: `c-${Date.now()}`,
-      author: 'Tu',
-      role: 'User',
-      timestamp: 'Adesso',
-      avatarText: 'ME',
-      content: newComment.trim(),
-    };
-    setComments((prev) => [...prev, commentItem]);
-    setNewComment('');
+  const applyFormat = (wrapper: string) => {
+    const textarea = commentTextareaRef.current;
+    if (!textarea) return;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selected = newComment.slice(start, end) || 'testo';
+    const updated = newComment.slice(0, start) + wrapper + selected + wrapper + newComment.slice(end);
+    setNewComment(updated);
+
+    requestAnimationFrame(() => {
+      textarea.focus();
+      const cursorStart = start + wrapper.length;
+      textarea.setSelectionRange(cursorStart, cursorStart + selected.length);
+    });
+  };
+
+  const handleAddComment = async () => {
+    const trimmed = newComment.trim();
+    if (!trimmed || !id || submittingComment) return;
+
+    setSubmittingComment(true);
+    setCommentSubmitError(null);
+    try {
+      const saved = await commentService.addComment(id, trimmed);
+      setComments((prev) => [...prev, saved]);
+      setNewComment('');
+    } catch (err) {
+      setCommentSubmitError(
+        err instanceof Error ? err.message : 'Errore durante l’invio del commento.'
+      );
+    } finally {
+      setSubmittingComment(false);
+    }
   };
 
   const typeKey = issue?.type?.toUpperCase() || 'BUG';
@@ -306,57 +381,96 @@ export const IssueDetailsView: React.FC = () => {
               <section className="comments-section-container" data-purpose="issue-discussion">
                 <div className="section-header-line">
                   <h2 className="section-label">Attività &amp; Discussione ({comments.length})</h2>
-                  <button type="button" className="refresh-feed-btn">
-                    Aggiorna feed
+                  <button
+                    type="button"
+                    className="refresh-feed-btn"
+                    disabled={commentsLoading}
+                    onClick={() => id && loadComments(id)}
+                  >
+                    {commentsLoading ? 'Aggiornamento...' : 'Aggiorna feed'}
                   </button>
                 </div>
 
-                {comments.length === 0 ? (
+                {commentsError && <p className="comment-error-banner">{commentsError}</p>}
+
+                {commentsLoading && comments.length === 0 ? (
+                  <p className="empty-section-hint">Caricamento commenti...</p>
+                ) : comments.length === 0 ? (
                   <p className="empty-section-hint">Nessun commento presente. Avvia la discussione qui sotto.</p>
                 ) : (
                   comments.map((comment) => (
                     <div key={comment.id} className="comment-card-box">
-                      <div className="comment-avatar-bubble">{comment.avatarText}</div>
+                      <div className="comment-avatar-bubble">{getCommentInitials(comment)}</div>
                       <div className="comment-body-col">
                         <div className="comment-author-row">
                           <div className="comment-author-badge">
-                            <span className="comment-user-name">{comment.author}</span>
-                            <span className="comment-role-tag">{comment.role}</span>
+                            <span className="comment-user-name">{getCommentAuthorName(comment)}</span>
                           </div>
-                          <time className="comment-timestamp">{comment.timestamp}</time>
+                          <time className="comment-timestamp">{formatCommentDate(comment.creationDate)}</time>
                         </div>
-                        <p className="comment-message-text">{comment.content}</p>
+                        <p className="comment-message-text">{comment.text}</p>
                       </div>
                     </div>
                   ))
                 )}
 
+                {commentSubmitError && <p className="comment-error-banner">{commentSubmitError}</p>}
+
                 {/* Add Comment Input Area */}
                 <div className="new-comment-editor">
                   <textarea
+                    ref={commentTextareaRef}
                     className="comment-input-textarea"
                     rows={2}
-                    placeholder="Scrivi una risposta tecnica o menziona un collaboratore (@nome)..."
+                    maxLength={2000}
+                    placeholder="Scrivi una risposta tecnica o premi Ctrl+Invio per inviare..."
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
+                    onKeyDown={(e) => {
+                      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddComment();
+                      }
+                    }}
+                    disabled={submittingComment}
                   ></textarea>
                   <div className="editor-bottom-bar">
                     <div className="editor-formatting-tools">
-                      <button type="button" className="btn-format-tool" title="Grassetto">
+                      <button
+                        type="button"
+                        className="btn-format-tool"
+                        title="Grassetto"
+                        onClick={() => applyFormat('**')}
+                      >
                         <strong>B</strong>
                       </button>
-                      <button type="button" className="btn-format-tool" title="Corsivo">
+                      <button
+                        type="button"
+                        className="btn-format-tool"
+                        title="Corsivo"
+                        onClick={() => applyFormat('*')}
+                      >
                         <em>I</em>
                       </button>
-                      <button type="button" className="btn-format-tool font-mono" title="Codice inline">
+                      <button
+                        type="button"
+                        className="btn-format-tool font-mono"
+                        title="Codice inline"
+                        onClick={() => applyFormat('`')}
+                      >
                         &lt;/&gt;
                       </button>
                     </div>
-                    <button type="button" className="btn-submit-comment" onClick={handleAddComment}>
+                    <button
+                      type="button"
+                      className="btn-submit-comment"
+                      onClick={handleAddComment}
+                      disabled={submittingComment || !newComment.trim()}
+                    >
                       <svg className="send-comment-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                       </svg>
-                      Invia Commento
+                      {submittingComment ? 'Invio...' : 'Invia Commento'}
                     </button>
                   </div>
                 </div>
