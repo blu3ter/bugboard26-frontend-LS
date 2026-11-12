@@ -48,9 +48,6 @@ export const CommentForm: React.FC<CommentFormProps> = ({ onSubmit, disabled = f
         rows={3}
       />
       <div className="comment-form-footer">
-        <span style={{ fontSize: '0.72rem', color: '#64748b' }}>
-          Premi Invia per pubblicare il commento
-        </span>
         <button
           type="submit"
           className="btn-submit-comment"
