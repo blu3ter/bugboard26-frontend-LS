@@ -1,13 +1,56 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './AllIssuesView.css';
 import { IssuesFilterBar } from '../../components/IssuesFilterBar';
+import { issueService } from '../../service/issueService';
+import type { IssueDto } from '../../types/issue.types';
 
 interface AllIssuesViewProps {
-  // Pass isAdmin from your auth context or global state
   isAdmin?: boolean;
 }
 
 export const AllIssuesView: React.FC<AllIssuesViewProps> = ({ isAdmin = true }) => {
+  const [issues, setIssues] = useState<IssueDto[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchIssues = async () => {
+      try {
+        const data = await issueService.getAllIssues();
+        setIssues(data);
+      } catch (error) {
+        console.error("Failed to fetch all issues", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchIssues();
+  }, []);
+
+  const getTypeStyles = (type: string) => {
+    switch (type) {
+      case 'BUG': 
+        return { color: '#ef4444', icon: 'bug_report', badgeBg: 'rgba(239, 68, 68, 0.1)', badgeBorder: '#ef4444', textColor: '#ef4444' };
+      case 'FEATURE': 
+        return { color: '#10b981', icon: 'add_box', badgeBg: 'rgba(16, 185, 129, 0.1)', badgeBorder: '#10b981', textColor: '#10b981' };
+      case 'QUESTION': 
+        return { color: '#fbbf24', icon: 'help', badgeBg: 'rgba(251, 191, 36, 0.1)', badgeBorder: '#fbbf24', textColor: '#fbbf24' };
+      case 'DOCUMENTATION': 
+        return { color: '#2563eb', icon: 'description', badgeBg: 'rgba(37, 99, 235, 0.1)', badgeBorder: '#2563eb', textColor: '#2563eb' };
+      default: 
+        return { color: 'var(--primary)', icon: 'list', badgeBg: 'var(--surface-container-high)', badgeBorder: 'var(--border-color)', textColor: 'var(--text-secondary)' };
+    }
+  };
+
+  const getStateBadgeClass = (state: string) => {
+    switch (state) {
+      case 'TODO': return 'badge-todo';
+      case 'IN_PROGRESS': return 'badge-in-progress';
+      case 'REVIEW': return 'badge-in-review';
+      case 'DONE': return 'badge-closed';
+      default: return 'badge-todo';
+    }
+  };
+
   return (
     <div className="issues-view-container">
       {/* Filters & Search */}
@@ -15,159 +58,62 @@ export const AllIssuesView: React.FC<AllIssuesViewProps> = ({ isAdmin = true }) 
 
       {/* Grid of Issues */}
       <div className="issues-grid">
-        {/* Card 1: Urgent Bug */}
-        <article className="issue-card" style={{ borderColor: 'rgba(186,26,26,0.5)' }}>
-          <div className="card-accent-line" style={{ backgroundColor: '#ba1a1a' }}></div>
-          
-          <div className="card-header">
-            <div className="card-id-group">
-              <span className="issue-id">BB-1042</span>
-              <span className="badge-urgent">
-                <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>warning</span> URGENTE
-              </span>
-            </div>
-            <button className="btn-check">
-              <span className="material-symbols-outlined">check_circle</span>
-            </button>
-          </div>
-          
-          <h3 className="issue-title">Database Connection Timeout on Production Cluster</h3>
-          <p className="issue-project">Project: Core Backend</p>
-          
-          <div className="card-footer">
-            <span className="badge badge-bug">
-              <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>bug_report</span> Bug
-            </span>
-            <span className="badge badge-in-progress">
-              <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>autorenew</span> In Lavorazione
-            </span>
-            
-            <div className="assignee-info">
-              <span className="assignee-text">Svolta da: Mario Rossi</span>
-              <span className="comments-count">
-                <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>chat_bubble</span> 5
-              </span>
-            </div>
-            
-            {isAdmin && (
-              <button className="btn-assign" title="Riassegna">
-                <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>sync</span>
-                <span>Assegna</span>
-              </button>
-            )}
-          </div>
-        </article>
-
-        {/* Card 2: Feature Todo */}
-        <article className="issue-card">
-          <div className="card-accent-line" style={{ backgroundColor: 'var(--primary)' }}></div>
-          
-          <div className="card-header">
-            <div className="card-id-group">
-              <span className="issue-id">BB-1045</span>
-            </div>
-            <button className="btn-check">
-              <span className="material-symbols-outlined">check_circle</span>
-            </button>
-          </div>
-          
-          <h3 className="issue-title">Implement Dark Mode Toggle for User Settings</h3>
-          <p className="issue-project">Project: Web Frontend App</p>
-          
-          <div className="card-footer">
-            <span className="badge badge-feature">
-              <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>add_box</span> Feature
-            </span>
-            <span className="badge badge-todo">
-              <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>list</span> Todo
-            </span>
-            
-            <div className="assignee-info">
-              <span className="comments-count">
-                <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>chat_bubble</span> 12
-              </span>
-            </div>
-            
-            {isAdmin && (
-              <button className="btn-assign ml-auto" title="Assegna">
-                <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>person_add</span>
-                <span>Assegna</span>
-              </button>
-            )}
-          </div>
-        </article>
-
-        {/* Card 3: BUG IN VERIFICA */}
-        <article className="issue-card" style={{ borderColor: 'rgba(186,26,26,0.5)' }}>
-          <div className="card-accent-line" style={{ backgroundColor: '#ba1a1a' }}></div>
-          
-          <div className="card-header">
-            <div className="card-id-group">
-              <span className="issue-id">BB-1021</span>
-            </div>
-            <button className="btn-check">
-              <span className="material-symbols-outlined">check_circle</span>
-            </button>
-          </div>
-          
-          <h3 className="issue-title">Null Pointer Exception on User Login Flow</h3>
-          <p className="issue-project">Project: Auth Service</p>
-          
-          <div className="card-footer">
-            <span className="badge badge-bug">
-              <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>bug_report</span> Bug
-            </span>
-            <span className="badge badge-in-review">
-              <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>visibility</span> In Verifica
-            </span>
-            
-            <div className="assignee-info">
-              <span className="assignee-text">Svolta da: Giulia Verdi</span>
-              <span className="comments-count">
-                <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>chat_bubble</span> 3
-              </span>
-            </div>
-            
-            {isAdmin && (
-              <button className="btn-assign" title="Riassegna">
-                <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>cached</span>
-                <span>Assegna</span>
-              </button>
-            )}
-          </div>
-        </article>
-
-        {/* Card 4: DOCUMENTAZIONE CHIUSO */}
-        <article className="issue-card card-closed">
-          <div className="card-accent-line" style={{ backgroundColor: 'var(--secondary)' }}></div>
-          
-          <div className="card-header">
-            <div className="card-id-group">
-              <span className="issue-id">BB-0988</span>
-            </div>
-            <button className="btn-check btn-checked" disabled>
-              <span className="material-symbols-outlined" style={{ fontVariationSettings: '"FILL" 1' }}>check_circle</span>
-            </button>
-          </div>
-          
-          <h3 className="issue-title issue-title-closed">Update API Docs for Payment Gateway v2</h3>
-          <p className="issue-project">Project: Developer Docs</p>
-          
-          <div className="card-footer">
-            <span className="badge badge-documentation">
-              <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>description</span> Documentazione
-            </span>
-            <span className="badge badge-closed">
-              <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>done_all</span> Chiuso
-            </span>
-            
-            <div className="assignee-info" style={{ marginLeft: 'auto' }}>
-              <span className="comments-count">
-                <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>chat_bubble</span> 8
-              </span>
-            </div>
-          </div>
-        </article>
+        {loading ? (
+          <p>Loading issues...</p>
+        ) : issues.length === 0 ? (
+          <p>No issues found.</p>
+        ) : (
+          issues.map((issue) => {
+            const typeStyle = getTypeStyles(issue.type);
+            return (
+              <article 
+                key={issue.id} 
+                className={`issue-card ${issue.state === 'DONE' ? 'card-closed' : ''}`}
+                style={issue.isUrgent ? { borderColor: 'rgba(186,26,26,0.5)' } : {}}
+              >
+                <div className="card-accent-line" style={{ backgroundColor: typeStyle.color }}></div>
+                
+                <div className="card-header">
+                  <div className="card-id-group">
+                    <span className="issue-id">BB-{issue.id}</span>
+                    {issue.isUrgent && (
+                      <span className="badge-urgent">
+                        <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>warning</span> URGENT
+                      </span>
+                    )}
+                  </div>
+                </div>
+                
+                <h3 className={`issue-title ${issue.state === 'DONE' ? 'issue-title-closed' : ''}`}>{issue.title}</h3>
+                {issue.reporterFullName && (
+                  <p className="issue-project">Reporter: {issue.reporterFullName}</p>
+                )}
+                
+                <div className="card-footer">
+                  <span className="badge" style={{ backgroundColor: typeStyle.badgeBg, border: `1px solid ${typeStyle.badgeBorder}`, color: typeStyle.textColor }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>{typeStyle.icon}</span> {issue.type}
+                  </span>
+                  <span className={`badge ${getStateBadgeClass(issue.state)}`}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>list</span> {issue.state}
+                  </span>
+                  
+                  <div className="assignee-info">
+                    {issue.assigneeFullName && (
+                      <span className="assignee-text">Assigned to: {issue.assigneeFullName}</span>
+                    )}
+                  </div>
+                  
+                  {isAdmin && (
+                    <button className="btn-assign" style={!issue.assigneeFullName ? { marginLeft: 'auto' } : {}} title="Assign / Reassign">
+                      <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>{issue.assigneeFullName ? 'sync' : 'person_add'}</span>
+                      <span>{issue.assigneeFullName ? 'Reassign' : 'Assign'}</span>
+                    </button>
+                  )}
+                </div>
+              </article>
+            );
+          })
+        )}
       </div>
     </div>
   );

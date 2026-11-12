@@ -399,302 +399,311 @@ export const CreateIssueView: React.FC = () => {
             </button>
           </div>
 
-          {/* Form Body */}
+          {/* Form Body with 2-Column Grid */}
           <form className="modal-form custom-scroll" onSubmit={handleSubmit}>
-            {/* Title */}
-            <div className="form-field">
-              <div className="field-header">
-                <label className="field-label" htmlFor="issue-title">
-                  Title <span className="required-mark">*</span>
-                </label>
-                <span className="field-hint">Max 120 characters</span>
-              </div>
-              <input
-                id="issue-title"
-                name="issue-title"
-                type="text"
-                className="title-input"
-                placeholder="Enter a descriptive title for the issue or request..."
-                maxLength={120}
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                required
-              />
-            </div>
-
-            {/* Description & Rich Text Editor */}
-            <div className="form-field">
-              <label className="field-label" htmlFor="issue-description">
-                Description <span className="required-mark">*</span>
-              </label>
-              <div className="editor-container">
-                <div className="editor-toolbar">
-                  <button
-                    type="button"
-                    className="editor-toolbar-btn"
-                    title="Bold"
-                    onClick={() => applyMarkdown('**', '**')}
-                  >
-                    <i className="ph-bold ph-text-b"></i>
-                  </button>
-                  <button
-                    type="button"
-                    className="editor-toolbar-btn"
-                    title="Italic"
-                    onClick={() => applyMarkdown('*', '*')}
-                  >
-                    <i className="ph-bold ph-text-italic"></i>
-                  </button>
-                  <span className="editor-toolbar-divider"></span>
-                  <button
-                    type="button"
-                    className="editor-toolbar-btn font-code"
-                    title="Inline code"
-                    onClick={() => applyMarkdown('`', '`')}
-                  >
-                    &lt;/&gt;
-                  </button>
-                  <button
-                    type="button"
-                    className={`editor-toolbar-btn ${isListActive ? 'is-active' : ''}`}
-                    title="Bullet list"
-                    onClick={handleToggleList}
-                  >
-                    <i className="ph-bold ph-list-bullets"></i>
-                  </button>
-                  <span className="editor-support-text">Markdown supported</span>
+            <div className="modal-horizontal-grid">
+              {/* LEFT COLUMN: Title & Description */}
+              <div className="modal-col-main">
+                {/* Title */}
+                <div className="form-field">
+                  <div className="field-header">
+                    <label className="field-label" htmlFor="issue-title">
+                      Title <span className="required-mark">*</span>
+                    </label>
+                    <span className="field-hint">
+                      Max 120 characters <span className={`title-char-counter ${title.length >= 120 ? 'is-max' : ''}`}>({title.length}/120)</span>
+                    </span>
+                  </div>
+                  <input
+                    id="issue-title"
+                    name="issue-title"
+                    type="text"
+                    className="title-input"
+                    placeholder="Enter a descriptive title for the issue or request..."
+                    maxLength={120}
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    required
+                  />
                 </div>
-                <textarea
-                  id="issue-description"
-                  ref={textareaRef}
-                  name="issue-description"
-                  className="editor-textarea"
-                  rows={3}
-                  placeholder="Describe the issue in detail, precise steps to reproduce, expected behavior..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  onKeyDown={handleDescriptionKeyDown}
-                  onClick={updateActiveFormatting}
-                  onKeyUp={updateActiveFormatting}
-                  required
-                ></textarea>
-              </div>
-            </div>
 
-            {/* Issue Type (D6) */}
-            <div className="form-field">
-              <label className="field-label">
-                Issue Type (D6) <span className="required-mark">*</span>
-              </label>
-              <div className="type-selector-grid" role="radiogroup" aria-label="Issue Type">
-                {/* Bug */}
-                <label
-                  className={`type-radio-card type-bug ${issueType === 'bug' ? 'is-selected' : ''}`}
-                  onClick={() => setIssueType('bug')}
-                >
-                  <input
-                    type="radio"
-                    name="issue_type"
-                    value="bug"
-                    checked={issueType === 'bug'}
-                    onChange={() => setIssueType('bug')}
-                  />
-                  <i className="ph-fill ph-bug type-icon"></i>
-                  <span className="type-label">Bug</span>
-                </label>
-
-                {/* Feature */}
-                <label
-                  className={`type-radio-card type-feature ${issueType === 'feature' ? 'is-selected' : ''}`}
-                  onClick={() => setIssueType('feature')}
-                >
-                  <input
-                    type="radio"
-                    name="issue_type"
-                    value="feature"
-                    checked={issueType === 'feature'}
-                    onChange={() => setIssueType('feature')}
-                  />
-                  <i className="ph-bold ph-sparkle type-icon"></i>
-                  <span className="type-label">Feature</span>
-                </label>
-
-                {/* Question */}
-                <label
-                  className={`type-radio-card type-question ${issueType === 'question' ? 'is-selected' : ''}`}
-                  onClick={() => setIssueType('question')}
-                >
-                  <input
-                    type="radio"
-                    name="issue_type"
-                    value="question"
-                    checked={issueType === 'question'}
-                    onChange={() => setIssueType('question')}
-                  />
-                  <i className="ph-bold ph-question type-icon"></i>
-                  <span className="type-label">Question</span>
-                </label>
-
-                {/* Documentation */}
-                <label
-                  className={`type-radio-card type-docs ${issueType === 'documentation' ? 'is-selected' : ''}`}
-                  onClick={() => setIssueType('documentation')}
-                >
-                  <input
-                    type="radio"
-                    name="issue_type"
-                    value="documentation"
-                    checked={issueType === 'documentation'}
-                    onChange={() => setIssueType('documentation')}
-                  />
-                  <i className="ph-bold ph-file-text type-icon"></i>
-                  <span className="type-label">Docs</span>
-                </label>
-              </div>
-            </div>
-
-            {/* Labels & Scope (D7) */}
-            <div className="form-field">
-              <div className="field-header">
-                <label className="field-label">Labels &amp; Scope (D7)</label>
-                <span className="field-hint">
-                  {labels.length === 0 ? 'Click + to select tags' : `${labels.length} selected`}
-                </span>
-              </div>
-              <div className="labels-box-grid">
-                {availableTags.map((tag) => {
-                  const isSelected = labels.includes(tag);
-                  return (
-                    <button
-                      type="button"
-                      key={tag}
-                      className={`selectable-tag-chip ${getTagColorClass(tag)} ${isSelected ? 'is-active' : ''}`}
-                      onClick={() => handleToggleTag(tag)}
-                      title={isSelected ? `Click to deselect ${tag}` : `Click to select ${tag}`}
-                      aria-pressed={isSelected}
-                    >
-                      <i className="ph-bold ph-plus tag-toggle-icon"></i>
-                      <span className="tag-name">{tag}</span>
-                    </button>
-                  );
-                })}
-
-                {/* Add Custom Label */}
-                {isAddingLabel ? (
-                  <div className="add-label-inline-form">
-                    <i className="ph-bold ph-tag add-label-tag-icon"></i>
-                    <input
-                      type="text"
-                      className="add-label-input"
-                      placeholder="tag name..."
-                      value={newLabelInput}
-                      onChange={(e) => setNewLabelInput(e.target.value)}
-                      onKeyDown={handleCustomLabelKeyDown}
-                      onBlur={handleSaveCustomLabel}
-                      autoFocus
-                    />
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    className="btn-add-label-trigger"
-                    onClick={() => setIsAddingLabel(true)}
-                  >
-                    <i className="ph-bold ph-plus-circle"></i>
-                    <span>Add tag</span>
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* Priority & Urgency Section (D3) */}
-            <div className="form-field">
-              <label className="field-label">Priority &amp; Urgency Level (D3)</label>
-              <div className={`urgency-card ${isUrgent ? 'is-active' : ''}`}>
-                <div className="urgency-info">
-                  <div className="urgency-icon-box">
-                    <i className="ph-bold ph-warning animate-pulse-icon"></i>
-                  </div>
-                  <div className="urgency-text-group">
-                    <div className="urgency-title-row">
-                      <span className="urgency-title-text">Mark as URGENT</span>
-                      <span className="urgency-badge-block">Blocker</span>
+                {/* Description & Rich Text Editor */}
+                <div className="form-field flex-grow-field">
+                  <label className="field-label" htmlFor="issue-description">
+                    Description <span className="required-mark">*</span>
+                  </label>
+                  <div className="editor-container flex-grow-editor">
+                    <div className="editor-toolbar">
+                      <button
+                        type="button"
+                        className="editor-toolbar-btn"
+                        title="Bold"
+                        onClick={() => applyMarkdown('**', '**')}
+                      >
+                        <i className="ph-bold ph-text-b"></i>
+                      </button>
+                      <button
+                        type="button"
+                        className="editor-toolbar-btn"
+                        title="Italic"
+                        onClick={() => applyMarkdown('*', '*')}
+                      >
+                        <i className="ph-bold ph-text-italic"></i>
+                      </button>
+                      <span className="editor-toolbar-divider"></span>
+                      <button
+                        type="button"
+                        className="editor-toolbar-btn font-code"
+                        title="Inline code"
+                        onClick={() => applyMarkdown('`', '`')}
+                      >
+                        &lt;/&gt;
+                      </button>
+                      <button
+                        type="button"
+                        className={`editor-toolbar-btn ${isListActive ? 'is-active' : ''}`}
+                        title="Bullet list"
+                        onClick={handleToggleList}
+                      >
+                        <i className="ph-bold ph-list-bullets"></i>
+                      </button>
+                      <span className="editor-support-text">Ctrl+B / Ctrl+I</span>
                     </div>
-                    <p className="urgency-subtext">
-                      Highlights issue with top priority and pins it to the board
-                    </p>
+                    <textarea
+                      id="issue-description"
+                      ref={textareaRef}
+                      name="issue-description"
+                      className="editor-textarea"
+                      placeholder="Describe the issue in detail, precise steps to reproduce, expected behavior... Use • for lists."
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      onKeyDown={handleDescriptionKeyDown}
+                      onClick={updateActiveFormatting}
+                      onKeyUp={updateActiveFormatting}
+                      required
+                    ></textarea>
                   </div>
                 </div>
-
-                {/* Switch Toggle */}
-                <label className="urgency-switch">
-                  <input
-                    type="checkbox"
-                    checked={isUrgent}
-                    onChange={(e) => handleToggleUrgent(e.target.checked)}
-                  />
-                  <span className="switch-slider"></span>
-                </label>
-              </div>
-            </div>
-
-            {/* Attachments Section */}
-            <div className="form-field">
-              <div className="field-header">
-                <label className="field-label">
-                  Attach a screenshot <span className="field-optional">(optional)</span>
-                </label>
-                <span className="field-hint">PNG, JPG or GIF up to 10MB</span>
               </div>
 
-              {/* Hidden File Input */}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                style={{ display: 'none' }}
-                onChange={handleFileChange}
-              />
-
-              <div
-                className={`dropzone-box ${isDragOver ? 'is-dragover' : ''}`}
-                onClick={() => fileInputRef.current?.click()}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setIsDragOver(true);
-                }}
-                onDragLeave={() => setIsDragOver(false)}
-                onDrop={handleDrop}
-              >
-                <div className="dropzone-icon-circle">
-                  <i className="ph ph-upload-simple"></i>
-                </div>
-                <p className="dropzone-prompt">
-                  <span className="dropzone-link-text">Choose file</span> or drag image here
-                </p>
-                <p className="dropzone-keyboard-hint">
-                  You can paste screenshots directly with <kbd className="kbd-badge">Ctrl+V</kbd>
-                </p>
-
-                {/* Attached File Preview */}
-                {attachment && (
-                  <div
-                    className="attachment-preview-card"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <i className="ph-fill ph-file-image attachment-preview-icon"></i>
-                    <span className="attachment-filename">{attachment.name}</span>
-                    <span className="attachment-filesize">({attachment.size})</span>
-                    <button
-                      type="button"
-                      className="attachment-remove-btn"
-                      aria-label="Remove attachment"
-                      onClick={() => setAttachment(null)}
+              {/* RIGHT COLUMN: Classification, Labels, Urgency, Attachments */}
+              <div className="modal-col-sidebar">
+                {/* Issue Type (D6) */}
+                <div className="form-field">
+                  <label className="field-label">
+                    Issue Type (D6) <span className="required-mark">*</span>
+                  </label>
+                  <div className="type-selector-grid" role="radiogroup" aria-label="Issue Type">
+                    {/* Bug */}
+                    <label
+                      className={`type-radio-card type-bug ${issueType === 'bug' ? 'is-selected' : ''}`}
+                      onClick={() => setIssueType('bug')}
                     >
-                      <i className="ph-bold ph-x"></i>
-                    </button>
+                      <input
+                        type="radio"
+                        name="issue_type"
+                        value="bug"
+                        checked={issueType === 'bug'}
+                        onChange={() => setIssueType('bug')}
+                      />
+                      <i className="ph-fill ph-bug type-icon"></i>
+                      <span className="type-label">Bug</span>
+                    </label>
+
+                    {/* Feature */}
+                    <label
+                      className={`type-radio-card type-feature ${issueType === 'feature' ? 'is-selected' : ''}`}
+                      onClick={() => setIssueType('feature')}
+                    >
+                      <input
+                        type="radio"
+                        name="issue_type"
+                        value="feature"
+                        checked={issueType === 'feature'}
+                        onChange={() => setIssueType('feature')}
+                      />
+                      <i className="ph-bold ph-sparkle type-icon"></i>
+                      <span className="type-label">Feature</span>
+                    </label>
+
+                    {/* Question */}
+                    <label
+                      className={`type-radio-card type-question ${issueType === 'question' ? 'is-selected' : ''}`}
+                      onClick={() => setIssueType('question')}
+                    >
+                      <input
+                        type="radio"
+                        name="issue_type"
+                        value="question"
+                        checked={issueType === 'question'}
+                        onChange={() => setIssueType('question')}
+                      />
+                      <i className="ph-bold ph-question type-icon"></i>
+                      <span className="type-label">Question</span>
+                    </label>
+
+                    {/* Documentation */}
+                    <label
+                      className={`type-radio-card type-docs ${issueType === 'documentation' ? 'is-selected' : ''}`}
+                      onClick={() => setIssueType('documentation')}
+                    >
+                      <input
+                        type="radio"
+                        name="issue_type"
+                        value="documentation"
+                        checked={issueType === 'documentation'}
+                        onChange={() => setIssueType('documentation')}
+                      />
+                      <i className="ph-bold ph-file-text type-icon"></i>
+                      <span className="type-label">Docs</span>
+                    </label>
                   </div>
-                )}
+                </div>
+
+                {/* Labels & Scope (D7) */}
+                <div className="form-field">
+                  <div className="field-header">
+                    <label className="field-label">Labels &amp; Scope (D7)</label>
+                    <span className="field-hint">
+                      {labels.length === 0 ? 'Click + to select tags' : `${labels.length} selected`}
+                    </span>
+                  </div>
+                  <div className="labels-box-grid">
+                    {availableTags.map((tag) => {
+                      const isSelected = labels.includes(tag);
+                      return (
+                        <button
+                          type="button"
+                          key={tag}
+                          className={`selectable-tag-chip ${getTagColorClass(tag)} ${isSelected ? 'is-active' : ''}`}
+                          onClick={() => handleToggleTag(tag)}
+                          title={isSelected ? `Click to deselect ${tag}` : `Click to select ${tag}`}
+                          aria-pressed={isSelected}
+                        >
+                          <i className="ph-bold ph-plus tag-toggle-icon"></i>
+                          <span className="tag-name">{tag}</span>
+                        </button>
+                      );
+                    })}
+
+                    {/* Add Custom Label */}
+                    {isAddingLabel ? (
+                      <div className="add-label-inline-form">
+                        <i className="ph-bold ph-tag add-label-tag-icon"></i>
+                        <input
+                          type="text"
+                          className="add-label-input"
+                          placeholder="tag name..."
+                          value={newLabelInput}
+                          onChange={(e) => setNewLabelInput(e.target.value)}
+                          onKeyDown={handleCustomLabelKeyDown}
+                          onBlur={handleSaveCustomLabel}
+                          autoFocus
+                        />
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        className="btn-add-label-trigger"
+                        onClick={() => setIsAddingLabel(true)}
+                      >
+                        <i className="ph-bold ph-plus-circle"></i>
+                        <span>Add tag</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Priority & Urgency Section (D3) */}
+                <div className="form-field">
+                  <label className="field-label">Priority &amp; Urgency Level (D3)</label>
+                  <div className={`urgency-card ${isUrgent ? 'is-active' : ''}`}>
+                    <div className="urgency-info">
+                      <div className="urgency-icon-box">
+                        <i className="ph-bold ph-warning animate-pulse-icon"></i>
+                      </div>
+                      <div className="urgency-text-group">
+                        <div className="urgency-title-row">
+                          <span className="urgency-title-text">Mark as URGENT</span>
+                          <span className="urgency-badge-block">Blocker</span>
+                        </div>
+                        <p className="urgency-subtext">
+                          Highlights issue with top priority and pins it to the board
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Switch Toggle */}
+                    <label className="urgency-switch">
+                      <input
+                        type="checkbox"
+                        checked={isUrgent}
+                        onChange={(e) => handleToggleUrgent(e.target.checked)}
+                      />
+                      <span className="switch-slider"></span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Attachments Section */}
+                <div className="form-field">
+                  <div className="field-header">
+                    <label className="field-label">
+                      Attach a screenshot <span className="field-optional">(optional)</span>
+                    </label>
+                    <span className="field-hint">PNG, JPG or GIF up to 10MB</span>
+                  </div>
+
+                  {/* Hidden File Input */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={handleFileChange}
+                  />
+
+                  <div
+                    className={`dropzone-box ${isDragOver ? 'is-dragover' : ''}`}
+                    onClick={() => fileInputRef.current?.click()}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      setIsDragOver(true);
+                    }}
+                    onDragLeave={() => setIsDragOver(false)}
+                    onDrop={handleDrop}
+                  >
+                    <div className="dropzone-icon-circle">
+                      <i className="ph ph-upload-simple"></i>
+                    </div>
+                    <p className="dropzone-prompt">
+                      <span className="dropzone-link-text">Choose file</span> or drag image here
+                    </p>
+                    <p className="dropzone-keyboard-hint">
+                      You can paste screenshots directly with <kbd className="kbd-badge">Ctrl+V</kbd>
+                    </p>
+
+                    {/* Attached File Preview */}
+                    {attachment && (
+                      <div
+                        className="attachment-preview-card"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <i className="ph-fill ph-file-image attachment-preview-icon"></i>
+                        <span className="attachment-filename">{attachment.name}</span>
+                        <span className="attachment-filesize">({attachment.size})</span>
+                        <button
+                          type="button"
+                          className="attachment-remove-btn"
+                          aria-label="Remove attachment"
+                          onClick={() => setAttachment(null)}
+                        >
+                          <i className="ph-bold ph-x"></i>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
 
