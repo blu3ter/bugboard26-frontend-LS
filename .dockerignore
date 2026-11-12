@@ -1,0 +1,29 @@
+# Dipendenze e build locali (verranno ricreati nel container)
+node_modules/
+dist/
+dist-ssr/
+
+# Git, IDE & Sistema Operativo
+.git/
+.gitignore
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Log e file temporanei / bozze
+*.log
+npm-debug.log*
+promemoria.md
+todo.md
+appunti.txt
+test.html
+preview_*.html
+*.sql
+README.md
+
+# Variabili d'ambiente locali
+.env
+.env.*
+!.env.example
+
