@@ -48,13 +48,13 @@ export const AllIssuesView: React.FC<AllIssuesViewProps> = ({ isAdmin = true }) 
   const getTypeStyles = (type: string) => {
     switch (type) {
       case 'BUG':
-        return { color: '#ef4444', icon: 'bug_report', badgeBg: 'rgba(239, 68, 68, 0.1)', badgeBorder: '#ef4444', textColor: '#ef4444' };
+        return { color: '#dd1f25', icon: 'bug_report', badgeBg: '#dd1f25', badgeBorder: '#dd1f25', textColor: '#ffffff' };
       case 'FEATURE':
-        return { color: '#10b981', icon: 'add_box', badgeBg: 'rgba(16, 185, 129, 0.1)', badgeBorder: '#10b981', textColor: '#10b981' };
+        return { color: '#15803d', icon: 'add_box', badgeBg: '#15803d', badgeBorder: '#15803d', textColor: '#ffffff' };
       case 'QUESTION':
-        return { color: '#fbbf24', icon: 'help', badgeBg: 'rgba(251, 191, 36, 0.1)', badgeBorder: '#fbbf24', textColor: '#fbbf24' };
+        return { color: '#ffb800', icon: 'help', badgeBg: '#ffb800', badgeBorder: '#ffb800', textColor: '#1c1917' };
       case 'DOCUMENTATION':
-        return { color: '#2563eb', icon: 'description', badgeBg: 'rgba(37, 99, 235, 0.1)', badgeBorder: '#2563eb', textColor: '#2563eb' };
+        return { color: '#00539f', icon: 'description', badgeBg: '#00539f', badgeBorder: '#00539f', textColor: '#ffffff' };
       default:
         return { color: 'var(--primary)', icon: 'list', badgeBg: 'var(--surface-container-high)', badgeBorder: 'var(--border-color)', textColor: 'var(--text-secondary)' };
     }
@@ -113,10 +113,7 @@ export const AllIssuesView: React.FC<AllIssuesViewProps> = ({ isAdmin = true }) 
               <article
                 key={issue.id}
                 className={`issue-card ${issue.state === 'DONE' || issue.state === 'CLOSED' ? 'card-closed' : ''}`}
-                style={{
-                  cursor: 'pointer',
-                  ...(issue.isUrgent ? { borderColor: 'rgba(186,26,26,0.5)' } : {})
-                }}
+                style={{ cursor: 'pointer' }}
                 onClick={() => setSelectedIssueId(issue.id)}
               >
                 <div className="card-accent-line" style={{ backgroundColor: typeStyle.color }}></div>

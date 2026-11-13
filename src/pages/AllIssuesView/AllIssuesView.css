@@ -165,12 +165,12 @@
 }
 
 .badge-urgent {
-  background-color: #ffdad6;
-  color: #93000a;
+  background-color: #dd1f25;
+  color: #ffffff;
   padding: 2px 8px;
   border-radius: 9999px;
   font-size: 11px;
-  font-weight: bold;
+  font-weight: 700;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -221,43 +221,48 @@
 }
 
 .badge-bug {
-  background-color: #ef4444;
-  color: white;
+  background-color: #dd1f25;
+  color: #ffffff;
 }
 
 .badge-in-progress {
   background-color: transparent;
   color: var(--on-surface-variant);
+  border: 1px solid var(--outline-variant);
 }
 
 .badge-feature {
-  background-color: #10b981;
-  color: white;
+  background-color: #15803d;
+  color: #ffffff;
 }
 
 .badge-todo {
   background-color: transparent;
   color: var(--on-surface-variant);
+  border: 1px solid var(--outline-variant);
 }
 
 .badge-in-review {
   background-color: transparent;
   color: var(--on-surface-variant);
+  border: 1px solid var(--outline-variant);
 }
 
 .badge-documentation {
-  background-color: #2563eb;
-  color: white;
+  background-color: #00539f;
+  color: #ffffff;
 }
 
 .badge-question {
-  background-color: #fbbf24;
-  color: #1e293b;
+  background-color: #ffb800;
+  color: #1c1917;
+  font-weight: 700;
 }
 
 .badge-closed {
   background-color: transparent;
   color: var(--on-surface-variant);
+  border: 1px solid var(--outline-variant);
 }
 
 .card-closed {
