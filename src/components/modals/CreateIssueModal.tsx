@@ -107,7 +107,7 @@ export const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
           {/* Header */}
           <div className="modal-header">
             <div className="header-icon-container">
-              <span className="material-symbols-outlined" style={{ color: '#38bdf8' }}>
+              <span className="material-symbols-outlined" style={{ color: '#ffffff' }}>
                 add_task
               </span>
             </div>
@@ -131,12 +131,12 @@ export const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
           <form className="modal-body-scrollable" onSubmit={handleSubmit}>
             {errorMessage && (
               <div style={{
-                backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                color: '#f87171',
+                backgroundColor: '#dd1f25',
+                color: '#ffffff',
                 padding: '10px 14px',
                 borderRadius: '8px',
-                border: '1px solid rgba(239, 68, 68, 0.3)',
-                fontSize: '0.85rem'
+                fontSize: '0.85rem',
+                fontWeight: 600
               }}>
                 {errorMessage}
               </div>
