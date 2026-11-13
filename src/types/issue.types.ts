@@ -14,6 +14,16 @@ export interface IssueCreateDto {
   tagNames?: string[];
 }
 
+export interface IssueUpdateDto {
+  title: string;
+  description?: string;
+  isUrgent?: boolean;
+  type: IssueType;
+  assigneeId?: number;
+  tagNames?: string[];
+  removeImage?: boolean;
+}
+
 export interface IssueDto {
   id: number;
   title: string;
@@ -30,6 +40,7 @@ export interface IssueDto {
   assigneeFullName?: string;
   tags: string[];
   commentsCount?: number;
+  hasImage?: boolean;
   imageUrl?: string | null;
   imageBase64?: string | null;
   image?: string | null;

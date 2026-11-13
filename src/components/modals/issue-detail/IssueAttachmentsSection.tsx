@@ -1,8 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { formatByteSize } from '../../../utils/format';
 import type { IssueDto } from '../../../types';
+
+export interface StagedAttachment {
+  file: File;
+  previewUrl: string;
+  sizeLabel: string;
+}
 
 interface IssueAttachmentsSectionProps {
   issue: IssueDto;
+  isEditing?: boolean;
+  stagedAttachment?: StagedAttachment | null;
+  removeExistingImage?: boolean;
+  imageError?: string | null;
+  onSelectFile?: (file: File) => void;
+  onRemoveImage?: () => void;
 }
 
 interface ResolvedAttachment {
@@ -19,14 +32,7 @@ function detectMimeFromBase64(raw: string): string {
   return 'image/png';
 }
 
-function formatByteSize(bytes?: number | null): string | undefined {
-  if (!bytes || bytes <= 0) return undefined;
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
-function resolveIssueAttachment(issue: IssueDto): ResolvedAttachment | null {
+function resolveExistingAttachment(issue: IssueDto): ResolvedAttachment | null {
   const raw = issue.imageUrl || issue.imageBase64 || issue.image;
   if (!raw || typeof raw !== 'string') return null;
 
@@ -55,14 +61,40 @@ function resolveIssueAttachment(issue: IssueDto): ResolvedAttachment | null {
   };
 }
 
+function resolveStagedAttachment(staged: StagedAttachment): ResolvedAttachment {
+  const ext = staged.file.name.split('.').pop()?.toUpperCase() || 'IMG';
+  return {
+    src: staged.previewUrl,
+    name: staged.file.name,
+    formatLabel: ext === 'JPEG' ? 'JPG' : ext,
+    sizeLabel: staged.sizeLabel,
+  };
+}
+
 /**
- * Sezione allegati immagine dell'issue con preview compatta, download,
- * apertura in nuova scheda e lightbox a schermo intero.
+ * Sezione allegati immagine dell'issue:
+ * - In lettura mostra la card preview con download, apertura scheda e lightbox.
+ * - In modifica consente caricamento, sostituzione o rimozione dell'immagine.
  */
-export const IssueAttachmentsSection: React.FC<IssueAttachmentsSectionProps> = ({ issue }) => {
+export const IssueAttachmentsSection: React.FC<IssueAttachmentsSectionProps> = ({
+  issue,
+  isEditing = false,
+  stagedAttachment = null,
+  removeExistingImage = false,
+  imageError = null,
+  onSelectFile,
+  onRemoveImage,
+}) => {
   const [lightboxIssueId, setLightboxIssueId] = useState<number | null>(null);
-  const attachment = resolveIssueAttachment(issue);
-  const lightboxOpen = Boolean(attachment) && lightboxIssueId === issue.id;
+  const [isDragOver, setIsDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const existingAttachment = removeExistingImage ? null : resolveExistingAttachment(issue);
+  const activeAttachment = stagedAttachment
+    ? resolveStagedAttachment(stagedAttachment)
+    : existingAttachment;
+
+  const lightboxOpen = Boolean(activeAttachment) && lightboxIssueId === issue.id;
 
   useEffect(() => {
     if (!lightboxOpen) return;
@@ -92,6 +124,23 @@ export const IssueAttachmentsSection: React.FC<IssueAttachmentsSectionProps> = (
     }
   };
 
+  const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      onSelectFile?.(file);
+    }
+    event.target.value = '';
+  };
+
+  const handleDrop = (event: React.DragEvent) => {
+    event.preventDefault();
+    setIsDragOver(false);
+    const file = event.dataTransfer.files?.[0];
+    if (file) {
+      onSelectFile?.(file);
+    }
+  };
+
   return (
     <section className="issue-section-block">
       <div className="issue-section-header">
@@ -99,9 +148,9 @@ export const IssueAttachmentsSection: React.FC<IssueAttachmentsSectionProps> = (
           <span className="material-symbols-outlined issue-section-icon" aria-hidden="true">
             image
           </span>
-          <h3 className="section-label">Allegati ({attachment ? 1 : 0})</h3>
+          <h3 className="section-label">Allegati ({activeAttachment ? 1 : 0})</h3>
         </div>
-        {attachment && (
+        {activeAttachment && (
           <button
             type="button"
             className="attachment-zoom-hint-btn"
@@ -115,14 +164,24 @@ export const IssueAttachmentsSection: React.FC<IssueAttachmentsSectionProps> = (
         )}
       </div>
 
-      {attachment ? (
+      {isEditing && (
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/png,image/jpeg,image/gif"
+          onChange={handleFileInputChange}
+          style={{ display: 'none' }}
+        />
+      )}
+
+      {activeAttachment ? (
         <div className="issue-attachments-grid">
           <article className="issue-attachment-card">
             <div
               className="attachment-preview-media"
               role="button"
               tabIndex={0}
-              aria-label={`Ingrandisci ${attachment.name}`}
+              aria-label={`Ingrandisci ${activeAttachment.name}`}
               onClick={() => setLightboxIssueId(issue.id)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -131,7 +190,11 @@ export const IssueAttachmentsSection: React.FC<IssueAttachmentsSectionProps> = (
                 }
               }}
             >
-              <img src={attachment.src} alt={attachment.name} className="attachment-preview-img" />
+              <img
+                src={activeAttachment.src}
+                alt={activeAttachment.name}
+                className="attachment-preview-img"
+              />
               <span className="attachment-expand-badge" aria-hidden="true">
                 <span className="material-symbols-outlined">open_in_full</span>
               </span>
@@ -139,38 +202,90 @@ export const IssueAttachmentsSection: React.FC<IssueAttachmentsSectionProps> = (
 
             <div className="attachment-card-footer">
               <div className="attachment-file-meta">
-                <span className="attachment-file-name" title={attachment.name}>
-                  {attachment.name}
+                <span className="attachment-file-name" title={activeAttachment.name}>
+                  {activeAttachment.name}
                 </span>
                 <span className="attachment-file-details">
-                  {attachment.sizeLabel
-                    ? `${attachment.formatLabel} • ${attachment.sizeLabel}`
-                    : `${attachment.formatLabel} • Immagine allegata`}
+                  {activeAttachment.sizeLabel
+                    ? `${activeAttachment.formatLabel} • ${activeAttachment.sizeLabel}`
+                    : `${activeAttachment.formatLabel} • Immagine allegata`}
                 </span>
               </div>
 
               <div className="attachment-card-actions">
-                <a
-                  href={attachment.src}
-                  download={attachment.name}
-                  className="btn-attachment-icon"
-                  title="Scarica immagine"
-                  aria-label="Scarica immagine"
-                >
-                  <span className="material-symbols-outlined">download</span>
-                </a>
-                <button
-                  type="button"
-                  className="btn-attachment-icon"
-                  title="Apri in una nuova scheda"
-                  aria-label="Apri in una nuova scheda"
-                  onClick={() => handleOpenInNewTab(attachment.src)}
-                >
-                  <span className="material-symbols-outlined">open_in_new</span>
-                </button>
+                {isEditing ? (
+                  <>
+                    <button
+                      type="button"
+                      className="btn-attachment-edit-replace"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      Sostituisci
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-attachment-edit-remove"
+                      onClick={() => onRemoveImage?.()}
+                    >
+                      Rimuovi
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <a
+                      href={activeAttachment.src}
+                      download={activeAttachment.name}
+                      className="btn-attachment-icon"
+                      title="Scarica immagine"
+                      aria-label="Scarica immagine"
+                    >
+                      <span className="material-symbols-outlined">download</span>
+                    </a>
+                    <button
+                      type="button"
+                      className="btn-attachment-icon"
+                      title="Apri in una nuova scheda"
+                      aria-label="Apri in una nuova scheda"
+                      onClick={() => handleOpenInNewTab(activeAttachment.src)}
+                    >
+                      <span className="material-symbols-outlined">open_in_new</span>
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </article>
+        </div>
+      ) : isEditing ? (
+        <div
+          className={`attachment-edit-dropzone ${isDragOver ? 'is-drag-over' : ''}`}
+          role="button"
+          tabIndex={0}
+          onClick={() => fileInputRef.current?.click()}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              fileInputRef.current?.click();
+            }
+          }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setIsDragOver(true);
+          }}
+          onDragLeave={() => setIsDragOver(false)}
+          onDrop={handleDrop}
+        >
+          <span className="material-symbols-outlined" aria-hidden="true">
+            add_photo_alternate
+          </span>
+          <div className="attachment-dropzone-copy">
+            <span className="attachment-dropzone-title">
+              Clicca o trascina qui un&apos;immagine
+            </span>
+            <span className="attachment-dropzone-hint">
+              PNG, JPG o GIF · max 1 MB
+            </span>
+          </div>
         </div>
       ) : (
         <div className="attachments-empty-state">
@@ -181,17 +296,23 @@ export const IssueAttachmentsSection: React.FC<IssueAttachmentsSectionProps> = (
         </div>
       )}
 
-      {lightboxOpen && attachment && (
+      {imageError && (
+        <p className="attachment-edit-error" role="alert">
+          {imageError}
+        </p>
+      )}
+
+      {lightboxOpen && activeAttachment && (
         <div
           className="issue-attachment-lightbox"
           role="dialog"
           aria-modal="true"
-          aria-label={`Anteprima di ${attachment.name}`}
+          aria-label={`Anteprima di ${activeAttachment.name}`}
           onClick={() => setLightboxIssueId(null)}
         >
           <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
             <div className="lightbox-header">
-              <span className="lightbox-filename">{attachment.name}</span>
+              <span className="lightbox-filename">{activeAttachment.name}</span>
               <button
                 type="button"
                 className="btn-close-lightbox"
@@ -201,7 +322,11 @@ export const IssueAttachmentsSection: React.FC<IssueAttachmentsSectionProps> = (
                 <span className="material-symbols-outlined">close</span>
               </button>
             </div>
-            <img src={attachment.src} alt={attachment.name} className="lightbox-full-img" />
+            <img
+              src={activeAttachment.src}
+              alt={activeAttachment.name}
+              className="lightbox-full-img"
+            />
           </div>
         </div>
       )}

@@ -1,5 +1,5 @@
 import { API_BASE_URL, getAuthHeaders } from './apiConfig';
-import type { IssueDto, IssueCreateDto, IssueAssignDto, IssueState } from '../types';
+import type { IssueDto, IssueCreateDto, IssueUpdateDto, IssueAssignDto, IssueState } from '../types';
 
 /**
  * Service per la gestione delle Issue (CRUD, Workflow State, Assegnazioni)
@@ -84,6 +84,38 @@ export class IssueService {
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(errorText || 'Failed to create issue');
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Aggiorna i campi di una issue esistente (titolo, descrizione, tipo, urgenza, tag e immagine).
+   * Multipart con parti 'data' (JSON) e 'image' opzionale (MultipartFile).
+   */
+  public async updateIssue(
+    issueId: number,
+    issueData: IssueUpdateDto,
+    imageFile?: File | null
+  ): Promise<IssueDto> {
+    const formData = new FormData();
+    formData.append(
+      'data',
+      new Blob([JSON.stringify(issueData)], { type: 'application/json' })
+    );
+
+    if (imageFile) {
+      formData.append('image', imageFile);
+    }
+
+    const response = await fetch(`${API_BASE_URL}/issues/${issueId}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(false),
+      body: formData,
+    });
+
+    if (!response.ok) {
+      await this.throwResponseError(response, 'Impossibile aggiornare la issue');
     }
 
     return response.json();

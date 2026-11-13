@@ -48,7 +48,7 @@ export const DashboardLayout: React.FC = () => {
     return 'Overview of your open issues.';
   };
 
-  const isAdmin = user ? user.role === 'ADMIN' : true;
+  const isAdmin = user?.role?.toUpperCase() === 'ADMIN';
 
   const handleReportBug = () => {
     navigate('/dashboard/create-issue');

@@ -246,6 +246,159 @@
   }
 }
 
+.header-actions-col {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn-edit-issue {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background-color: #162035;
+  border: 1px solid #2b3a59;
+  color: #e2e8f0;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-edit-issue .material-symbols-outlined {
+  font-size: 15px;
+}
+
+.btn-edit-issue:hover {
+  background-color: var(--id-primary-blue);
+  border-color: var(--id-primary-blue-hover);
+  color: #ffffff;
+}
+
+.badge-readonly-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  background-color: rgba(15, 23, 42, 0.9);
+  border: 1px solid #334155;
+  color: var(--id-text-muted);
+}
+
+.badge-readonly-pill .material-symbols-outlined {
+  font-size: 13px;
+}
+
+/* Header Edit Controls */
+.issue-edit-badges-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.edit-type-selector {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.edit-type-chip {
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid #2a3752;
+  background-color: #0b101c;
+  color: var(--id-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.edit-type-chip:hover {
+  color: #ffffff;
+  border-color: #475569;
+}
+
+.edit-type-chip.type-bug.is-selected {
+  background-color: var(--id-accent-rose);
+  border-color: var(--id-accent-rose);
+  color: #ffffff;
+}
+
+.edit-type-chip.type-feature.is-selected {
+  background-color: var(--id-accent-green);
+  border-color: var(--id-accent-green);
+  color: #ffffff;
+}
+
+.edit-type-chip.type-question.is-selected {
+  background-color: var(--id-accent-amber);
+  border-color: var(--id-accent-amber);
+  color: #1c1917;
+}
+
+.edit-type-chip.type-documentation.is-selected {
+  background-color: var(--id-primary-blue);
+  border-color: var(--id-primary-blue);
+  color: #ffffff;
+}
+
+.edit-urgent-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid #2a3752;
+  background-color: #0b101c;
+  color: var(--id-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.edit-urgent-toggle .badge-urgent-icon {
+  color: inherit;
+}
+
+.edit-urgent-toggle.is-active {
+  background-color: var(--id-accent-rose);
+  border-color: var(--id-accent-rose);
+  color: #ffffff;
+}
+
+.issue-edit-title-input {
+  width: 100%;
+  box-sizing: border-box;
+  background-color: var(--id-card-bg);
+  border: 1px solid #2b3a59;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.issue-edit-title-input:focus {
+  border-color: var(--id-accent-cyan);
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+}
+
 .btn-close-modal {
   background: transparent;
   border: none;
@@ -473,6 +626,28 @@
   word-break: break-word;
 }
 
+.issue-description-card.is-editing {
+  padding: 10px 12px;
+}
+
+.issue-edit-description-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: vertical;
+  min-height: 110px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #f1f5f9;
+}
+
+.issue-edit-description-textarea::placeholder {
+  color: var(--id-text-subtle);
+}
+
 .issue-description-card .description-spacer {
   height: 4px;
 }
@@ -684,6 +859,89 @@
 .attachments-empty-state .material-symbols-outlined {
   font-size: 18px;
   opacity: 0.7;
+}
+
+.btn-attachment-edit-replace,
+.btn-attachment-edit-remove {
+  padding: 4px 9px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.btn-attachment-edit-replace {
+  background-color: #162035;
+  border-color: #2b3a59;
+  color: #e2e8f0;
+}
+
+.btn-attachment-edit-replace:hover {
+  background-color: var(--id-primary-blue);
+  border-color: var(--id-primary-blue-hover);
+  color: #ffffff;
+}
+
+.btn-attachment-edit-remove {
+  background-color: rgba(221, 31, 37, 0.14);
+  border-color: rgba(221, 31, 37, 0.35);
+  color: #fca5a5;
+}
+
+.btn-attachment-edit-remove:hover {
+  background-color: var(--id-accent-rose);
+  border-color: var(--id-accent-rose);
+  color: #ffffff;
+}
+
+.attachment-edit-dropzone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 18px 16px;
+  border-radius: 12px;
+  background-color: rgba(11, 16, 28, 0.75);
+  border: 1.5px dashed #2b3a59;
+  color: var(--id-text-muted);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.attachment-edit-dropzone:hover,
+.attachment-edit-dropzone.is-drag-over {
+  border-color: var(--id-accent-cyan);
+  background-color: rgba(0, 83, 159, 0.12);
+}
+
+.attachment-edit-dropzone .material-symbols-outlined {
+  font-size: 26px;
+  color: var(--id-accent-cyan);
+}
+
+.attachment-dropzone-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.attachment-dropzone-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.attachment-dropzone-hint {
+  font-size: 11px;
+  color: var(--id-text-subtle);
+}
+
+.attachment-edit-error {
+  margin: 0;
+  font-size: 12px;
+  color: #f87171;
 }
 
 /* Lightbox Overlay */
@@ -976,4 +1234,30 @@
 
 .btn-state-action.reject:hover:not(:disabled) {
   background-color: #b91c1c;
+}
+
+.btn-footer-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 16px;
+  border-radius: 8px;
+  border: 1px solid #2b3a59;
+  background-color: transparent;
+  color: #cbd5e1;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-footer-secondary:hover:not(:disabled) {
+  background-color: #1e293b;
+  border-color: #475569;
+  color: #ffffff;
+}
+
+.btn-footer-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

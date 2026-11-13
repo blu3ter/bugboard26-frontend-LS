@@ -5,13 +5,15 @@ import { useIssuesFilter } from '../../hooks/useIssuesFilter';
 import { issueService } from '../../service/issueService';
 import { TagBadge } from '../../components/tags';
 import { IssueDetailModal } from '../../components/modals';
+import { authService } from '../../service/authService';
 import type { IssueDto } from '../../types/issue.types';
 
 interface AllIssuesViewProps {
   isAdmin?: boolean;
 }
 
-export const AllIssuesView: React.FC<AllIssuesViewProps> = ({ isAdmin = true }) => {
+export const AllIssuesView: React.FC<AllIssuesViewProps> = ({ isAdmin }) => {
+  const effectiveIsAdmin = isAdmin ?? authService.getUser()?.role?.toUpperCase() === 'ADMIN';
   const [issues, setIssues] = useState<IssueDto[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedIssueId, setSelectedIssueId] = useState<number | null>(null);
@@ -168,7 +170,7 @@ export const AllIssuesView: React.FC<AllIssuesViewProps> = ({ isAdmin = true }) 
         issueId={selectedIssueId}
         onClose={() => setSelectedIssueId(null)}
         onIssueUpdated={fetchIssues}
-        isAdmin={isAdmin}
+        isAdmin={effectiveIsAdmin}
       />
     </div>
   );
