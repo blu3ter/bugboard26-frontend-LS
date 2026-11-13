@@ -30,4 +30,10 @@ export interface IssueDto {
   assigneeFullName?: string;
   tags: string[];
   commentsCount?: number;
+  imageUrl?: string | null;
+  imageBase64?: string | null;
+  image?: string | null;
+  imageName?: string | null;
+  imageContentType?: string | null;
+  imageSizeBytes?: number | null;
 }
