@@ -146,7 +146,11 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({
   const handleAddComment = async (text: string) => {
     if (!issue) return;
     const newComment = await commentService.addComment(issue.id, text);
+    const nextCommentsCount = comments.length + 1;
     setComments((prev) => [...prev, newComment]);
+    const updated = { ...issue, commentsCount: nextCommentsCount };
+    setIssue(updated);
+    if (onIssueUpdated) onIssueUpdated(updated);
   };
 
   return (
