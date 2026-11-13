@@ -13,16 +13,16 @@
   --id-card-border: #1b253b;
   --id-section-border: #182338;
   
-  --id-primary-blue: #2563eb;
-  --id-primary-blue-hover: #3b82f6;
-  --id-primary-blue-active: #1d4ed8;
+  --id-primary-blue: #00539f;
+  --id-primary-blue-hover: #0066c0;
+  --id-primary-blue-active: #00417d;
   --id-text-main: #e2e8f0;
   --id-text-muted: #94a3b8;
   --id-text-subtle: #64748b;
   --id-accent-cyan: #60a5fa;
-  --id-accent-green: #34d399;
-  --id-accent-amber: #f59e0b;
-  --id-accent-rose: #f43f5e;
+  --id-accent-green: #15803d;
+  --id-accent-amber: #ffb800;
+  --id-accent-rose: #dd1f25;
 }
 
 /* Page Overlay & Backdrop */
@@ -218,35 +218,34 @@
   flex-shrink: 0;
 }
 
-/* Issue Type Variants */
+/* Issue Type Variants (Bauhaus solid palette) */
 .issue-type-badge.type-bug {
-  background-color: rgba(239, 68, 68, 0.16);
-  color: #fca5a5;
-  border: 1px solid rgba(239, 68, 68, 0.38);
-  box-shadow: 0 0 10px rgba(239, 68, 68, 0.12);
+  background-color: #dd1f25;
+  color: #ffffff;
+  border: none;
 }
 
 .issue-type-badge.type-feature {
-  background-color: rgba(147, 51, 234, 0.16);
-  color: #d8b4fe;
-  border: 1px solid rgba(147, 51, 234, 0.38);
-  box-shadow: 0 0 10px rgba(147, 51, 234, 0.12);
+  background-color: #15803d;
+  color: #ffffff;
+  border: none;
 }
 
 .issue-type-badge.type-question {
-  background-color: rgba(6, 182, 212, 0.16);
-  color: #67e8f9;
-  border: 1px solid rgba(6, 182, 212, 0.38);
+  background-color: #ffb800;
+  color: #1c1917;
+  border: none;
 }
 
 .issue-type-badge.type-documentation {
-  background-color: rgba(59, 130, 246, 0.16);
-  color: #93c5fd;
-  border: 1px solid rgba(59, 130, 246, 0.38);
+  background-color: #00539f;
+  color: #ffffff;
+  border: none;
 }
 
-/* Status Pill: In Lavorazione */
-.badge-in-progress {
+/* Status Pill: In Lavorazione (scoped to modal so it does not leak onto dashboard cards) */
+.issue-detail-modal .badge-in-progress,
+.badge-state-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -254,16 +253,16 @@
   border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
-  background-color: rgba(245, 158, 11, 0.15);
-  color: #fcd34d;
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  background-color: #1e293b;
+  color: #e2e8f0;
+  border: 1px solid #334155;
 }
 
 .pulse-indicator {
   width: 6px;
   height: 6px;
   border-radius: 9999px;
-  background-color: #fbbf24;
+  background-color: #ffb800;
   animation: pulse-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
@@ -278,8 +277,9 @@
   }
 }
 
-/* Status Pill: URGENTE */
-.badge-urgent {
+/* Status Pill: URGENTE (scoped to modal) */
+.issue-detail-modal .badge-urgent,
+.badge-urgent-flag {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -287,9 +287,9 @@
   border-radius: 6px;
   font-size: 12px;
   font-weight: 700;
-  background-color: rgba(225, 29, 72, 0.2);
-  color: #fda4af;
-  border: 1px solid rgba(244, 63, 94, 0.4);
+  background-color: #dd1f25;
+  color: #ffffff;
+  border: none;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -297,8 +297,63 @@
 .badge-urgent-icon {
   width: 14px;
   height: 14px;
-  color: #fb7185;
+  color: #ffffff;
   flex-shrink: 0;
+}
+
+/* Workflow Action Buttons inside IssueDetailModal */
+.issue-workflow-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 16px;
+  background-color: #0e1526;
+  border: 1px solid #1b263e;
+  border-radius: 12px;
+}
+
+.workflow-buttons-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-state-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: none;
+  background-color: #00539f;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.btn-state-action:hover {
+  background-color: #0066c0;
+}
+
+.btn-state-action.approve {
+  background-color: #15803d;
+}
+
+.btn-state-action.approve:hover {
+  background-color: #166534;
+}
+
+.btn-state-action.reject {
+  background-color: #dd1f25;
+}
+
+.btn-state-action.reject:hover {
+  background-color: #b91c1c;
 }
 
 /* Modal Title */
@@ -667,11 +722,11 @@
 }
 
 .tag-backend-color {
-  background-color: #2563eb;
+  background-color: #00539f;
 }
 
 .tag-security-color {
-  background-color: #9333ea;
+  background-color: #6d28d9;
 }
 
 .tag-database-color {
@@ -679,7 +734,7 @@
 }
 
 .tag-urgent-color {
-  background-color: #e11d48;
+  background-color: #dd1f25;
   font-weight: 600;
 }
 
@@ -769,7 +824,7 @@
   width: 32px;
   height: 32px;
   border-radius: 9999px;
-  background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+  background-color: #00539f;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -806,13 +861,13 @@
 }
 
 .comment-role-tag {
-  background-color: #172554;
-  color: #60a5fa;
+  background-color: #00539f;
+  color: #ffffff;
   font-size: 10px;
   padding: 2px 8px;
   border-radius: 4px;
   font-family: 'Fira Code', monospace;
-  border: 1px solid rgba(30, 64, 175, 0.4);
+  border: none;
 }
 
 .comment-timestamp {
@@ -1019,9 +1074,8 @@
   background-color: var(--id-primary-blue);
   border: none;
   border-radius: 12px;
-  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 @media (min-width: 640px) {
@@ -1033,7 +1087,6 @@
 
 .btn-footer-submit:hover {
   background-color: var(--id-primary-blue-hover);
-  box-shadow: 0 10px 20px -2px rgba(37, 99, 235, 0.45);
 }
 
 .btn-footer-submit:active {
