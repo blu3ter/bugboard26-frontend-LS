@@ -54,8 +54,8 @@ export const UsersManagementView: React.FC = () => {
             <p>Set up credentials and assign workspace permissions for the new user.</p>
           </div>
 
-          {error && <div className="error-message" style={{ color: '#d32f2f', backgroundColor: '#ffebee', padding: '10px', borderRadius: '4px', marginBottom: '16px', fontSize: '14px' }}>{error}</div>}
-          {success && <div className="success-message" style={{ color: '#2e7d32', backgroundColor: '#e8f5e9', padding: '10px', borderRadius: '4px', marginBottom: '16px', fontSize: '14px' }}>User created successfully!</div>}
+          {error && <div className="error-message" style={{ color: '#ffffff', backgroundColor: '#dd1f25', padding: '10px 14px', borderRadius: '8px', marginBottom: '16px', fontSize: '14px', fontWeight: 600 }}>{error}</div>}
+          {success && <div className="success-message" style={{ color: '#ffffff', backgroundColor: '#15803d', padding: '10px 14px', borderRadius: '8px', marginBottom: '16px', fontSize: '14px', fontWeight: 600 }}>User created successfully!</div>}
 
           <form className="admin-form" onSubmit={handleSubmit}>
             <div className="form-row">

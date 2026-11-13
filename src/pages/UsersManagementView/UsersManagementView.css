@@ -186,30 +186,33 @@
 }
 
 .role-radio-input:checked + .role-card {
-  border-color: var(--primary);
+  border-color: #00539f;
   background-color: var(--secondary-container);
-  box-shadow: 0 0 0 1px var(--primary);
+  box-shadow: 0 0 0 1px #00539f;
 }
 
 .role-radio-input:checked + .role-card .role-card-icon {
-  background-color: var(--primary);
-  color: var(--on-primary);
-}
-
-.role-radio-input[value="admin"]:checked + .role-card {
-  border-color: #ba1a1a;
-  background-color: #ffdad6;
-  box-shadow: 0 0 0 1px #ba1a1a;
-}
-
-.role-radio-input[value="admin"]:checked + .role-card .role-card-icon {
-  background-color: #ba1a1a;
+  background-color: #00539f;
   color: #ffffff;
 }
 
-.role-radio-input[value="admin"]:checked + .role-card .role-card-title,
+.role-radio-input[value="admin"]:checked + .role-card {
+  border-color: #dd1f25;
+  background-color: #1b1620;
+  box-shadow: 0 0 0 1px #dd1f25;
+}
+
+.role-radio-input[value="admin"]:checked + .role-card .role-card-icon {
+  background-color: #dd1f25;
+  color: #ffffff;
+}
+
+.role-radio-input[value="admin"]:checked + .role-card .role-card-title {
+  color: #ffffff;
+}
+
 .role-radio-input[value="admin"]:checked + .role-card .role-card-desc {
-  color: #410002;
+  color: #cbd5e1;
 }
 
 /* Submit Button */
@@ -217,10 +220,10 @@
   width: 100%;
   padding: 16px;
   margin-top: 16px;
-  background-color: var(--primary);
-  color: var(--on-primary);
+  background-color: #00539f;
+  color: #ffffff;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   border-radius: 9999px;
   border: none;
   cursor: pointer;
@@ -228,13 +231,13 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: all 0.2s;
+  transition: background-color 0.2s;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .btn-submit:hover {
-  background-color: #00468b;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  background-color: #0066c0;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.15);
 }
 
 .btn-submit:active {
