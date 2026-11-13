@@ -181,8 +181,11 @@
 }
 
 .role-card-label:hover .role-card {
-  border-color: var(--primary);
-  background-color: var(--surface-container);
+  border-color: #00539f;
+}
+
+.role-card-label:hover .role-radio-input[value="admin"] + .role-card {
+  border-color: #dd1f25;
 }
 
 .role-radio-input:checked + .role-card {
