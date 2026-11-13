@@ -135,7 +135,7 @@ export const MyIssuesView: React.FC = () => {
       />
 
       {/* Split Layout (Left: Grid, Right: Sidebar) */}
-      <div className="my-issues-layout" style={{ marginTop: '24px' }}>
+      <div className="my-issues-layout">
         {/* Main Content Area (Left side) */}
         <div className="my-issues-main-content">
           {loading ? (

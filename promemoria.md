@@ -1,12 +1,2 @@
-il filtro "in review" è buggato
-
-il bottone assing e reassing hdi all isssue non ha senso. (verifica)
-
-Implementare un tutorial
-
-maggior sicurezza sul login
-
-
-io0f riusolvo queste cose qui. Tu ti fai issuedetail e create. REVIEW e io mi faccio assign. Ma assign non la posso fare ficneh tu non sfai review, perchè sono nella stessa scehrmata, vedi
-
-il logo del login, non deve ingrtandirsi, altrimenti smebra un pulsante.
+In assignmenent todo, devi far eun bel refgact. Status è inutile la Poi dovresti emtterci un bottone detail che ti fa visualizzare quella issue precisa facendo la solita chiamata issue/[id]/....
+In select memeber , quando lo clicchi, esce ocmep rimo campo selected member, che è inutile. INvece li mettici un piccolo cmapo field che ti trova le cose che scrivi, che siano il numero delle issue op il nome o cognome 
