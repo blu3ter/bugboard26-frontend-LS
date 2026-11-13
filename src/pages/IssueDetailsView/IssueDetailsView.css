@@ -245,8 +245,8 @@
   border: 1px solid rgba(59, 130, 246, 0.38);
 }
 
-/* Status Pill: In Lavorazione */
-.badge-in-progress {
+/* Status Pill (Scoped to Issue Detail Modal) */
+.issue-detail-modal .badge-in-progress {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -254,9 +254,9 @@
   border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
-  background-color: rgba(245, 158, 11, 0.15);
-  color: #fcd34d;
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  background-color: transparent;
+  color: var(--on-surface-variant);
+  border: none;
 }
 
 .pulse-indicator {

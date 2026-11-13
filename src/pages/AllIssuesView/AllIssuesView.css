@@ -2,10 +2,12 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+  padding-bottom: 24px;
 }
 
 /* Filters Section */
 .filters-section {
+  flex-shrink: 0;
   background-color: var(--surface-container-lowest);
   border-radius: 12px;
   padding: 16px;
@@ -225,24 +227,18 @@
   color: white;
 }
 
-.badge-in-progress {
+.badge-todo,
+.badge-in-progress,
+.badge-in-review,
+.badge-closed {
   background-color: transparent;
+  border: none;
   color: var(--on-surface-variant);
 }
 
 .badge-feature {
   background-color: #10b981;
   color: white;
-}
-
-.badge-todo {
-  background-color: transparent;
-  color: var(--on-surface-variant);
-}
-
-.badge-in-review {
-  background-color: transparent;
-  color: var(--on-surface-variant);
 }
 
 .badge-documentation {
@@ -253,11 +249,6 @@
 .badge-question {
   background-color: #fbbf24;
   color: #1e293b;
-}
-
-.badge-closed {
-  background-color: transparent;
-  color: var(--on-surface-variant);
 }
 
 .card-closed {
@@ -292,6 +283,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 11px;
-  color: var(--on-surface-variant);
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-left: auto;
 }

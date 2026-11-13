@@ -146,19 +146,19 @@ export const AllIssuesView: React.FC<AllIssuesViewProps> = ({ isAdmin = true }) 
                   </div>
                 )}
 
-                <div className="card-footer">
-                  <span className="badge" style={{ backgroundColor: typeStyle.badgeBg, border: `1px solid ${typeStyle.badgeBorder}`, color: typeStyle.textColor }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>{typeStyle.icon}</span> {issue.type}
-                  </span>
-                  <span className={`badge ${getStateBadgeClass(issue.state)}`}>
-                    <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>list</span> {getStateText(issue.state)}
-                  </span>
-
-                  {issue.assigneeFullName && (
-                    <div className="assignee-info" style={{ marginLeft: 'auto' }}>
-                      <span className="assignee-text">Assigned to: {issue.assigneeFullName}</span>
-                    </div>
-                  )}
+                <div className="card-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <span className="badge" style={{ backgroundColor: typeStyle.badgeBg, border: `1px solid ${typeStyle.badgeBorder}`, color: typeStyle.textColor }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>{typeStyle.icon}</span> {issue.type}
+                    </span>
+                    <span className={`badge ${getStateBadgeClass(issue.state)}`}>
+                      <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>list</span> {getStateText(issue.state)}
+                    </span>
+                  </div>
+                  <div className="comments-count">
+                    <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>chat_bubble</span>
+                    <span>{issue.commentsCount || 0}</span>
+                  </div>
                 </div>
               </article>
             );
