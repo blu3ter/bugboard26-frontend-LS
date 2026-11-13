@@ -178,7 +178,7 @@ export const MyIssuesView: React.FC = () => {
                           disabled={sendingId === issue.id}
                         >
                           <span className="material-symbols-outlined">send</span>
-                          <span>{sendingId === issue.id ? 'SENDING...' : 'SEND'}</span>
+                          <span>{sendingId === issue.id ? 'Sending...' : 'Send to review'}</span>
                         </button>
                       )}
                     </div>

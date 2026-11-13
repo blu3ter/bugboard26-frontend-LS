@@ -6,6 +6,33 @@ import { TutorialOverlay } from './tutorial/TutorialOverlay';
 import { adminTutorialSteps, userTutorialSteps } from './tutorial/tutorialSteps';
 import './DashboardLayout.css';
 
+const FLOATING_BG_TAGS: Array<{
+  label: string;
+  style: React.CSSProperties;
+}> = [
+    { label: '#backend', style: { top: '6%', left: '4%', backgroundColor: 'rgba(37, 66, 160, 0.85)', animationDelay: '0s' } },
+    { label: '#dangerous', style: { top: '4%', left: '34%', backgroundColor: 'rgba(204, 26, 40, 0.9)', animationDelay: '-3s' } },
+    { label: '#closed', style: { top: '7%', left: '61%', backgroundColor: 'rgba(51, 65, 85, 0.9)', color: '#e2e8f0', animationDelay: '-7s' } },
+    { label: '#hotfix', style: { top: '9%', right: '6%', backgroundColor: 'rgba(220, 38, 38, 0.9)', animationDelay: '-2s' } },
+    { label: '#open', style: { top: '20%', left: '14%', backgroundColor: 'rgba(234, 88, 12, 0.9)', animationDelay: '-5s' } },
+    { label: '#frontend', style: { top: '18%', right: '16%', backgroundColor: 'rgba(2, 132, 199, 0.9)', animationDelay: '-9s' } },
+    { label: '#bug', style: { top: '28%', right: '4%', backgroundColor: 'rgba(185, 28, 28, 0.9)', animationDelay: '-4s' } },
+    { label: '#urgent', style: { top: '33%', left: '3%', backgroundColor: 'rgba(225, 29, 72, 0.9)', animationDelay: '-11s' } },
+    { label: '#meeting', style: { top: '41%', left: '22%', backgroundColor: 'rgba(245, 158, 11, 0.9)', color: '#000', fontWeight: 700, animationDelay: '-6s' } },
+    { label: '#question', style: { top: '43%', right: '22%', backgroundColor: 'rgba(124, 58, 237, 0.9)', animationDelay: '-13s' } },
+    { label: '#fast', style: { top: '53%', left: '5%', backgroundColor: 'rgba(13, 148, 136, 0.9)', animationDelay: '-8s' } },
+    { label: '#feature', style: { top: '52%', right: '6%', backgroundColor: 'rgba(22, 163, 74, 0.9)', animationDelay: '-1s' } },
+    { label: '#ui/ux', style: { top: '65%', left: '18%', backgroundColor: 'rgba(219, 39, 119, 0.9)', animationDelay: '-10s' } },
+    { label: '#in progress', style: { top: '64%', right: '20%', backgroundColor: 'rgba(14, 165, 233, 0.9)', animationDelay: '-14s' } },
+    { label: '#backend', style: { top: '74%', right: '5%', backgroundColor: 'rgba(29, 78, 216, 0.9)', animationDelay: '-4.5s' } },
+    { label: '#frontend', style: { bottom: '18%', left: '4%', backgroundColor: 'rgba(2, 132, 199, 0.9)', animationDelay: '-12s' } },
+    { label: '#feature', style: { bottom: '13%', left: '28%', backgroundColor: 'rgba(21, 128, 61, 0.9)', animationDelay: '-6.5s' } },
+    { label: '#fast', style: { bottom: '12%', right: '26%', backgroundColor: 'rgba(13, 148, 136, 0.9)', animationDelay: '-2.5s' } },
+    { label: '#devops', style: { bottom: '5%', left: '8%', backgroundColor: 'rgba(2, 132, 199, 0.9)', animationDelay: '-15s' } },
+    { label: '#chill', style: { bottom: '5%', left: '44%', backgroundColor: 'rgba(217, 119, 6, 0.9)', animationDelay: '-8.5s' } },
+    { label: '#bug', style: { bottom: '6%', right: '8%', backgroundColor: 'rgba(185, 28, 28, 0.9)', animationDelay: '-5.5s' } },
+  ];
+
 export const DashboardLayout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -116,6 +143,15 @@ export const DashboardLayout: React.FC = () => {
 
       {/* Main Content Canvas */}
       <main className="dashboard-main">
+        {/* Background Floating Tags Layer */}
+        <div className="dashboard-bg-layer" aria-hidden="true">
+          {FLOATING_BG_TAGS.map((tag, index) => (
+            <div key={`${tag.label}-${index}`} className="dashboard-floating-tag" style={tag.style}>
+              {tag.label}
+            </div>
+          ))}
+        </div>
+
         {/* Top App Bar */}
         <header className="dashboard-topbar">
           <div className="topbar-welcome">
