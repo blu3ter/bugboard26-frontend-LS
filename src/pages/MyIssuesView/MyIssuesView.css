@@ -137,15 +137,15 @@
   border-radius: 6px;
 }
 
-/* Specific metric colors */
-.metric-todo .metric-icon-wrapper { background-color: var(--secondary-container); color: var(--btn-primary-bg); }
-.metric-todo .metric-value { background-color: var(--secondary-container); color: #ffffff; }
+/* Specific metric colors (Bauhaus solid palette) */
+.metric-todo .metric-icon-wrapper { background-color: #00539f; color: #ffffff; }
+.metric-todo .metric-value { background-color: #00539f; color: #ffffff; }
 
-.metric-urgent .metric-icon-wrapper { background-color: #451212; color: #fca5a5; }
-.metric-urgent .metric-value { background-color: rgba(69, 18, 18, 0.6); color: #fca5a5; }
+.metric-urgent .metric-icon-wrapper { background-color: #dd1f25; color: #ffffff; }
+.metric-urgent .metric-value { background-color: #dd1f25; color: #ffffff; }
 .metric-urgent .active-badge {
-  background-color: #451212;
-  color: #fca5a5;
+  background-color: #dd1f25;
+  color: #ffffff;
   font-size: 10px;
   font-weight: 700;
   padding: 2px 6px;
@@ -154,11 +154,11 @@
   margin-left: 6px;
 }
 
-.metric-progress .metric-icon-wrapper { background-color: rgba(133, 77, 14, 0.3); border: 1px solid rgba(133, 77, 14, 0.4); color: #fef08a; }
-.metric-progress .metric-value { background-color: rgba(133, 77, 14, 0.3); color: #fef08a; }
+.metric-progress .metric-icon-wrapper { background-color: #ffb800; color: #1c1917; }
+.metric-progress .metric-value { background-color: #ffb800; color: #1c1917; }
 
-.metric-done .metric-icon-wrapper { background-color: rgba(20, 83, 45, 0.4); border: 1px solid rgba(20, 83, 45, 0.6); color: #86efac; }
-.metric-done .metric-value { background-color: rgba(20, 83, 45, 0.4); color: #86efac; }
+.metric-done .metric-icon-wrapper { background-color: #15803d; color: #ffffff; }
+.metric-done .metric-value { background-color: #15803d; color: #ffffff; }
 
 
 /* Donut Chart Section */
@@ -189,10 +189,10 @@
 
 .chart-badge {
   font-size: 12px;
-  color: var(--primary);
-  font-weight: 500;
-  background-color: rgba(56, 189, 248, 0.1);
-  padding: 2px 8px;
+  color: #ffffff;
+  font-weight: 600;
+  background-color: #00539f;
+  padding: 2px 10px;
   border-radius: 9999px;
 }
 
@@ -226,9 +226,9 @@
   transition: stroke-dasharray 0.4s ease, stroke-dashoffset 0.4s ease;
 }
 
-.segment-urgent { stroke: #ef4444; }
-.segment-progress { stroke: #fef08a; }
-.segment-done { stroke: #86efac; }
+.segment-urgent { stroke: #dd1f25; }
+.segment-progress { stroke: #ffb800; }
+.segment-done { stroke: #15803d; }
 
 .donut-text {
   position: absolute;
@@ -287,10 +287,10 @@
   font-size: 11px;
 }
 
-.bg-todo { background-color: #38bdf8; }
-.bg-urgent { background-color: #ef4444; }
-.bg-progress { background-color: #fef08a; }
-.bg-done { background-color: #86efac; }
+.bg-todo { background-color: #00539f; }
+.bg-urgent { background-color: #dd1f25; }
+.bg-progress { background-color: #ffb800; }
+.bg-done { background-color: #15803d; }
 
 /* Send button (IN_PROGRESS issues) */
 .card-header-actions {
@@ -303,23 +303,23 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  padding: 4px 12px;
+  padding: 5px 12px;
   border-radius: 9999px;
-  background-color: rgba(56, 189, 248, 0.1);
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  color: #38bdf8;
+  background-color: #00539f;
+  border: none;
+  color: #ffffff;
   font-size: 11px;
   line-height: 16px;
-  font-weight: 500;
+  font-weight: 600;
   white-space: nowrap;
   flex-shrink: 0;
   cursor: pointer;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
   transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-send:hover {
-  background-color: rgba(56, 189, 248, 0.2);
+  background-color: #0066c0;
 }
 
 .btn-send:active {
