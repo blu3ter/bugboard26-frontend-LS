@@ -88,7 +88,7 @@ export const AssignmentSection: React.FC<AssignmentSectionProps> = ({
       <div className="team-workload-card">
         <div className="team-workload-header">
           <div className="team-workload-title">
-            <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#38bdf8' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#3b82f6' }}>
               groups
             </span>
             <span>Team Members & Active Issues (Least to Most Busy)</span>
@@ -165,7 +165,7 @@ export const AssignmentSection: React.FC<AssignmentSectionProps> = ({
                 return (
                   <tr key={issue.id}>
                     <td>
-                      <span style={{ fontFamily: 'monospace', fontWeight: 600, color: '#38bdf8' }}>
+                      <span style={{ fontFamily: 'monospace', fontWeight: 600, color: '#60a5fa' }}>
                         BB-{issue.id}
                       </span>
                     </td>
@@ -182,9 +182,9 @@ export const AssignmentSection: React.FC<AssignmentSectionProps> = ({
                     </td>
                     <td>
                       {issue.assigneeFullName || issue.assigneeEmail ? (
-                        <span style={{ color: '#38bdf8' }}>{issue.assigneeFullName || issue.assigneeEmail}</span>
+                        <span style={{ color: '#60a5fa' }}>{issue.assigneeFullName || issue.assigneeEmail}</span>
                       ) : (
-                        <span style={{ color: '#f59e0b', fontSize: '0.78rem' }}>Unassigned</span>
+                        <span style={{ color: '#ffb800', fontSize: '0.78rem', fontWeight: 600 }}>Unassigned</span>
                       )}
                     </td>
                     <td>

@@ -63,7 +63,7 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
           {issues.map((issue) => (
             <tr key={issue.id}>
               <td>
-                <span style={{ fontFamily: 'monospace', fontWeight: 600, color: '#38bdf8' }}>
+                <span style={{ fontFamily: 'monospace', fontWeight: 600, color: '#60a5fa' }}>
                   BB-{issue.id}
                 </span>
               </td>
@@ -71,7 +71,7 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
                 <strong style={{ color: '#f1f5f9' }}>{issue.title}</strong>
               </td>
               <td>
-                <span style={{ fontSize: '0.78rem', textTransform: 'uppercase', color: '#a5b4fc' }}>
+                <span style={{ fontSize: '0.78rem', textTransform: 'uppercase', color: '#cbd5e1', fontWeight: 600 }}>
                   {issue.type}
                 </span>
               </td>
