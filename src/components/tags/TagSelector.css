@@ -41,20 +41,19 @@
   align-items: center;
   justify-content: center;
   gap: 4px;
-  background-color: rgba(59, 130, 246, 0.15);
-  border: 1px solid rgba(59, 130, 246, 0.3);
-  color: #60a5fa;
+  background-color: #00539f;
+  border: none;
+  color: #ffffff;
   border-radius: 8px;
   padding: 6px 12px;
   font-size: 0.82rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .tag-selector-btn-add:hover {
-  background-color: rgba(59, 130, 246, 0.25);
-  border-color: #3b82f6;
+  background-color: #0066c0;
 }
 
 .tag-selector-suggestions {

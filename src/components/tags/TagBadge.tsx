@@ -73,12 +73,12 @@ export const TagBadge: React.FC<TagBadgeProps> = ({
   const formattedName = name.startsWith('#') ? name : `#${name}`;
   const colorClass = resolveTagColorClass(name);
 
-  // Stile personalizzato inline se è stato passato un colore esadecimale specifico
+  // Stile personalizzato inline se è stato passato un colore esadecimale specifico (pieno Bauhaus)
   const customStyle: React.CSSProperties = color
     ? {
-        backgroundColor: `${color}20`,
-        borderColor: `${color}50`,
-        color: color,
+        backgroundColor: color,
+        borderColor: 'rgba(255, 255, 255, 0.14)',
+        color: '#ffffff',
       }
     : {};
 

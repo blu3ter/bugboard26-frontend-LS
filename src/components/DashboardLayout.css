@@ -23,10 +23,10 @@
   --on-surface: #f8fafc;
   --on-surface-variant: #94a3b8;
 
-  /* Primary Accent (Sky Blue) */
-  --primary: #38bdf8;
-  --on-primary: #0f172a;
-  --primary-container: #0066cc;
+  /* Primary Accent (Bauhaus Blue) */
+  --primary: #3b82f6;
+  --on-primary: #ffffff;
+  --primary-container: #00539f;
   --on-primary-container: #ffffff;
 
   /* Secondary & Tertiary Tokens */
@@ -34,15 +34,15 @@
   --on-secondary: #cbd5e1;
   --secondary-container: #1e293b;
   --on-secondary-container: #cbd5e1;
-  --tertiary-container: rgba(133, 77, 14, 0.25);
-  --on-tertiary-container: #fef08a;
+  --tertiary-container: #ffb800;
+  --on-tertiary-container: #1c1917;
 
   /* Buttons & Nav */
-  --btn-primary-bg: #93c5fd;
-  --btn-primary-hover: #bfdbfe;
-  --btn-primary-text: #0f172a;
+  --btn-primary-bg: #00539f;
+  --btn-primary-hover: #0066c0;
+  --btn-primary-text: #ffffff;
   --nav-hover: #161f2e;
-  --nav-active-bg: #0066cc;
+  --nav-active-bg: #00539f;
   --nav-active-text: #ffffff;
 }
 
@@ -335,7 +335,7 @@ body {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  background-color: #00539f;
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -368,12 +368,12 @@ body {
 }
 
 .user-role-badge.badge-admin {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  color: #ffffff;
+  background-color: #ffb800;
+  color: #1c1917;
 }
 
 .user-role-badge.badge-user {
-  background: linear-gradient(135deg, #10b981, #059669);
+  background-color: #15803d;
   color: #ffffff;
 }
 
