@@ -15,11 +15,13 @@ export const IssueManagementView: React.FC = () => {
   const [users, setUsers] = useState<UserSummaryDto[]>([]);
 
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [selectedIssueId, setSelectedIssueId] = useState<number | null>(null);
 
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
       const [reviewData, allData, usersData] = await Promise.all([
         issueService.getReviewIssues(),
         issueService.getAllIssues(),
@@ -30,6 +32,7 @@ export const IssueManagementView: React.FC = () => {
       setUsers(usersData);
     } catch (err) {
       console.error('Error loading management data:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load management data.');
     } finally {
       setLoading(false);
     }
@@ -39,19 +42,27 @@ export const IssueManagementView: React.FC = () => {
     loadData();
   }, [loadData]);
 
+  const runAction = async (action: () => Promise<unknown>, fallbackError: string) => {
+    try {
+      setError(null);
+      await action();
+      await loadData();
+    } catch (err) {
+      console.error(fallbackError, err);
+      setError(err instanceof Error ? err.message : fallbackError);
+    }
+  };
+
   const handleApprove = async (issueId: number) => {
-    await issueService.updateIssueState(issueId, 'DONE');
-    await loadData();
+    await runAction(() => issueService.updateIssueState(issueId, 'DONE'), 'Failed to approve issue.');
   };
 
   const handleReject = async (issueId: number) => {
-    await issueService.updateIssueState(issueId, 'IN_PROGRESS');
-    await loadData();
+    await runAction(() => issueService.updateIssueState(issueId, 'IN_PROGRESS'), 'Failed to reject issue.');
   };
 
   const handleAssign = async (issueId: number, assigneeId: number) => {
-    await issueService.assignIssue(issueId, assigneeId);
-    await loadData();
+    await runAction(() => issueService.assignIssue(issueId, assigneeId), 'Failed to assign issue.');
   };
 
   return (
@@ -72,6 +83,24 @@ export const IssueManagementView: React.FC = () => {
           Refresh
         </button>
       </div>
+
+      {/* Error Alert Banner */}
+      {error && (
+        <div className="management-error-banner" role="alert">
+          <div className="management-error-content">
+            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>error</span>
+            <span>{error}</span>
+          </div>
+          <button
+            type="button"
+            className="management-error-dismiss"
+            onClick={() => setError(null)}
+            aria-label="Dismiss error"
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>close</span>
+          </button>
+        </div>
+      )}
 
       {/* Tabs Switcher */}
       <div className="management-tabs-bar">

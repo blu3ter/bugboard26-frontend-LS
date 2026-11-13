@@ -6,6 +6,11 @@ import type { IssueDto, IssueCreateDto, IssueAssignDto, IssueState } from '../ty
  * Completamente integrato con supporto a filtri per tag e gestione multipart per allegati.
  */
 export class IssueService {
+  private async throwResponseError(response: Response, fallbackMessage: string): Promise<never> {
+    const errorText = await response.text().catch(() => '');
+    throw new Error(errorText || fallbackMessage);
+  }
+
   /**
    * Recupera tutte le issue registrate a sistema, con eventuale filtro per tag
    */
@@ -96,7 +101,7 @@ export class IssueService {
       body: JSON.stringify(payload),
     });
 
-    if (!response.ok) throw new Error('Failed to assign issue');
+    if (!response.ok) await this.throwResponseError(response, 'Failed to assign issue');
     return response.json();
   }
 
@@ -109,7 +114,7 @@ export class IssueService {
       headers: getAuthHeaders(true),
     });
 
-    if (!response.ok) throw new Error('Failed to send issue to review');
+    if (!response.ok) await this.throwResponseError(response, 'Failed to send issue to review');
     return response.json();
   }
 
@@ -122,7 +127,7 @@ export class IssueService {
       headers: getAuthHeaders(true),
     });
 
-    if (!response.ok) throw new Error('Failed to send issue back to in progress');
+    if (!response.ok) await this.throwResponseError(response, 'Failed to send issue back to in progress');
     return response.json();
   }
 
@@ -135,7 +140,7 @@ export class IssueService {
       headers: getAuthHeaders(true),
     });
 
-    if (!response.ok) throw new Error('Failed to close issue');
+    if (!response.ok) await this.throwResponseError(response, 'Failed to close issue');
     return response.json();
   }
 

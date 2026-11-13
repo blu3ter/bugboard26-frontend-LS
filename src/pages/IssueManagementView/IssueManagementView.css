@@ -232,3 +232,32 @@
   background-color: #ffb800;
   color: #1c1917;
 }
+
+.management-error-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background-color: rgba(221, 31, 37, 0.14);
+  border: 1px solid #dd1f25;
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: #fecaca;
+  font-size: 0.88rem;
+}
+
+.management-error-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.management-error-dismiss {
+  background: none;
+  border: none;
+  color: #fecaca;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px;
+}
