@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import type { IssueDto, UserSummaryDto } from '../../../types';
+import { TagBadge } from '../../../components/tags/TagBadge';
 
 export interface AssignmentSectionProps {
   issues: IssueDto[];
@@ -16,9 +17,24 @@ export const AssignmentSection: React.FC<AssignmentSectionProps> = ({
   onAssign,
   onOpenDetail,
 }) => {
-  const [onlyUnassigned, setOnlyUnassigned] = useState(true);
   const [selectedUserMap, setSelectedUserMap] = useState<Record<number, number>>({});
   const [assigningId, setAssigningId] = useState<number | null>(null);
+  const [openDropdownIssueId, setOpenDropdownIssueId] = useState<number | null>(null);
+  const [memberSearchQuery, setMemberSearchQuery] = useState<string>('');
+  const dropdownContainerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownContainerRef.current &&
+        !dropdownContainerRef.current.contains(event.target as Node)
+      ) {
+        setOpenDropdownIssueId(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const sortedUsersWithWorkload = useMemo(() => {
     return users
@@ -54,12 +70,29 @@ export const AssignmentSection: React.FC<AssignmentSectionProps> = ({
       });
   }, [users, issues]);
 
-  const displayedIssues = onlyUnassigned
-    ? issues.filter((i) => !i.assigneeId)
-    : issues;
+  const unassignedIssues = issues.filter(
+    (i) => !i.assigneeId && !i.assigneeFullName && !i.assigneeEmail
+  );
 
   const handleUserChange = (issueId: number, userId: number) => {
     setSelectedUserMap((prev) => ({ ...prev, [issueId]: userId }));
+    setOpenDropdownIssueId(null);
+    setMemberSearchQuery('');
+  };
+
+  const toggleDropdown = (issueId: number) => {
+    if (openDropdownIssueId === issueId) {
+      setOpenDropdownIssueId(null);
+    } else {
+      setOpenDropdownIssueId(issueId);
+      setMemberSearchQuery('');
+    }
+  };
+
+  const getWorkloadClass = (count: number) => {
+    if (count === 0) return 'workload-zero';
+    if (count <= 2) return 'workload-low';
+    return 'workload-high';
   };
 
   const handleExecuteAssign = async (issueId: number) => {
@@ -124,43 +157,41 @@ export const AssignmentSection: React.FC<AssignmentSectionProps> = ({
         )}
       </div>
 
-      {/* Quick Filter */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.88rem' }}>
-          <input
-            type="checkbox"
-            checked={onlyUnassigned}
-            onChange={(e) => setOnlyUnassigned(e.target.checked)}
-          />
-          <span>Show only unassigned issues ({issues.filter((i) => !i.assigneeId).length})</span>
-        </label>
-        <span style={{ fontSize: '0.8rem', color: '#64748b' }}>
-          Total shown: {displayedIssues.length}
-        </span>
-      </div>
-
       <div className="management-table-card">
         <table className="management-table">
           <thead>
             <tr>
               <th>ID</th>
               <th>Title</th>
-              <th>Status</th>
-              <th>Current Assignee</th>
+              <th>Type</th>
+              <th>Tags</th>
               <th>New Assignment</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            {displayedIssues.length === 0 ? (
+            {unassignedIssues.length === 0 ? (
               <tr>
                 <td colSpan={6} style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
-                  No issues found with the current filters.
+                  No unassigned issues found.
                 </td>
               </tr>
             ) : (
-              displayedIssues.map((issue) => {
-                const currentSelectedUser = selectedUserMap[issue.id] || (issue.assigneeId ?? '');
+              unassignedIssues.map((issue) => {
+                const currentSelectedUserId = selectedUserMap[issue.id] || issue.assigneeId;
+                const selectedMember = sortedUsersWithWorkload.find(
+                  (u) => u.id === currentSelectedUserId
+                );
+                const isOpen = openDropdownIssueId === issue.id;
+
+                const filteredMembers = sortedUsersWithWorkload.filter((u) => {
+                  const q = memberSearchQuery.trim().toLowerCase();
+                  if (!q) return true;
+                  const searchableText = `${u.displayName} ${u.firstName ?? ''} ${u.lastName ?? ''} ${u.activeIssuesCount} ${
+                    u.activeIssuesCount === 1 ? 'active issue' : 'active issues'
+                  }`.toLowerCase();
+                  return searchableText.includes(q);
+                });
 
                 return (
                   <tr key={issue.id}>
@@ -178,39 +209,152 @@ export const AssignmentSection: React.FC<AssignmentSectionProps> = ({
                       </strong>
                     </td>
                     <td>
-                      <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>{issue.state}</span>
+                      <span style={{ fontSize: '0.78rem', textTransform: 'uppercase', color: '#cbd5e1', fontWeight: 600 }}>
+                        {issue.type}
+                      </span>
                     </td>
                     <td>
-                      {issue.assigneeFullName || issue.assigneeEmail ? (
-                        <span style={{ color: '#60a5fa' }}>{issue.assigneeFullName || issue.assigneeEmail}</span>
-                      ) : (
-                        <span style={{ color: '#ffb800', fontSize: '0.78rem', fontWeight: 600 }}>Unassigned</span>
-                      )}
-                    </td>
-                    <td>
-                      <select
-                        className="user-select-dropdown"
-                        value={currentSelectedUser}
-                        onChange={(e) => handleUserChange(issue.id, Number(e.target.value))}
-                      >
-                        <option value="">Select member...</option>
-                        {sortedUsersWithWorkload.map((u) => (
-                          <option key={u.id} value={u.id}>
-                            {u.displayName} — {u.activeIssuesCount}{' '}
-                            {u.activeIssuesCount === 1 ? 'active issue' : 'active issues'}
-                          </option>
+                      <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                        {issue.tags && issue.tags.map((tag) => (
+                          <TagBadge key={tag} name={tag} size="sm" />
                         ))}
-                      </select>
+                      </div>
                     </td>
                     <td>
-                      <button
-                        type="button"
-                        className="btn-action-sm details"
-                        disabled={!selectedUserMap[issue.id] || assigningId === issue.id}
-                        onClick={() => handleExecuteAssign(issue.id)}
+                      <div
+                        className="member-selector-wrapper"
+                        ref={isOpen ? dropdownContainerRef : null}
                       >
-                        {assigningId === issue.id ? 'Assigning...' : 'Assign'}
-                      </button>
+                        <button
+                          type="button"
+                          className={`member-selector-trigger ${isOpen ? 'open' : ''} ${
+                            selectedMember ? 'has-value' : ''
+                          }`}
+                          onClick={() => toggleDropdown(issue.id)}
+                        >
+                          {selectedMember ? (
+                            <span className="member-selector-selected">
+                              <span className="member-selector-name">
+                                {selectedMember.displayName}
+                              </span>
+                              <span
+                                className={`team-workload-badge ${getWorkloadClass(
+                                  selectedMember.activeIssuesCount
+                                )}`}
+                              >
+                                {selectedMember.activeIssuesCount}{' '}
+                                {selectedMember.activeIssuesCount === 1
+                                  ? 'active issue'
+                                  : 'active issues'}
+                              </span>
+                            </span>
+                          ) : (
+                            <span className="member-selector-placeholder">
+                              <span
+                                className="material-symbols-outlined"
+                                style={{ fontSize: '16px', color: '#64748b' }}
+                              >
+                                person_search
+                              </span>
+                              <span>Select member...</span>
+                            </span>
+                          )}
+                          <span className="material-symbols-outlined member-selector-chevron">
+                            expand_more
+                          </span>
+                        </button>
+
+                        {isOpen && (
+                          <div className="member-selector-popover">
+                            <div className="member-selector-search-box">
+                              <span
+                                className="material-symbols-outlined"
+                                style={{ fontSize: '16px', color: '#60a5fa' }}
+                              >
+                                search
+                              </span>
+                              <input
+                                type="text"
+                                className="member-selector-search-input"
+                                placeholder="Filter by name, surname or number..."
+                                value={memberSearchQuery}
+                                onChange={(e) => setMemberSearchQuery(e.target.value)}
+                                autoFocus
+                              />
+                              {memberSearchQuery && (
+                                <button
+                                  type="button"
+                                  className="member-selector-clear-btn"
+                                  onClick={() => setMemberSearchQuery('')}
+                                  aria-label="Clear filter"
+                                >
+                                  <span
+                                    className="material-symbols-outlined"
+                                    style={{ fontSize: '15px' }}
+                                  >
+                                    close
+                                  </span>
+                                </button>
+                              )}
+                            </div>
+
+                            <div className="member-selector-options-list">
+                              {filteredMembers.length === 0 ? (
+                                <div className="member-selector-empty">
+                                  No matching members found
+                                </div>
+                              ) : (
+                                filteredMembers.map((u) => {
+                                  const isSelected = u.id === currentSelectedUserId;
+                                  return (
+                                    <button
+                                      key={u.id}
+                                      type="button"
+                                      className={`member-selector-option ${
+                                        isSelected ? 'selected' : ''
+                                      }`}
+                                      onClick={() => handleUserChange(issue.id, u.id)}
+                                    >
+                                      <span className="member-selector-option-name">
+                                        {u.displayName}
+                                      </span>
+                                      <span
+                                        className={`team-workload-badge ${getWorkloadClass(
+                                          u.activeIssuesCount
+                                        )}`}
+                                      >
+                                        {u.activeIssuesCount}{' '}
+                                        {u.activeIssuesCount === 1
+                                          ? 'active issue'
+                                          : 'active issues'}
+                                      </span>
+                                    </button>
+                                  );
+                                })
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button
+                          type="button"
+                          className="btn-action-sm details"
+                          onClick={() => onOpenDetail(issue.id)}
+                        >
+                          Details
+                        </button>
+                        <button
+                          type="button"
+                          className="btn-action-sm details"
+                          disabled={!selectedUserMap[issue.id] || assigningId === issue.id}
+                          onClick={() => handleExecuteAssign(issue.id)}
+                        >
+                          {assigningId === issue.id ? 'Assigning...' : 'Assign'}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );

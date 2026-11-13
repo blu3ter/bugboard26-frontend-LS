@@ -74,7 +74,7 @@
   background-color: #0e1526;
   border: 1px solid #1b263e;
   border-radius: 14px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .management-table {
@@ -90,6 +90,14 @@
   font-weight: 600;
   padding: 14px 18px;
   border-bottom: 1px solid #1e293b;
+}
+
+.management-table th:first-child {
+  border-top-left-radius: 13px;
+}
+
+.management-table th:last-child {
+  border-top-right-radius: 13px;
 }
 
 .management-table td {
@@ -147,91 +155,274 @@
   cursor: not-allowed;
 }
 
-.user-select-dropdown {
-  background-color: #0b1120;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 6px;
-  color: #f8fafc;
-  padding: 6px 10px;
-  font-size: 0.82rem;
-  outline: none;
-}
 
-/* Team Workload Overview (Assignment Section) */
-.team-workload-card {
-  background-color: #0e1526;
-  border: 1px solid #1b263e;
-  border-radius: 14px;
-  padding: 16px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+  /* Custom Searchable Member Selector Dropdown */
+  .member-selector-wrapper {
+    position: relative;
+    width: 280px;
+    max-width: 100%;
+  }
 
-.team-workload-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
+  .member-selector-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background-color: #0b1120;
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    color: #f8fafc;
+    padding: 7px 12px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+  }
 
-.team-workload-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.92rem;
-  font-weight: 600;
-  color: #f1f5f9;
-}
+  .member-selector-trigger:hover {
+    border-color: #334155;
+    background-color: #111a2e;
+  }
 
-.team-workload-subtitle {
-  font-size: 0.78rem;
-  color: #64748b;
-  font-weight: 500;
-}
+  .member-selector-trigger.open {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
+    background-color: #111a2e;
+  }
 
-.team-workload-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
+  .member-selector-placeholder {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #94a3b8;
+    font-weight: 500;
+  }
 
-.team-workload-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background-color: #162035;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  padding: 8px 12px;
-}
+  .member-selector-selected {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
+  }
 
-.team-workload-name {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #f8fafc;
-}
+  .member-selector-name {
+    font-weight: 600;
+    color: #f8fafc;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-.team-workload-badge {
-  border-radius: 9999px;
-  padding: 2px 8px;
-  font-size: 0.75rem;
-  font-weight: 700;
-}
+  .member-selector-chevron {
+    font-size: 18px;
+    color: #64748b;
+    transition: transform 0.2s ease, color 0.2s ease;
+    flex-shrink: 0;
+  }
 
-.team-workload-badge.workload-zero {
-  background-color: #15803d;
-  color: #ffffff;
-}
+  .member-selector-trigger.open .member-selector-chevron {
+    transform: rotate(180deg);
+    color: #60a5fa;
+  }
 
-.team-workload-badge.workload-low {
-  background-color: #00539f;
-  color: #ffffff;
-}
+  .member-selector-popover {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    width: 100%;
+    min-width: 280px;
+    background-color: #0e1526;
+    border: 1px solid #263554;
+    border-radius: 12px;
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(59, 130, 246, 0.12);
+    z-index: 60;
+    overflow: hidden;
+    animation: memberPopoverFadeIn 0.14s ease-out;
+  }
 
-.team-workload-badge.workload-high {
-  background-color: #ffb800;
-  color: #1c1917;
-}
+  @keyframes memberPopoverFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .member-selector-search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    background-color: #162035;
+    border-bottom: 1px solid #1e293b;
+  }
+
+  .member-selector-search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #f8fafc;
+    font-size: 0.8rem;
+    min-width: 0;
+  }
+
+  .member-selector-search-input::placeholder {
+    color: #64748b;
+  }
+
+  .member-selector-clear-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.06);
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 0;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+
+  .member-selector-clear-btn:hover {
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+  }
+
+  .member-selector-options-list {
+    max-height: 210px;
+    overflow-y: auto;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .member-selector-option {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 8px 10px;
+    color: #e2e8f0;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-align: left;
+  }
+
+  .member-selector-option:hover {
+    background-color: #162035;
+    border-color: rgba(59, 130, 246, 0.22);
+  }
+
+  .member-selector-option.selected {
+    background-color: rgba(0, 83, 159, 0.28);
+    border-color: rgba(96, 165, 250, 0.4);
+  }
+
+  .member-selector-option-name {
+    font-weight: 600;
+    color: #f8fafc;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .member-selector-empty {
+    padding: 16px 12px;
+    text-align: center;
+    color: #64748b;
+    font-size: 0.8rem;
+  }
+
+  /* Team Workload Overview (Assignment Section) */
+  .team-workload-card {
+    background-color: #0e1526;
+    border: 1px solid #1b263e;
+    border-radius: 14px;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .team-workload-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .team-workload-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #f1f5f9;
+  }
+
+  .team-workload-subtitle {
+    font-size: 0.78rem;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  .team-workload-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .team-workload-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #162035;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 8px 12px;
+  }
+
+  .team-workload-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #f8fafc;
+  }
+
+  .team-workload-badge {
+    border-radius: 9999px;
+    padding: 2px 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .team-workload-badge.workload-zero {
+    background-color: #15803d;
+    color: #ffffff;
+  }
+
+  .team-workload-badge.workload-low {
+    background-color: #00539f;
+    color: #ffffff;
+  }
+
+  .team-workload-badge.workload-high {
+    background-color: #ffb800;
+    color: #1c1917;
+  }
 
 .management-error-banner {
   display: flex;
